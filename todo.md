@@ -1,6 +1,12 @@
 # ToDo
 <!-- ![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNgS4NjTHOlP7WmZ3pIngUGbEa8IQ3yOVvfg&usqp=CAU) -->
  
+## Next Steps
+1. Register Users
+2. Complement tests for Users +  POST tests for grupos, check bellow
+3. TypeScript implamentation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428')
+
+
 #### Create Project with NodeJS 107. API Server Setup ✅
 ```
 npm inti -y
@@ -8,7 +14,9 @@ npm install express
 npm install --save-dev nodemon
 ```
 
-Add date field to Grupos json 
+Testing my server:
+1. Listing (GET) grupos using json
+2. Posting (POST) grupos -> [class 123]('https://www.udemy.com/course/complete-nodejs-developer-zero-to-mastery/learn/lecture/26172358#overview')
 
 # Automated tests ⚠️
 #### NodeJS  132. Jest:  3’20
