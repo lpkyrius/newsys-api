@@ -2,7 +2,8 @@
 <!-- ![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNgS4NjTHOlP7WmZ3pIngUGbEa8IQ3yOVvfg&usqp=CAU) -->
  
 ## Next Steps
-1. Register Users
+1. [336. Setting up our Database]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/22727187#overview')
+1. [312. Register Users]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/8820886#overview')
 2. Complement tests for Users +  POST tests for grupos, check bellow
 3. TypeScript implamentation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428')
 
@@ -53,3 +54,10 @@ npm install supertest --save-dev
 
 ## Testing Area
 Access _localhost_ [here](http://localhost:8000/grupos)
+
+
+## Next Steps
+#### Frontend 
+* Check [Class vs Hooks]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/26127202#overview') and mainly [here]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/36906286#overview')
+* NextJS? May be it'd be better 
+* [Redux]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/10173568#overview')

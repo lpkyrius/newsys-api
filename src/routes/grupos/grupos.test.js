@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('../../app');
 
 describe('Test GET /grupos', () => {
-    test('It should respond with 200 success', async () => {
+    test('It should respond with 200 success + Content-Type = json', async () => {
         const response = await request(app)
             .get('/grupos')
             .expect('Content-Type', /json/)
