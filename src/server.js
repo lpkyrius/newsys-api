@@ -10,13 +10,12 @@ const server = http.createServer(app);
 
 async function startServer() {
     server.listen(PORT, () => {
+        // await function_name();
         console.log(`Listening on PORT ${PORT}...`);
     });
 }
 
 startServer();
-
-
 
 // server.on('request', (req, res) => {
 //     if (req.url === '/'){

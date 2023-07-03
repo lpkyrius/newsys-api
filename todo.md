@@ -5,7 +5,7 @@
 1. [336. Setting up our Database]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/22727187#overview')
 1. [312. Register Users]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/8820886#overview')
 2. Complement tests for Users +  POST tests for grupos, check bellow
-3. TypeScript implamentation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428')
+3. TypeScript implementation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428')
 
 
 #### Create Project with NodeJS 107. API Server Setup ✅
@@ -49,7 +49,7 @@ npm install supertest --save-dev
 
 #### Note about the sequence:
 1. Server > App
-2.1 Foward approach: Router > Controller > Model
+2.1 Forward approach: Router > Controller > Model
 2.2 Bottom UP approach: Model > Router > Controller
 
 ## Testing Area
