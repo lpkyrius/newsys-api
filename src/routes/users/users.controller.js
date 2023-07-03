@@ -28,19 +28,25 @@ function handleSignin(req, res) {
             return res.status(400).json('Erro no login :(');
         }
 }
-// function handleRegister(req, res) {
-//     const { email, password, name } = req.body;
-//     database.users.push({
-//         id: 3,
-//         name: name,
-//         email: email,
-//         joined: new Date(),
-//         password: password,
-//     })
-//     res.json(database.users[database.users.length -1]);
-// }
 
+function handleRegister(req, res) {
+    const { email, password, name } = req.body;
+    database.users.push({
+        id: 3,
+        name: name,
+        email: email,
+        joined: new Date(),
+        password: password,
+    })
+    res.json(database.users[database.users.length-1]);
+}
+
+function listUser(req, res) {
+    res.send(database.users);
+}
 
 module.exports = {
     handleSignin,
+    handleRegister,
+    listUser
 };
