@@ -2,19 +2,12 @@
 <!-- ![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNgS4NjTHOlP7WmZ3pIngUGbEa8IQ3yOVvfg&usqp=CAU) -->
  
 ## Next Steps
-1. [313.Profile id and image]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/8820890#questions/10944650')
-* Profile id to point to a specific user
-* Image to see how to PUT in order to update the user with CPF, etc.
-⚠️ It may be better to check [321. User Profile Update]
 
-2. 315 Encrypt Passwords
+1. [336. Setting up our Database]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/22727187#overview')
 
-3. [336. Setting up our Database]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/22727187#overview')
-4. [312. Register Users]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/8820886#overview')
+3. Complement tests for Users +  POST tests for grupos, check bellow
 
-5. Complement tests for Users +  POST tests for grupos, check bellow
-
-6. TypeScript implementation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428')
+4. TypeScript implementation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428')
 
 
 #### Create Project with NodeJS 107. API Server Setup ✅

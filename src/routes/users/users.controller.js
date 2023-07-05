@@ -1,4 +1,8 @@
 //const database = require('../../models/users.model');
+
+const saltRounds = 10;
+const pass1 = 'ann123';
+const hash1 = '$2b$10$PxMr1mHQ3ZzD241Ibp1Pueiqh1YLwKC4GydyEnXD83VUrcHSw8WQC';
 const database = {
     users: [
         {
@@ -21,13 +25,23 @@ const database = {
     login: [
         {
             id: '223',
-            password: '',
+            hash: '',
             email: 'john@gmail.com',
         }
     ] 
 };
 
-function handleSignin(req, res) {
+function handleSignin(req, res, bcrypt) {
+
+    // console.log(bcrypt.compareSync(pass1, hash1)); // true
+    // console.log(bcrypt.compareSync("1234", hash1)); // false
+
+    bcrypt.compare(pass1, hash1, function(err, res) {
+        console.log('first guess', res);
+    });
+    bcrypt.compare("34w342", hash1, function(err, res) {
+        console.log('second guess', res);
+    });
     if (req.body.email === database.users[0].email &&
         req.body.password === database.users[0].password){
             return res.json('success');
@@ -36,8 +50,13 @@ function handleSignin(req, res) {
         }
 }
 
-function handleRegister(req, res) {
+function handleRegister(req, res, bcrypt) {
     const { email, password, name, cpf } = req.body;
+    //console.log(bcrypt);
+    bcrypt.hash(password, saltRounds, function(err, hash) {
+        console.log(hash);
+    }); 
+
     database.users.push({
         id: '125',
         name: name,

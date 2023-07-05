@@ -17,6 +17,7 @@ async function startServer() {
 
 startServer();
 
+
 // server.on('request', (req, res) => {
 //     if (req.url === '/'){
 //         res.writeHead(200, {
