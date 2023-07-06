@@ -1,12 +1,12 @@
 const express = require('express'); 
 
 const  { 
-    getAllGrupos 
+    httpGetAllGrupos 
 } =  require('./grupos.controller');
  
 const gruposRouter = express.Router();
 
-gruposRouter.get('/grupos', getAllGrupos);
+gruposRouter.get('/grupos', httpGetAllGrupos);
 
 module.exports = gruposRouter;
 

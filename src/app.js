@@ -1,7 +1,6 @@
 const express = require('express'); 
 // const cors = require('cors'); 
 
-
 const usersRouter = require('./routes/users/users.router');
 const gruposRouter = require('./routes/grupos/grupos.router');
 

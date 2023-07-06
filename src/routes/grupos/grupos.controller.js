@@ -1,9 +1,9 @@
-const grupos = require('../../models/grupos.model');
+const { getAllGrupos } = require('../../models/grupos.model');
 
-function getAllGrupos(req, res) {
-    return res.status(200).json(grupos);
+async function httpGetAllGrupos(req, res) {
+    return res.status(200).json(await getAllGrupos());
 }
 
 module.exports = {
-    getAllGrupos,
+    httpGetAllGrupos,
 };

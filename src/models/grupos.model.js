@@ -24,7 +24,10 @@ const grupos = [
     },
 ];
 
+function getAllGrupos() {
+    return grupos;
+}
 
 module.exports = {
-    grupos: grupos,
+    getAllGrupos,
 };

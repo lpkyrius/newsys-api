@@ -1,4 +1,4 @@
-//const database = require('../../models/users.model');
+const { getAllUsers, registerUser } = require('../../models/users.model');
 
 const saltRounds = 10;
 const pass1 = 'ann123';
@@ -32,10 +32,6 @@ const database = {
 };
 
 function handleSignin(req, res, bcrypt) {
-
-    // console.log(bcrypt.compareSync(pass1, hash1)); // true
-    // console.log(bcrypt.compareSync("1234", hash1)); // false
-
     bcrypt.compare(pass1, hash1, function(err, res) {
         console.log('first guess', res);
     });
@@ -50,26 +46,41 @@ function handleSignin(req, res, bcrypt) {
         }
 }
 
-function handleRegister(req, res, bcrypt) {
-    const { email, password, name, cpf } = req.body;
-    //console.log(bcrypt);
-    bcrypt.hash(password, saltRounds, function(err, hash) {
-        console.log(hash);
-    }); 
+async function handleRegister(req, res, bcrypt) {
+    
+    const user = req.body;
+    // let password = req.body.password;
 
-    database.users.push({
-        id: '125',
-        name: name,
-        cpf: cpf,
-        email: email,
-        joined: new Date(),
-        password: password,
-    })
-    res.json(database.users[database.users.length-1]);
+    user.joined = new Date();
+    if (isNaN(user.joined)) {
+        return res.status(400).json({
+            error: 'Data de registro inválida.',
+        });
+    }
+
+    // console.log('before hash', password);
+    // bcrypt.hash(password, saltRounds, function(err, hash) {
+    //     console.log('hash', hash);
+    //     req.body.password = hash;
+    // }); 
+    // console.log('after hash', req.body.password);
+
+
+    //console.log('calling model...')
+    //console.log(registerUser(user));
+    //return res.status(200).json(await registerUser(user));
+
+    await registerUser(user);
+    return res.status(201).json(user);
+
+   
+
+    // res.status(200).json(await registerUser(req, res));
+    //res.json(database.users[database.users.length-1]);
 }
 
-function listUser(req, res) {
-    res.send(database.users);
+async function httpGetAllUsers(req, res) {
+    return res.status(200).json(await getAllUsers());
 }
 
 function getUser(req, res) {
@@ -106,7 +117,7 @@ function updateUser(req, res) {
 module.exports = {
     handleSignin,
     handleRegister,
-    listUser,
+    httpGetAllUsers,
     getUser, 
     updateUser
 };

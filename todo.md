@@ -3,7 +3,7 @@
  
 ## Next Steps
 
-1. [336. Setting up our Database]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/22727187#overview')
+1. [340. Setting up our Database]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/8860478#questions/10944650')
 
 3. Complement tests for Users +  POST tests for grupos, check bellow
 
@@ -12,7 +12,7 @@
 
 #### Create Project with NodeJS 107. API Server Setup ✅
 ```
-npm inti -y
+npm init -y
 npm install express 
 npm install --save-dev nodemon
 ```
