@@ -1,5 +1,5 @@
 const { getAllUsers, registerUser } = require('../../models/users.model');
-
+const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const pass1 = 'ann123';
 const hash1 = '$2b$10$PxMr1mHQ3ZzD241Ibp1Pueiqh1YLwKC4GydyEnXD83VUrcHSw8WQC';
@@ -32,12 +32,12 @@ const database = {
 };
 
 function handleSignin(req, res, bcrypt) {
-    bcrypt.compare(pass1, hash1, function(err, res) {
-        console.log('first guess', res);
-    });
-    bcrypt.compare("34w342", hash1, function(err, res) {
-        console.log('second guess', res);
-    });
+    // bcrypt.compare(pass1, hash1, function(err, res) {
+    //     console.log('first guess', res);
+    // });
+    // bcrypt.compare("34w342", hash1, function(err, res) {
+    //     console.log('second guess', res);
+    // });
     if (req.body.email === database.users[0].email &&
         req.body.password === database.users[0].password){
             return res.json('success');
@@ -47,36 +47,20 @@ function handleSignin(req, res, bcrypt) {
 }
 
 async function handleRegister(req, res, bcrypt) {
-    
-    const user = req.body;
-    // let password = req.body.password;
-
-    user.joined = new Date();
-    if (isNaN(user.joined)) {
-        return res.status(400).json({
-            error: 'Data de registro inválida.',
-        });
+    try {
+        const user = req.body;
+        // let password = req.body.password;
+        user.joined = new Date();
+        if (isNaN(user.joined)) {
+            return res.status(400).json({
+                error: 'Data de registro inválida.',
+            });
+        }
+        res.status(201).json(await registerUser(user));
+    } catch (error) {
+        res.status(500).json({ error: 'Falha ao registrar novo usuário.' });
     }
 
-    // console.log('before hash', password);
-    // bcrypt.hash(password, saltRounds, function(err, hash) {
-    //     console.log('hash', hash);
-    //     req.body.password = hash;
-    // }); 
-    // console.log('after hash', req.body.password);
-
-
-    //console.log('calling model...')
-    //console.log(registerUser(user));
-    //return res.status(200).json(await registerUser(user));
-
-    await registerUser(user);
-    return res.status(201).json(user);
-
-   
-
-    // res.status(200).json(await registerUser(req, res));
-    //res.json(database.users[database.users.length-1]);
 }
 
 async function httpGetAllUsers(req, res) {
