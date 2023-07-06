@@ -53,15 +53,19 @@ function handleSignin(req, res, bcrypt) {
 
 async function handleRegister(req, res, bcrypt) {
     try {
-        const user = req.body;
-        // let password = req.body.password;
-        user.joined = new Date();
-        if (isNaN(user.joined)) {
+        let {email, name, cpf, password } = req.body;
+        const joined = new Date();
+        
+        // data validation
+        if (isNaN(joined)) {
             return res.status(400).json({
                 error: 'Data de registro inválida.',
             });
         }
-        res.status(201).json(await registerUser(user));
+        
+        const userData = {email, name, cpf, joined };
+        res.status(201).json(await registerUser(userData));
+        
         // send confirmation email
 
     } catch (error) {
@@ -77,9 +81,8 @@ async function httpGetAllUsers(req, res) {
         } else {
             res.status(400).json('Não foi possível localizar usuários.');
         }
-        
     } catch (error) {
-        res.status(500).json('Falha ao localizar usuários.');
+        res.status(500).json({ error: 'Falha ao localizar usuários.' });
     }
 }
 
