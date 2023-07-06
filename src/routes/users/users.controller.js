@@ -1,4 +1,4 @@
-const { getAllUsers, registerUser, getUser } = require('../../models/users.model');
+const { registerUser, getUser, getAllUsers } = require('../../models/users.model');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const pass1 = 'ann123';
@@ -63,7 +63,17 @@ async function handleRegister(req, res, bcrypt) {
 }
 
 async function httpGetAllUsers(req, res) {
-    return res.status(200).json(await getAllUsers());
+    try {
+        const recoveredUsers = await getAllUsers()
+        if (recoveredUsers.length) {
+            res.status(200).json(recoveredUsers);
+        } else {
+            res.status(400).json('Não foi possível localizar usuários.');
+        }
+        
+    } catch (error) {
+        res.status(500).json('Falha ao localizar usuários.');
+    }
 }
 
 async function httpGetUser(req, res) {

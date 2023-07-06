@@ -21,8 +21,15 @@ const database = {
     ]
 };
 
-function getAllUsers() {
-    return database.users;
+async function getAllUsers() {
+    try {
+        const recoveredUsers = await db('users')
+        .select('*').from('users');
+        return recoveredUsers;
+    } catch (error) {
+    console.log(`function getAllUsers(user): ${ error }`)
+    throw error;
+    }
 }
 
 async function registerUser(user) {
