@@ -1,13 +1,12 @@
 const { 
     registerUser, 
-    getUser, 
+    getUserById, 
     getAllUsers, 
-    updateUser 
+    updateUser,
+    signinUser 
 } = require('../../models/users.model');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const pass1 = 'ann123';
-const hash1 = '$2b$10$PxMr1mHQ3ZzD241Ibp1Pueiqh1YLwKC4GydyEnXD83VUrcHSw8WQC';
 const database = {
     users: [
         {
@@ -36,37 +35,49 @@ const database = {
     ] 
 };
 
-function handleSignin(req, res, bcrypt) {
-    // bcrypt.compare(pass1, hash1, function(err, res) {
-    //     console.log('first guess', res);
-    // });
-    // bcrypt.compare("34w342", hash1, function(err, res) {
-    //     console.log('second guess', res);
-    // });
-    if (req.body.email === database.users[0].email &&
-        req.body.password === database.users[0].password){
-            return res.json('success');
+async function handleSignin(req, res) {
+    try {
+        let {email, password } = req.body;
+
+        // data validation: right email/password format avoiding SQL Injection...
+    
+    
+        const loginData = {email, password };
+        const found = await signinUser(loginData, bcrypt, saltRounds);
+        if (found){
+            console.log('ok');
+            res.status(201).json('successo');
         } else {
-            return res.status(400).json('Erro no login :(');
+            console.log('not ok');
+            res.status(400).json('usuário ou senha inválidos');
         }
+    } catch (error) {
+        res.status(500).json({ error: 'Erro na tentativa de login.' });
+    }
+
+    
+
+
 }
 
-async function handleRegister(req, res, bcrypt) {
+async function handleRegister(req, res) {
     try {
         let {email, name, cpf, password } = req.body;
         const joined = new Date();
-        
+
         // data validation
+        password = bcrypt.hashSync(password, saltRounds);
+
         if (isNaN(joined)) {
             return res.status(400).json({
                 error: 'Data de registro inválida.',
             });
         }
-        
-        const userData = {email, name, cpf, joined };
+
+        const userData = {email, name, cpf, joined, password };
         res.status(201).json(await registerUser(userData));
         
-        // send confirmation email
+        // send confirmation email, when it returns, we should update login.verified = true;
 
     } catch (error) {
         res.status(500).json({ error: 'Falha ao registrar novo usuário.' });
@@ -89,7 +100,7 @@ async function httpGetAllUsers(req, res) {
 async function httpGetUser(req, res) {
     try {
         const { id } = req.params;
-        const recoveredUser = await getUser(id)
+        const recoveredUser = await getUserById(id)
         if (recoveredUser.length) {
             res.status(200).json(recoveredUser[0]);
         } else {
