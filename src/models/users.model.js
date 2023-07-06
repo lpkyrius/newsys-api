@@ -59,9 +59,19 @@ async function getUser(id) {
     throw error;
     }
 }
+async function updateUser(userId, userData) {
+    try {
+        const updatedUser = await db('users').where('id', userId).update(userData).returning('*');
+        return updatedUser;
+    } catch (error) {
+    console.log(`function updateUser(user): ${ error }`)
+    throw error;
+    }
+}
 
 module.exports = {
     getAllUsers,
     registerUser,
     getUser,
+    updateUser,
 };

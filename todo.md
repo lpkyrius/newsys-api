@@ -9,7 +9,7 @@
 
 4. TypeScript implementation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428') => Let's do it before continue.
 
-
+5. Knex.js Migration [for example]('https://youtu.be/6HmC32AY41k')
 
 #### Create Project with NodeJS 107. API Server Setup ✅
 ```

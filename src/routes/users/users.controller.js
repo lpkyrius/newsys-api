@@ -1,4 +1,9 @@
-const { registerUser, getUser, getAllUsers } = require('../../models/users.model');
+const { 
+    registerUser, 
+    getUser, 
+    getAllUsers, 
+    updateUser 
+} = require('../../models/users.model');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const pass1 = 'ann123';
@@ -57,6 +62,8 @@ async function handleRegister(req, res, bcrypt) {
             });
         }
         res.status(201).json(await registerUser(user));
+        // send confirmation email
+
     } catch (error) {
         res.status(500).json({ error: 'Falha ao registrar novo usuário.' });
     }
@@ -91,27 +98,28 @@ async function httpGetUser(req, res) {
     }
 }
 
-function updateUser(req, res) {
-    const { id } = req.params;
-    let found = false;
-    database.users.forEach(user => {
-        if (user.id === id){
-            found = true;
-            // update data
 
-            return res.json(user);
-        }
-    })
-    if (!found){
-        res.status(400).json('Usuário não localizado');
-    }
+async function httpUpdateUser(req, res) {
+    try {
+        const userId = req.params.id;
+        const userData = req.body;
+        // validating userData (cpf, email format, ...)
+        // It's interesting to validate if the JSON contains only the fields we need by destructuring userData
+        const updatedUser = await updateUser(userId, userData);
+        if (updatedUser.length) {
+            res.status(200).json(updatedUser[0]);
+        } else {
+            res.status(400).json('Não foi atualizar os dados do usuário.');
+        }        
+    } catch (error) {
+    res.status(500).json('Falha ao atualizar dados do usuário.');
+    }   
 }
-
 
 module.exports = {
     handleSignin,
     handleRegister,
     httpGetAllUsers,
     httpGetUser, 
-    updateUser
+    httpUpdateUser
 };
