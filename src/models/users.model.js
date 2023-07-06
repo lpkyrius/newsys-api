@@ -59,8 +59,9 @@ async function getUser(id) {
     throw error;
     }
 }
-async function updateUser(userId, email, name, cpf) {
+async function updateUser(userId, userData) {
     try {
+        const {email, name, cpf } = userData
         const updatedUser = await db('users')
             .where('id', '=', userId)
             .update({
@@ -71,8 +72,8 @@ async function updateUser(userId, email, name, cpf) {
             .returning('*');
         return updatedUser;
     } catch (error) {
-    console.log(`function updateUser(user): ${ error }`)
-    throw error;
+        console.log(`function updateUser(user): ${ error }`)
+        throw error;
     }
 }
 
