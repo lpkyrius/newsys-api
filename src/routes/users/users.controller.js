@@ -102,10 +102,10 @@ async function httpGetUser(req, res) {
 async function httpUpdateUser(req, res) {
     try {
         const userId = req.params.id;
-        const userData = req.body;
+        const {email, name, cpf } = req.body;
         // validating userData (cpf, email format, ...)
         // It's interesting to validate if the JSON contains only the fields we need by destructuring userData
-        const updatedUser = await updateUser(userId, userData);
+        const updatedUser = await updateUser(userId, email, name, cpf);
         if (updatedUser.length) {
             res.status(200).json(updatedUser[0]);
         } else {

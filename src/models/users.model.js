@@ -59,9 +59,16 @@ async function getUser(id) {
     throw error;
     }
 }
-async function updateUser(userId, userData) {
+async function updateUser(userId, email, name, cpf) {
     try {
-        const updatedUser = await db('users').where('id', userId).update(userData).returning('*');
+        const updatedUser = await db('users')
+            .where('id', '=', userId)
+            .update({
+                email: email,
+                name: name,
+                cpf: cpf
+              })
+            .returning('*');
         return updatedUser;
     } catch (error) {
     console.log(`function updateUser(user): ${ error }`)
