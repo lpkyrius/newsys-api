@@ -7,7 +7,8 @@
 
 3. Complement tests for Users +  POST tests for grupos, check bellow
 
-4. TypeScript implementation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428')
+4. TypeScript implementation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428') => Let's do it before continue.
+
 
 
 #### Create Project with NodeJS 107. API Server Setup ✅

@@ -1,4 +1,4 @@
-const { getAllUsers, registerUser } = require('../../models/users.model');
+const { getAllUsers, registerUser, getUser } = require('../../models/users.model');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const pass1 = 'ann123';
@@ -60,29 +60,29 @@ async function handleRegister(req, res, bcrypt) {
     } catch (error) {
         res.status(500).json({ error: 'Falha ao registrar novo usuário.' });
     }
-
 }
 
 async function httpGetAllUsers(req, res) {
     return res.status(200).json(await getAllUsers());
 }
 
-function getUser(req, res) {
-    const { id } = req.params;
-    let found = false;
-    database.users.forEach(user => {
-        if (user.id === id){
-            found = true; 
-            return res.json(user);
+async function httpGetUser(req, res) {
+    try {
+        const { id } = req.params;
+        const recoveredUser = await getUser(id)
+        if (recoveredUser.length) {
+            res.status(200).json(recoveredUser[0]);
+        } else {
+            res.status(400).json('Não foi possível localizar o usuário.');
         }
-    })
-    if (!found){
-        res.status(400).json('Usuário não localizado');
+        
+    } catch (error) {
+        res.status(500).json('Falha ao localizar usuário.');
     }
 }
 
 function updateUser(req, res) {
-    const { id } = req.body;
+    const { id } = req.params;
     let found = false;
     database.users.forEach(user => {
         if (user.id === id){
@@ -102,6 +102,6 @@ module.exports = {
     handleSignin,
     handleRegister,
     httpGetAllUsers,
-    getUser, 
+    httpGetUser, 
     updateUser
 };

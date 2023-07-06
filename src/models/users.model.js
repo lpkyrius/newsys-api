@@ -36,13 +36,25 @@ async function registerUser(user) {
             joined: user.joined
         });
         return insertedUser;
-      } catch (error) {
-        console.log(`async function registerUser(user): ${ error }`)
-        throw error;
-      }
+    } catch (error) {
+    console.log(`function registerUser(user): ${ error }`)
+    throw error;
     }
+}
+
+async function getUser(id) {
+    try {
+        const recoveredUser = await db('users')
+        .select('*').from('users').where({ id });
+        return recoveredUser;
+    } catch (error) {
+    console.log(`function getUser(user): ${ error }`)
+    throw error;
+    }
+}
 
 module.exports = {
     getAllUsers,
     registerUser,
+    getUser,
 };
