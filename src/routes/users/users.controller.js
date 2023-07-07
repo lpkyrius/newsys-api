@@ -7,33 +7,6 @@ const {
 } = require('../../models/users.model');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const database = {
-    users: [
-        {
-            id: '123',
-            name: 'John',
-            cpf: '00000000000',
-            email: 'john@gmail.com',
-            joined: new Date(),
-            password: 'john123',
-        },
-        {
-            id: '124',
-            name: 'Sally',
-            cpf: '00000000000',
-            email: 'sally@gmail.com',
-            joined: new Date(),
-            password: 'sally123',
-        }
-    ],
-    login: [
-        {
-            id: '223',
-            hash: '',
-            email: 'john@gmail.com',
-        }
-    ] 
-};
 
 async function handleSignin(req, res) {
     // try {
