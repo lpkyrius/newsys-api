@@ -1,20 +1,24 @@
 const express = require('express'); 
 
-const  { 
+const  {
+    home, 
     handleSignin,
     handleRegister,
     httpGetAllUsers,
     httpGetUser,
-    httpUpdateUser 
+    httpUpdateUser,
+    handleConfirmation 
 } =  require('./users.controller');
 
 const usersRouter = express.Router();
 
-usersRouter.post('/signin', handleSignin); //{ signin.handleSignin(req, res, db, bcrypt)}) // (req, res, db, bcrypt) -> dependency injection
-usersRouter.post('/register', handleRegister); //{ register.handleRegister(req, res, db, bcrypt)}) 
+usersRouter.get('/', home); 
+usersRouter.post('/signin', handleSignin); 
+usersRouter.post('/register', handleRegister); 
 usersRouter.get('/listUsers', httpGetAllUsers); 
 usersRouter.get('/profile/:id', httpGetUser); 
-usersRouter.put('/update_user/:id',httpUpdateUser); //{ register.handleRegister(req, res, db, bcrypt)}) 
+usersRouter.put('/update_user/:id',httpUpdateUser);
+usersRouter.get('/confirm/:id', handleConfirmation); // handleRegister email - confirmation route
 
 module.exports = usersRouter;
 
