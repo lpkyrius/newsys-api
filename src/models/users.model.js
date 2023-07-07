@@ -1,26 +1,5 @@
 const { db } = require('../services/postgresql');
 
-const database = {
-    users: [
-        {
-            id: 1,
-            name: 'John',
-            cpf: '00000000000',
-            email: 'john@gmail.com',
-            joined: new Date(),
-            password: 'john123',
-        },
-        {
-            id: 2,
-            name: 'Sally',
-            cpf: '00000000000',
-            email: 'sally@gmail.com',
-            joined: new Date(),
-            password: 'sally123',
-        }
-    ]
-};
-
 async function getAllUsers() {
     try {
         const recoveredUsers = await db('users')
@@ -91,20 +70,22 @@ async function updateUser(userId, userData) {
 
 async function signinUser(loginData, bcrypt, saltRounds) {
     try {
-        let found = false;
+        let recoveredUser = [];
+        let match = false;
         const recoveredLogin = await db('login')
         .select('*')
         .from('login')
         .where('email', '=', loginData.email);
-        if (recoveredLogin.length){           
-            found = await bcrypt.compare(loginData.password, recoveredLogin[0].hash);
-            if (found){
-                console.log('found');
-            } else {
-                console.log('not found');
+        if (recoveredLogin.length){          
+            match = await bcrypt.compare(loginData.password, recoveredLogin[0].hash);
+            if (match){
+                recoveredUser = await db('users')
+                .select('*')
+                .from('users')
+                .where('email', '=', recoveredLogin[0].email);
             }
-            return found;
         }
+        return recoveredUser[0];
     } catch (error) {
     console.log(`function signinUser(user): ${ error }`)
     throw error;

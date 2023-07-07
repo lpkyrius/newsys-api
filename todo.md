@@ -3,13 +3,13 @@
  
 ## Next Steps
 
-1. [340. Setting up our Database]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/8860478#questions/10944650')
+1. [347. just final check before move to the next bellow]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/8862376#questions/10944650')
 
-3. Complement tests for Users +  POST tests for grupos, check bellow
+2. Complement tests for Users +  POST tests for grupos, check bellow
 
-4. TypeScript implementation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428') => Let's do it before continue.
+3. TypeScript implementation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428') => Let's do it before continue.
 
-5. Knex.js Migration [for example]('https://youtu.be/6HmC32AY41k')
+4. Knex.js Migration [for example]('https://youtu.be/6HmC32AY41k')
 
 #### Create Project with NodeJS 107. API Server Setup ✅
 ```

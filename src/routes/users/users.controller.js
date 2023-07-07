@@ -43,21 +43,15 @@ async function handleSignin(req, res) {
     
     
         const loginData = {email, password };
-        const found = await signinUser(loginData, bcrypt, saltRounds);
-        if (found){
-            console.log('ok');
-            res.status(201).json('successo');
+        const user = await signinUser(loginData, bcrypt, saltRounds) || [];
+        if (user.id){
+            res.status(201).json(user);
         } else {
-            console.log('not ok');
             res.status(400).json('usuário ou senha inválidos');
         }
     } catch (error) {
         res.status(500).json({ error: 'Erro na tentativa de login.' });
     }
-
-    
-
-
 }
 
 async function handleRegister(req, res) {
