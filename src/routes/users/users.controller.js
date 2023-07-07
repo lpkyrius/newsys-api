@@ -36,7 +36,7 @@ const database = {
 };
 
 async function handleSignin(req, res) {
-    try {
+    // try {
         let {email, password } = req.body;
 
         // data validation: right email/password format avoiding SQL Injection...
@@ -45,20 +45,24 @@ async function handleSignin(req, res) {
         const loginData = {email, password };
         const user = await signinUser(loginData, bcrypt, saltRounds) || [];
         if (user.id){
+            // Uncomment after releasing the email verification feature
+            // if (!user.verified){
+            //     res.status(400).json('Usuário ainda não confirmado via email de confirmação.');
+            // } else {
             res.status(201).json(user);
+            // }
         } else {
             res.status(400).json('usuário ou senha inválidos');
         }
-    } catch (error) {
-        res.status(500).json({ error: 'Erro na tentativa de login.' });
-    }
+    // } catch (error) {
+    //     res.status(500).json({ error: 'Erro na tentativa de login.' });
+    // }
 }
 
 async function handleRegister(req, res) {
     try {
         let {email, name, cpf, password } = req.body;
         const joined = new Date();
-
         // data validation
         password = bcrypt.hashSync(password, saltRounds);
 

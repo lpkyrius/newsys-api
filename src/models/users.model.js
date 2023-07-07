@@ -76,7 +76,7 @@ async function signinUser(loginData, bcrypt, saltRounds) {
         .select('*')
         .from('login')
         .where('email', '=', loginData.email);
-        if (recoveredLogin.length){          
+        if (recoveredLogin.length){   
             match = await bcrypt.compare(loginData.password, recoveredLogin[0].hash);
             if (match){
                 recoveredUser = await db('users')
