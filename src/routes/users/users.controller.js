@@ -15,7 +15,7 @@ function home(req, res) {
 }
 
 async function handleSignin(req, res) {
-    // try {
+    try {
         let {email, password } = req.body;
 
         // data validation: right email/password format avoiding SQL Injection...
@@ -32,9 +32,9 @@ async function handleSignin(req, res) {
         } else {
             res.status(400).json({ error: 'usuário ou senha inválidos'});
         }
-    // } catch (error) {
-    //     res.status(500).json({ error: 'Erro na tentativa de login.' });
-    // }
+    } catch (error) {
+        res.status(500).json({ error: 'Erro na tentativa de login.' });
+    }
 }
 
 async function handleRegister(req, res) {
