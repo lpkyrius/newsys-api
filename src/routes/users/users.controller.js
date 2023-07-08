@@ -17,20 +17,23 @@ function home(req, res) {
 async function handleSignin(req, res) {
     try {
         let {email, password } = req.body;
-
         // data validation: right email/password format avoiding SQL Injection...
-    
-    
-        const loginData = {email, password };
-        const user = await signinUser(loginData, bcrypt, saltRounds) || [];
-        if (user.id){
-            if (!user.verified){
-                res.status(400).json('Usuário ainda não confirmado via email de confirmação.');
-            } else {
-                res.status(201).json(user);
-            }
+        if (email == "" || password == ""){
+            res.status(400).json({error: 'Campo em branco.',});
+        } else if (!checkEmail(email)){
+            res.status(400).json('Email inválido.');
         } else {
-            res.status(400).json({ error: 'usuário ou senha inválidos'});
+            const loginData = {email, password };
+            const user = await signinUser(loginData, bcrypt, saltRounds) || [];
+            if (user.id){
+                if (!user.verified){
+                    res.status(400).json('Usuário ainda não confirmado via email de confirmação.');
+                } else {
+                    res.status(201).json(user);
+                }
+            } else {
+                res.status(400).json({ error: 'usuário ou senha inválidos'});
+            }
         }
     } catch (error) {
         res.status(500).json({ error: 'Erro na tentativa de login.' });
@@ -41,20 +44,30 @@ async function handleRegister(req, res) {
     try {
         let {email, name, cpf, password } = req.body;
         const joined = new Date();
+
         // data validation
-        password = bcrypt.hashSync(password, saltRounds);
-
-        if (isNaN(joined)) {
-            return res.status(400).json({error: 'Data de registro inválida.',});
+        if (email == "" || name == "" || cpf == "" || password == ""){
+            res.status(400).json({error: 'Campo em branco.',});
+        } else if (isNaN(joined)) {
+            res.status(400).json({error: 'Data de registro inválida.',});
+        } else if (!checkUsername(name)){
+            res.status(400).json('Nome inválido.');
+        } else if (!checkUsername(email)){
+            res.status(400).json('Email inválido.');
+        } else if (password.length < 8){
+            res.status(400).json('Senha deve ter ao menos 8 caracteres.');
+        } else if (checkEmailExists(email)){
+            res.status(400).json('Email já cadastrado.');
+        } else if (checkCPFExists(cpf)){
+            res.status(400).json('Email já cadastrado.');
+        } else {
+            password = bcrypt.hashSync(password, saltRounds);
+            const userData = { email, name, cpf, joined, password };
+            const registeredUser = await registerUser(userData);
+            // Send confirmation email
+            sendConfirmationEmail(email, registeredUser[0].id);
+            res.status(201).json(registeredUser);
         }
-
-        const userData = { email, name, cpf, joined, password };
-        const registeredUser = await registerUser(userData);
-        
-        // Send confirmation email
-        sendConfirmationEmail(email, registeredUser[0].id);
-    
-        res.status(201).json(registeredUser);
     } catch (error) {
         res.status(500).json({ error: 'Falha ao registrar novo usuário.' });
     }
@@ -116,6 +129,12 @@ async function httpGetAllUsers(req, res) {
 async function httpGetUser(req, res) {
     try {
         const { id } = req.params;
+        
+        // Validation
+        if (isNaN(Number(id))){
+            return res.status(400).json({ error: 'Id de usuário deve ser em formato numérico.'});
+        }
+        
         const recoveredUser = await getUserById(id)
         if (recoveredUser.length) {
             res.status(200).json(recoveredUser[0]);
@@ -147,6 +166,38 @@ async function httpUpdateUser(req, res) {
     } catch (error) {
         res.status(500).json(error);
     }   
+}
+
+// Block of validation functions
+function checkUsername(name) {
+    // The number of characters must be between 3 and 100. 
+    // The string should only contain alphanumeric characters and/or underscores (_).
+    // The first character of the string should be alphabetic
+    if(/^[A-Za-z][A-Za-z0-9_]{2,99}$/.test(name)) {
+        console.log('Valid name');
+        return true;
+    } else {
+        console.log('Not valid name');
+        return false;
+    }
+}
+function checkEmail(email) {
+    console.log(email);
+    if(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
+        console.log('Valid email');
+        return true;
+    } else {
+        console.log('Not valid email');
+        return false;
+    }
+}
+
+function checkEmailExists(email){
+    return false;
+}
+
+function checkCPFExists(cpf){
+    return false;
 }
 
 module.exports = {

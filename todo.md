@@ -3,51 +3,56 @@
  
 ## Next Steps
 
-1. [347. just final check before move to the next bellow]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/8862376#questions/10944650')
+- [x] User register
+- [x] User login
+##### Based on [changes I've done based on this video]('https://youtu.be/yY2gXnRGVUw?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t')
+- [ ] I. Finish users.controller > checkEmailExists(email) 
+- [ ] II. Finish users.controller > checkCPFExists(cpf)
+- [ ] III. Test changes/validations for Register & SignIn
+##### [This video]('https://youtu.be/v6Ul3o8D-js?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t&t=286') and [this one]('https://youtu.be/XqOIjQ78oJA?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t') will help me to: 
+- [ ] I. Add a hash field on user table to save the key for verify user, avoiding emailing the real id as a param for the verification link. 
+- [ ] II. Add .env file and adjust email password and other current secret values to it.
+- [ ] III. Add expiration date for Register.
 
-2. Complement tests for Users +  POST tests for grupos, check bellow
+Note: In case I need another example [here we go]('https://youtu.be/T6rElSLldyc')
 
-3. TypeScript implementation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428') => Let's do it before continue.
+##### Still about the Register/SignIn
+- [ ] I. Complement to register: Forgot password (password recovery with email) [this video]('https://youtu.be/72JYhSoVYPc') seems to have JWT and other interesting logic like expiration date, etc. It worths to check.
+- [ ] II. Review (best practices) data validation when receiving Register and Login requests. How to avoid SQL injections, etc. Same to avoid several requisitions attacks.
+- [ ] III. Captcha [check this video]('https://youtu.be/u_QXNT4o_64')
+- [ ] IV. Disable (excluir ou desativar conta?)
 
-4. Knex.js Migration [for example]('https://youtu.be/6HmC32AY41k')
+##### And ...
+- [ ] [Review GitHub vulnerabilities]('https://github.com/lpkyrius/newsavic-api/security/dependabot')
+- [ ] Complement tests for Users +  POST tests for grupos
+- Testing my server:
+- Listing (GET) grupos using json
+- Posting (POST) grupos -> [class 123]('https://www.udemy.com/course/complete-nodejs-developer-zero-to-mastery/learn/lecture/26172358#overview')
+- [x] NodeJS  132. Jest:  3’20
+```
+npm install jest --save-dev
+npm install supertest --save-dev
+```
+- [x] NodeJS  133. SuperTest: 1’10 ⚠️
+* I've already installed and created the 1st test (GET)
+* For POST test, as soon as the POST is done, check [Class 134]('https://www.udemy.com/course/complete-nodejs-developer-zero-to-mastery/learn/lecture/26199790#overview') 
+- [ ] TypeScript NodeJS 394. TypeScript Installation implementation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428') => Let's do it before continue.
+- [ ] Knex.js Migration [for example]('https://youtu.be/6HmC32AY41k')
+- [ ] User roles, token: [check this video]('https://youtu.be/Tw5LupcpKS4')
 
-#### Create Project with NodeJS 107. API Server Setup ✅
+<br>
+- [x] Create Project with NodeJS 107. API Server Setup 
 ```
 npm init -y
 npm install express 
 npm install --save-dev nodemon
 ```
-
-Testing my server:
-1. Listing (GET) grupos using json
-2. Posting (POST) grupos -> [class 123]('https://www.udemy.com/course/complete-nodejs-developer-zero-to-mastery/learn/lecture/26172358#overview')
-
-# Automated tests ⚠️
-#### NodeJS  132. Jest:  3’20
-```
-npm install jest --save-dev
-npm install supertest --save-dev
-```
-
-#### NodeJS  133. SuperTest: 1’10 ⚠️
-* I've already installed and created the 1st test (GET)
-* For POST test, as soon as the POST is done, check [Class 134]('https://www.udemy.com/course/complete-nodejs-developer-zero-to-mastery/learn/lecture/26199790#overview') 
-
 #### Focus on essentials only!!! 👀
 * What are the **trully main features** we need as a 1st version?
 * What's the **priority**?
 * After that, **review if the next features still make sense**.
 * What's the **priority now**?
 
-# Typescript ( ⏳ Let's wait for now and do it later if necessary )
-#### NodeJS 394. TypeScript Installation
-
-#### CRUD for Users
-1. Register + email confirmation
-2. Login
-3. Logout
-4. Put (edit)
-5. Disable ("excluir conta")
 
 
 #### Note about the sequence:
