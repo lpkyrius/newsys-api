@@ -7,7 +7,8 @@ const  {
     httpGetAllUsers,
     httpGetUser,
     httpUpdateUser,
-    handleConfirmation 
+    handleEmailConfirmation,
+    httpUpdateUserEmail 
 } =  require('./users.controller');
 
 const usersRouter = express.Router();
@@ -18,7 +19,8 @@ usersRouter.post('/register', handleRegister);
 usersRouter.get('/listUsers', httpGetAllUsers); 
 usersRouter.get('/profile/:id', httpGetUser); 
 usersRouter.put('/update_user/:id',httpUpdateUser);
-usersRouter.get('/confirm/:id', handleConfirmation); // handleRegister email - confirmation route
+usersRouter.get('/confirm/:id', handleEmailConfirmation); 
+usersRouter.put('/update_user_email/:id',httpUpdateUserEmail);
 
 module.exports = usersRouter;
 

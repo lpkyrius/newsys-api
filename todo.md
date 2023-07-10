@@ -5,10 +5,16 @@
 
 - [x] User register
 - [x] User login
+- [x] CheckEmail
+- [x] Password minimum size
+- [x] CheckName
+- [x] TestaCPF
+- [x] httpUpdateUser validation
+- [ ] httpUpdateUserEmail 
 ##### Based on [changes I've done based on this video]('https://youtu.be/yY2gXnRGVUw?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t')
-- [ ] I. Finish users.controller > checkEmailExists(email) 
-- [ ] II. Finish users.controller > checkCPFExists(cpf)
-- [ ] III. Test changes/validations for Register & SignIn
+- [x] I. Finish users.controller > checkEmailExists(email) 
+- [x] II. Finish users.controller > checkCPFExists(cpf)
+- [x] III. Test changes/validations for Register & SignIn
 ##### [This video]('https://youtu.be/v6Ul3o8D-js?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t&t=286') and [this one]('https://youtu.be/XqOIjQ78oJA?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t') will help me to: 
 - [ ] I. Add a hash field on user table to save the key for verify user, avoiding emailing the real id as a param for the verification link. 
 - [ ] II. Add .env file and adjust email password and other current secret values to it.
@@ -18,7 +24,7 @@ Note: In case I need another example [here we go]('https://youtu.be/T6rElSLldyc'
 
 ##### Still about the Register/SignIn
 - [ ] I. Complement to register: Forgot password (password recovery with email) [this video]('https://youtu.be/72JYhSoVYPc') seems to have JWT and other interesting logic like expiration date, etc. It worths to check.
-- [ ] II. Review (best practices) data validation when receiving Register and Login requests. How to avoid SQL injections, etc. Same to avoid several requisitions attacks.
+- [ ] II. Review (best practices) data validation when receiving Register and Login requests. How to avoid SQL injections, etc. Same to avoid several requisitions attacks. For example, **create an user with limited privileges such as no access to create/drop/truncate tables/databases**.
 - [ ] III. Captcha [check this video]('https://youtu.be/u_QXNT4o_64')
 - [ ] IV. Disable (excluir ou desativar conta?)
 

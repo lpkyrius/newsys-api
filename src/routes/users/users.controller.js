@@ -1,14 +1,17 @@
 const { 
     registerUser, 
-    getUserById, 
+    getUserByKey, 
     getAllUsers, 
     updateUser,
     signinUser,
-    confirmUser 
+    confirmUser, 
+    getKeyAlreadyUsedByAnotherId,
+    updateEmail
 } = require('../../models/users.model');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const nodemailer = require('nodemailer');
+const passwordSize = 5;
 
 function home(req, res) {
     return res.status(200).json({ message: 'New SAVIC - RCC Brasil'});
@@ -20,6 +23,8 @@ async function handleSignin(req, res) {
         // data validation: right email/password format avoiding SQL Injection...
         if (email == "" || password == ""){
             res.status(400).json({error: 'Campo em branco.',});
+        } else if (password.length < passwordSize){
+            res.status(400).json(`Senha deve ter ao menos ${ passwordSize } caracteres.`);
         } else if (!checkEmail(email)){
             res.status(400).json('Email inválido.');
         } else {
@@ -52,13 +57,15 @@ async function handleRegister(req, res) {
             res.status(400).json({error: 'Data de registro inválida.',});
         } else if (!checkUsername(name)){
             res.status(400).json('Nome inválido.');
-        } else if (!checkUsername(email)){
+        } else if (!checkEmail(email)){
             res.status(400).json('Email inválido.');
-        } else if (password.length < 8){
-            res.status(400).json('Senha deve ter ao menos 8 caracteres.');
-        } else if (checkEmailExists(email)){
-            res.status(400).json('Email já cadastrado.');
-        } else if (checkCPFExists(cpf)){
+        } else if (password.length < passwordSize){
+            res.status(400).json(`Senha deve ter ao menos ${ passwordSize } caracteres.`);
+        } else if (!TestaCPF(cpf)){
+            res.status(400).json('CPF inválido.');
+        } else if (await checkCpfExists(cpf)){
+            res.status(400).json('CPF já cadastrado.');
+        } else if (await checkEmailExists(email)){
             res.status(400).json('Email já cadastrado.');
         } else {
             password = bcrypt.hashSync(password, saltRounds);
@@ -103,7 +110,7 @@ const sendConfirmationEmail = (email, userId) => {
     });
 };
   // Function to handle user confirmation (return from the user register confirmation email)
-async function handleConfirmation(req, res) {
+async function handleEmailConfirmation(req, res) {
     try {
         const userId = req.params.id;
         await confirmUser(userId);
@@ -128,14 +135,12 @@ async function httpGetAllUsers(req, res) {
 
 async function httpGetUser(req, res) {
     try {
-        const { id } = req.params;
-        
+        const key = req.params;
         // Validation
-        if (isNaN(Number(id))){
+        if (isNaN(Number(key.id))){
             return res.status(400).json({ error: 'Id de usuário deve ser em formato numérico.'});
         }
-        
-        const recoveredUser = await getUserById(id)
+        const recoveredUser = await getUserByKey(key);
         if (recoveredUser.length) {
             res.status(200).json(recoveredUser[0]);
         } else {
@@ -147,57 +152,140 @@ async function httpGetUser(req, res) {
     }
 }
 
-
 async function httpUpdateUser(req, res) {
     try {
         const userId = req.params.id;
-        let {email, name, cpf } = req.body;
-
-        // data validation
-        // cpf = "55555555556";
-        const userData = {email, name, cpf };
-
-        const updatedUser = await updateUser(userId, userData);
-        if (updatedUser.length) {
-            res.status(200).json(updatedUser[0]);
+        let { name, cpf } = req.body;
+        
+        // Validation
+        if (!checkUserName(name)){
+            res.status(400).json('Nome inválido.');
+        } else if (!TestaCPF(cpf)){
+            res.status(400).json('CPF inválido.');
+        } else if (await checkCpfAlreadyUsed(userId,cpf)){
+            res.status(400).json('CPF já cadastrado.');
         } else {
-            res.status(400).json({ error: 'Não foi atualizar os dados do usuário.'});
-        }        
+            const userData = { name, cpf };
+
+            const updatedUser = await updateUser(userId, userData);
+            if (updatedUser.length) {
+                res.status(200).json(updatedUser[0]);
+            } else {
+                res.status(400).json({ error: 'Não foi atualizar os dados do usuário.'});
+            }
+        }
+    } catch (error) {
+        res.status(500).json(error);
+    }   
+}
+
+async function httpUpdateUserEmail(req, res) {
+    try {
+        const userId = req.params.id;
+        let { email } = req.body;
+        
+        // Validation
+        if (!checkEmail(email)){
+            res.status(400).json('Email inválido.');
+        } else if (await checkEmailAlreadyUsed(userId,email)){
+            res.status(400).json('Email já cadastrado.');
+        } else {
+            // update email and verified (false) in order to force validate the email again
+            const userData = { email: email, verified: false };
+            const updatedUser = await updateEmail(userId, userData);
+            if (updatedUser.length) {
+                // Send confirmation email
+                sendConfirmationEmail(email, updatedUser[0].id);
+                res.status(200).json(updatedUser[0]);
+            } else {
+                res.status(400).json({ error: 'Não foi atualizar o email do usuário.'});
+            }
+        }
     } catch (error) {
         res.status(500).json(error);
     }   
 }
 
 // Block of validation functions
-function checkUsername(name) {
+function checkUserName(name) {
     // The number of characters must be between 3 and 100. 
     // The string should only contain alphanumeric characters and/or underscores (_).
     // The first character of the string should be alphabetic
-    if(/^[A-Za-z][A-Za-z0-9_]{2,99}$/.test(name)) {
-        console.log('Valid name');
-        return true;
+    if(/^[A-Za-z\s]{3,100}$/.test(name)) {
+        return true; // valid
     } else {
-        console.log('Not valid name');
-        return false;
+        return false; // invalid
     }
 }
 function checkEmail(email) {
-    console.log(email);
     if(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-        console.log('Valid email');
+        return true; // valid
+    } else {
+        return false; // invalid
+    }
+}
+
+async function checkEmailExists(email){
+    const key = { email: email }
+    const exists = await getUserByKey(key);
+    if (exists.length){
         return true;
     } else {
-        console.log('Not valid email');
         return false;
     }
 }
 
-function checkEmailExists(email){
-    return false;
+async function checkCpfExists(cpf){
+    const key = { cpf: cpf }
+    const exists = await getUserByKey(key);
+    if (exists.length){
+        return true;
+    } else {
+        return false;
+    }
 }
 
-function checkCPFExists(cpf){
-    return false;
+async function checkCpfAlreadyUsed(id, cpf){
+    const idSearch = { id: id };
+    const keySearch = { cpf: cpf };
+    const exists = await getKeyAlreadyUsedByAnotherId(idSearch, keySearch);
+    if (exists.length){
+        return true;
+    } else {
+        return false;
+    }
+}
+
+async function checkEmailAlreadyUsed(id, email){
+    const idSearch = { id: id };
+    const keySearch = { email: email };
+    const exists = await getKeyAlreadyUsedByAnotherId(idSearch, keySearch);
+    if (exists.length){
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function TestaCPF(strCPF) {
+    let Soma;
+    let Resto;
+    Soma = 0;
+  if (strCPF == "00000000000") return false;
+
+  for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+  Resto = (Soma * 10) % 11;
+
+    if ((Resto == 10) || (Resto == 11))  Resto = 0;
+    if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
+
+  Soma = 0;
+    for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+    Resto = (Soma * 10) % 11;
+
+    if ((Resto == 10) || (Resto == 11))  Resto = 0;
+    if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
+    return true;
 }
 
 module.exports = {
@@ -207,5 +295,6 @@ module.exports = {
     httpGetAllUsers,
     httpGetUser, 
     httpUpdateUser, 
-    handleConfirmation
+    handleEmailConfirmation,
+    httpUpdateUserEmail
 };

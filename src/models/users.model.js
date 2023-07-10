@@ -57,26 +57,74 @@ async function getUserById(id) {
         .select('*').from('users').where({ id });
         return recoveredUser;
     } catch (error) {
-    console.log(`function getUser(user): ${ error }`)
-    throw error;
+        console.log(`function getUserById(id): ${ error }`)
+        throw error;
     }
 }
 
+async function getUserByKey(key) {
+    try {
+        const recoveredUser = await db('users')
+        .select('*').from('users').where(key);
+        return recoveredUser;
+    } catch (error) {
+        console.log(`function getUserByKey(): ${ error }`)
+        throw error;
+    }
+}
+
+async function getKeyAlreadyUsedByAnotherId(id, key) {
+    try {
+        const recoveredUser = await db('users')
+        .select('*').from('users')
+            .whereNot(id)
+            .andWhere(key);
+
+        return recoveredUser;
+    } catch (error) {
+        console.log(`function getUserByKey(): ${ error }`)
+        throw error;
+    }
+}
 
 async function updateUser(userId, userData) {
     try {
-        const {email, name, cpf } = userData
+        const {name, cpf } = userData
         const updatedUser = await db('users')
             .where('id', '=', userId)
             .update({
-                email: email,
                 name: name,
                 cpf: cpf
               })
             .returning('*');
         return updatedUser;
     } catch (error) {
-        console.log(`function updateUser(user): ${ error }`)
+        console.log(`function updateUser(): ${ error }`)
+        throw error;
+    }
+}
+
+async function updateEmail(userId, userData) {
+    try {
+        const currentUserData = await getUserByKey({id: userId});
+        const updatedUserLogin = await db.transaction(async (trx) => {
+            const updatedUser = await trx('users')
+            .where('id', '=', userId)
+            .update(userData)
+            .returning('*');
+        
+        const updatedLogin = await trx('login')
+            .where('email', '=', currentUserData[0].email)
+            .update({ email: updatedUser[0].email })
+            .returning('*');
+
+            return updatedUser;
+        });
+
+        return updatedUserLogin;
+
+    } catch (error) {
+        console.log(`function updateEmail(): ${ error }`)
         throw error;
     }
 }
@@ -112,4 +160,7 @@ module.exports = {
     updateUser,
     signinUser,
     confirmUser,
+    getUserByKey,
+    getKeyAlreadyUsedByAnotherId,
+    updateEmail,
 };
