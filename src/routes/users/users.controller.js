@@ -183,7 +183,6 @@ async function httpUpdateUserEmail(req, res) {
     try {
         const userId = req.params.id;
         let { email } = req.body;
-        
         // Validation
         if (!checkEmail(email)){
             res.status(400).json('Email inválido.');

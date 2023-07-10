@@ -10,8 +10,9 @@
 - [x] CheckName
 - [x] TestaCPF
 - [x] httpUpdateUser validation
-- [x] httpUpdateUserEmail 
-- [ ] [Review GitHub vulnerabilities]('https://github.com/lpkyrius/newsavic-api/security/dependabot')
+- [x] httpUpdateUserEmail (1st verifies if it's actually a diff email address)
+- [x] httpUpdateCpf
+- [x] [Review GitHub vulnerabilities]('https://github.com/lpkyrius/newsavic-api/security/dependabot')
 ##### Based on [changes I've done based on this video]('https://youtu.be/yY2gXnRGVUw?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t')
 - [x] I. Finish users.controller > checkEmailExists(email) 
 - [x] II. Finish users.controller > checkCPFExists(cpf)

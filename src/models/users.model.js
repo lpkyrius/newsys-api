@@ -107,22 +107,25 @@ async function updateUser(userId, userData) {
 async function updateEmail(userId, userData) {
     try {
         const currentUserData = await getUserByKey({id: userId});
-        const updatedUserLogin = await db.transaction(async (trx) => {
-            const updatedUser = await trx('users')
-            .where('id', '=', userId)
-            .update(userData)
-            .returning('*');
-        
-        const updatedLogin = await trx('login')
-            .where('email', '=', currentUserData[0].email)
-            .update({ email: updatedUser[0].email })
-            .returning('*');
-
-            return updatedUser;
-        });
-
-        return updatedUserLogin;
-
+        if (currentUserData[0].email == userData.email){
+            return [];
+        } else {
+            const updatedUserLogin = await db.transaction(async (trx) => {
+                const updatedUser = await trx('users')
+                .where('id', '=', userId)
+                .update(userData)
+                .returning('*');
+            
+            const updatedLogin = await trx('login')
+                .where('email', '=', currentUserData[0].email)
+                .update({ email: updatedUser[0].email })
+                .returning('*');
+    
+                return updatedUser;
+            });
+    
+            return updatedUserLogin;
+        }
     } catch (error) {
         console.log(`function updateEmail(): ${ error }`)
         throw error;
