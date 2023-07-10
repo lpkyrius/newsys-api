@@ -218,10 +218,12 @@ function checkUserName(name) {
     }
 }
 function checkEmail(email) {
-    if(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-        return true; // valid
-    } else {
+    if(!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
         return false; // invalid
+    } else if (email.length < 3 || email.length > 100){
+        return false; // invalid
+    } else {
+        return true; // valid
     }
 }
 

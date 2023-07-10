@@ -10,7 +10,8 @@
 - [x] CheckName
 - [x] TestaCPF
 - [x] httpUpdateUser validation
-- [ ] httpUpdateUserEmail 
+- [x] httpUpdateUserEmail 
+- [ ] [Review GitHub vulnerabilities]('https://github.com/lpkyrius/newsavic-api/security/dependabot')
 ##### Based on [changes I've done based on this video]('https://youtu.be/yY2gXnRGVUw?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t')
 - [x] I. Finish users.controller > checkEmailExists(email) 
 - [x] II. Finish users.controller > checkCPFExists(cpf)
@@ -29,7 +30,7 @@ Note: In case I need another example [here we go]('https://youtu.be/T6rElSLldyc'
 - [ ] IV. Disable (excluir ou desativar conta?)
 
 ##### And ...
-- [ ] [Review GitHub vulnerabilities]('https://github.com/lpkyrius/newsavic-api/security/dependabot')
+
 - [ ] Complement tests for Users +  POST tests for grupos
 - Testing my server:
 - Listing (GET) grupos using json
