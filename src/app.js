@@ -1,4 +1,6 @@
 const express = require('express'); 
+// const jtw = require('jsonwebtoken');
+
 // const cors = require('cors'); 
 
 const usersRouter = require('./routes/users/users.router');
@@ -10,6 +12,11 @@ const app = express();
 //     origin: 'http://localhost:3000',
 // }));
 app.use(express.json());
+
+app.use(express.urlencoded({ extended: false }));
+app.set('view engine', 'ejs');
+
+app.get('/', (req, res) => {res.status(200).send('New SAVIC - RCC Brasil')}); 
 app.use(usersRouter);
 app.use(gruposRouter);
 

@@ -13,16 +13,12 @@ const saltRounds = 10;
 const nodemailer = require('nodemailer');
 const passwordSize = 5;
 
-function home(req, res) {
-    return res.status(200).json({ message: 'New SAVIC - RCC Brasil'});
-}
-
 async function handleSignin(req, res) {
     try {
         let {email, password } = req.body;
         // data validation: right email/password format avoiding SQL Injection...
         if (email == "" || password == ""){
-            res.status(400).json({error: 'Campo em branco.',});
+            res.status(400).json({error: 'Dados inválidos.',});
         } else if (password.length < passwordSize){
             res.status(400).json(`Senha deve ter ao menos ${ passwordSize } caracteres.`);
         } else if (!checkEmail(email)){
@@ -34,7 +30,7 @@ async function handleSignin(req, res) {
                 if (!user.verified){
                     res.status(400).json('Usuário ainda não confirmado via email de confirmação.');
                 } else {
-                    res.status(201).json(user);
+                    res.status(200).json(user);
                 }
             } else {
                 res.status(400).json({ error: 'usuário ou senha inválidos'});
@@ -52,7 +48,7 @@ async function handleRegister(req, res) {
 
         // data validation
         if (email == "" || name == "" || cpf == "" || password == ""){
-            res.status(400).json({error: 'Campo em branco.',});
+            res.status(400).json({error: 'Dados inválidos.',});
         } else if (isNaN(joined)) {
             res.status(400).json({error: 'Data de registro inválida.',});
         } else if (!checkUsername(name)){
@@ -171,7 +167,7 @@ async function httpUpdateUser(req, res) {
             if (updatedUser.length) {
                 res.status(200).json(updatedUser[0]);
             } else {
-                res.status(400).json({ error: 'Não foi atualizar os dados do usuário.'});
+                res.status(400).json({ error: 'Não foi possível atualizar os dados do usuário.'});
             }
         }
     } catch (error) {
@@ -197,7 +193,7 @@ async function httpUpdateUserEmail(req, res) {
                 sendConfirmationEmail(email, updatedUser[0].id);
                 res.status(200).json(updatedUser[0]);
             } else {
-                res.status(400).json({ error: 'Não foi atualizar o email do usuário.'});
+                res.status(400).json({ error: 'Não foi possível atualizar o email do usuário.'});
             }
         }
     } catch (error) {
@@ -289,13 +285,21 @@ function TestaCPF(strCPF) {
     return true;
 }
 
+async function httpRenderForgotPassword(req, res, next){
+    res.render('./src/views/forgot_password');
+}
+
+// async function httpRenderForgotPassword(req, res, next){
+
+// }
+
 module.exports = {
-    home,
     handleSignin,
     handleRegister,
     httpGetAllUsers,
     httpGetUser, 
     httpUpdateUser, 
     handleEmailConfirmation,
-    httpUpdateUserEmail
+    httpUpdateUserEmail,
+    httpRenderForgotPassword
 };
