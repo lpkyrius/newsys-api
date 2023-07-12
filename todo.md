@@ -16,6 +16,13 @@
 - [x] I. Finish users.controller > checkEmailExists(email) [based on this video]('https://youtu.be/yY2gXnRGVUw?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t')
 - [x] II. Finish users.controller > checkCPFExists(cpf) [based on this video]('https://youtu.be/yY2gXnRGVUw?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t')
 - [x] III. Test changes/validations for Register & SignIn [based on this video]('https://youtu.be/yY2gXnRGVUw?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t')
+- [ ] Complement tests Users > SignIn (success + fail)
+- [ ] Complement tests Users > Register  (success + fail)
+- [ ] Complement tests Users > ListUsers (success + fail)
+- [ ] Complement tests Users > Profile (success + fail)
+- [ ] Complement tests Users > update_user (success + fail)
+- [ ] Complement tests Users > confirm (success + fail)
+- [ ] Complement tests Users > update_user_email (success + fail)
 
 ##### Still about the Register/SignIn
 - [ ] I. Complement to register: Forgot password (password recovery with email) [this video]('https://youtu.be/72JYhSoVYPc') seems to have JWT and other interesting logic like expiration date, etc. It worths to check.
@@ -32,10 +39,6 @@ Note: In case I need another example [here we go]('https://youtu.be/T6rElSLldyc'
 
 ##### And ...
 
-- [ ] Complement tests for Users +  POST tests for grupos
-- Testing my server:
-- Listing (GET) grupos using json
-- Posting (POST) grupos -> [class 123]('https://www.udemy.com/course/complete-nodejs-developer-zero-to-mastery/learn/lecture/26172358#overview')
 - [x] NodeJS  132. Jest:  3’20
 ```
 npm install jest --save-dev
@@ -47,6 +50,7 @@ npm install supertest --save-dev
 - [ ] TypeScript NodeJS 394. TypeScript Installation implementation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428') => Let's do it before continue.
 - [ ] Knex.js Migration [for example]('https://youtu.be/6HmC32AY41k')
 - [ ] User roles, token: [check this video]('https://youtu.be/Tw5LupcpKS4')
+- [ ] Performance (PM2 Cluster) & Deploy scripts. [149. Improving Performance Of Our NASA Project]('https://www.udemy.com/course/complete-nodejs-developer-zero-to-mastery/learn/lecture/26009832#overview')
 
 <br>
 - [x] Create Project with NodeJS 107. API Server Setup 

@@ -45,13 +45,13 @@ async function handleRegister(req, res) {
     try {
         let {email, name, cpf, password } = req.body;
         const joined = new Date();
-
+        
         // data validation
         if (email == "" || name == "" || cpf == "" || password == ""){
             res.status(400).json({error: 'Dados inválidos.',});
         } else if (isNaN(joined)) {
             res.status(400).json({error: 'Data de registro inválida.',});
-        } else if (!checkUsername(name)){
+        } else if (!checkUserName(name)){
             res.status(400).json('Nome inválido.');
         } else if (!checkEmail(email)){
             res.status(400).json('Email inválido.');
