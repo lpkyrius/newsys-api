@@ -126,6 +126,8 @@ describe('Users API', () => {
             userDataWithoutDate.cpf = cpf;
         });   
 
+        // Still need to see how could we test a successful register due to the CPF validation
+        // -----------------------------------------------------------------------------------
         // describe('Test POST /register', () => {
         //     test('It should respond with 201 success + Content-Type = json', async () => {
         //         email = "test" + randomComplement + "@abc"+randomComplement+".com";
