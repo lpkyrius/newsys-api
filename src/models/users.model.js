@@ -44,7 +44,11 @@ async function registerUser(user) {
 // Function to confirm user and update verified field
 async function confirmUser(userId) {
     try {
-        await db('users').where('id', userId).update({ verified: true });
+        const updatedUser = await db('users')
+            .where('id', '=', userId)
+            .update({ verified: true })
+            .returning('*');
+        return updatedUser;
     } catch (error) {
         console.log(`function confirmUser(userId): ${error}`);
         throw error;
@@ -65,7 +69,9 @@ async function getUserById(id) {
 async function getUserByKey(key) {
     try {
         const recoveredUser = await db('users')
-        .select('*').from('users').where(key);
+            .select('*')
+            .from('users')
+            .where(key);
         return recoveredUser;
     } catch (error) {
         console.log(`function getUserByKey(): ${ error }`)
@@ -106,26 +112,20 @@ async function updateUser(userId, userData) {
 
 async function updateEmail(userId, userData) {
     try {
-        const currentUserData = await getUserByKey({id: userId});
-        if (currentUserData[0].email == userData.email){
-            return [];
-        } else {
-            const updatedUserLogin = await db.transaction(async (trx) => {
-                const updatedUser = await trx('users')
-                .where('id', '=', userId)
-                .update(userData)
-                .returning('*');
-            
-            const updatedLogin = await trx('login')
-                .where('email', '=', currentUserData[0].email)
-                .update({ email: updatedUser[0].email })
-                .returning('*');
-    
-                return updatedUser;
-            });
-    
-            return updatedUserLogin;
-        }
+        const updatedUserLogin = await db.transaction(async (trx) => {
+            const updatedUser = await trx('users')
+            .where('id', '=', userId)
+            .update(userData)
+            .returning('*');
+        
+        const updatedLogin = await trx('login')
+            .where('email', '=', currentUserData[0].email)
+            .update({ email: updatedUser[0].email })
+            .returning('*');
+
+            return updatedUser;
+        });
+        return updatedUserLogin;
     } catch (error) {
         console.log(`function updateEmail(): ${ error }`)
         throw error;

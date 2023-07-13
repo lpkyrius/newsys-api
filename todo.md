@@ -20,9 +20,9 @@
 - [x] Complement tests Users > Register  (success + fail)
 - [x] Complement tests Users > ListUsers (success + fail)
 - [x] Complement tests Users > Profile (success + fail)
-- [ ] Complement tests Users > update_user (success + fail)
-- [ ] Complement tests Users > confirm (success + fail)
-- [ ] Complement tests Users > update_user_email (success + fail)
+- [x] Complement tests Users > update_user (success + fail)
+- [x] Complement tests Users > confirm (success + fail)
+- [x] Complement tests Users > update_user_email (success + fail)
 
 ##### Still about the Register/SignIn
 - [ ] I. Complement to register: Forgot password (password recovery with email) [this video]('https://youtu.be/72JYhSoVYPc') seems to have JWT and other interesting logic like expiration date, etc. It worths to check.

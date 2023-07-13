@@ -18,17 +18,17 @@ async function handleSignin(req, res) {
         let {email, password } = req.body;
         // data validation: right email/password format avoiding SQL Injection...
         if (email == "" || password == ""){
-            res.status(400).json({error: 'Dados inválidos.',});
+            res.status(400).json({ error: 'Dados inválidos.' });
         } else if (password.length < passwordSize){
-            res.status(400).json(`Senha deve ter ao menos ${ passwordSize } caracteres.`);
+            res.status(400).json({ error: `Senha deve ter ao menos ${ passwordSize } caracteres.` });
         } else if (!checkEmail(email)){
-            res.status(400).json('Email inválido.');
+            res.status(400).json({ error: 'Email inválido.' });
         } else {
             const loginData = {email, password };
             const user = await signinUser(loginData, bcrypt, saltRounds) || [];
             if (user.id){
                 if (!user.verified){
-                    res.status(400).json('Usuário ainda não confirmado via email de confirmação.');
+                    res.status(400).json({ error: 'Usuário ainda não confirmado via email de confirmação.' });
                 } else {
                     res.status(200).json(user);
                 }
@@ -48,21 +48,21 @@ async function handleRegister(req, res) {
         
         // data validation
         if (email == "" || name == "" || cpf == "" || password == ""){
-            res.status(400).json({error: 'Dados inválidos.',});
+            res.status(400).json({ error: 'Dados inválidos.' });
         } else if (isNaN(joined)) {
-            res.status(400).json({error: 'Data de registro inválida.',});
+            res.status(400).json({ error: 'Data de registro inválida.' });
         } else if (!checkUserName(name)){
-            res.status(400).json('Nome inválido.');
+            res.status(400).json({ error: 'Nome inválido.' });
         } else if (!checkEmail(email)){
-            res.status(400).json('Email inválido.');
+            res.status(400).json({ error: 'Email inválido.' });
         } else if (password.length < passwordSize){
-            res.status(400).json(`Senha deve ter ao menos ${ passwordSize } caracteres.`);
+            res.status(400).json({ error: `Senha deve ter ao menos ${ passwordSize } caracteres.` });
         } else if (!TestaCPF(cpf)){
-            res.status(400).json('CPF inválido.');
+            res.status(400).json({ error: 'CPF inválido.' });
         } else if (await checkCpfExists(cpf)){
-            res.status(400).json('CPF já cadastrado.');
+            res.status(400).json({ error: 'CPF já cadastrado.' });
         } else if (await checkEmailExists(email)){
-            res.status(400).json('Email já cadastrado.');
+            res.status(400).json({ error: 'Email já cadastrado.' });
         } else {
             password = bcrypt.hashSync(password, saltRounds);
             const userData = { email, name, cpf, joined, password };
@@ -109,8 +109,15 @@ const sendConfirmationEmail = (email, userId) => {
 async function handleEmailConfirmation(req, res) {
     try {
         const userId = req.params.id;
-        await confirmUser(userId);
-        res.status(200).json({ message: 'Sucesso na confirmação do email do usuário.' });
+        if (isNaN(userId)){
+            return res.status(400).json({ error: 'Não foi possível confirmar o email do usuário.' });
+        };
+        const updatedUser = await confirmUser(userId);
+        if (updatedUser.length) {
+            res.status(200).json({ message: 'Sucesso na confirmação do email do usuário.' });
+        } else {
+            res.status(400).json({ error: 'Não foi possível confirmar o email do usuário.' });
+        }
     } catch (error) {
       res.status(500).json({ error: 'Falha ao confirmar usuário.' });
     }
@@ -122,7 +129,7 @@ async function httpGetAllUsers(req, res) {
         if (recoveredUsers.length) {
             res.status(200).json(recoveredUsers);
         } else {
-            res.status(400).json({ error: 'Não foi possível localizar usuários.'});
+            res.status(400).json({ error: 'Não foi possível localizar usuários.' });
         }
     } catch (error) {
         res.status(500).json({ error: 'Falha ao localizar usuários.' });
@@ -140,11 +147,11 @@ async function httpGetUser(req, res) {
         if (recoveredUser.length) {
             res.status(200).json(recoveredUser[0]);
         } else {
-            res.status(400).json({ error: 'Não foi possível localizar o usuário.'});
+            res.status(400).json({ error: 'Não foi possível localizar o usuário.' });
         }
         
     } catch (error) {
-        res.status(500).json({ error: 'Falha ao localizar usuário.'});
+        res.status(500).json({ error: 'Falha ao localizar usuário.' });
     }
 }
 
@@ -154,20 +161,21 @@ async function httpUpdateUser(req, res) {
         let { name, cpf } = req.body;
         
         // Validation
-        if (!checkUserName(name)){
-            res.status(400).json('Nome inválido.');
+        if (isNaN(Number(userId))){
+            res.status(400).json({ error: 'Id de usuário deve ser em formato numérico.'});
+        } else if (!checkUserName(name)){
+            res.status(400).json({ error: 'Nome inválido.' });
         } else if (!TestaCPF(cpf)){
-            res.status(400).json('CPF inválido.');
+            res.status(400).json({ error: 'CPF inválido.' });
         } else if (await checkCpfAlreadyUsed(userId,cpf)){
-            res.status(400).json('CPF já cadastrado.');
+            res.status(400).json({ error: 'CPF já cadastrado.' });
         } else {
             const userData = { name, cpf };
-
             const updatedUser = await updateUser(userId, userData);
             if (updatedUser.length) {
                 res.status(200).json(updatedUser[0]);
             } else {
-                res.status(400).json({ error: 'Não foi possível atualizar os dados do usuário.'});
+                res.status(400).json({ error: 'Não foi possível atualizar os dados do usuário.' });
             }
         }
     } catch (error) {
@@ -180,20 +188,27 @@ async function httpUpdateUserEmail(req, res) {
         const userId = req.params.id;
         let { email } = req.body;
         // Validation
-        if (!checkEmail(email)){
-            res.status(400).json('Email inválido.');
+        if (isNaN(Number(userId))){
+            res.status(400).json({ error: 'Id de usuário deve ser em formato numérico.'});
+        } else if (!checkEmail(email)){
+            res.status(400).json({ error: 'Email inválido.' });
         } else if (await checkEmailAlreadyUsed(userId,email)){
-            res.status(400).json('Email já cadastrado.');
+            res.status(400).json({ error: 'Email já cadastrado.' });
         } else {
-            // update email and verified (false) in order to force validate the email again
-            const userData = { email: email, verified: false };
-            const updatedUser = await updateEmail(userId, userData);
-            if (updatedUser.length) {
-                // Send confirmation email
-                sendConfirmationEmail(email, updatedUser[0].id);
-                res.status(200).json(updatedUser[0]);
+            const checkIfEmailChanged = await getUserByKey({id: userId});
+            if (checkIfEmailChanged.length && checkIfEmailChanged[0].email == email){
+                res.status(200).json(checkIfEmailChanged[0]);
             } else {
-                res.status(400).json({ error: 'Não foi possível atualizar o email do usuário.'});
+                // update email and verified (false) in order to force validate the email again
+                const userData = { email: email, verified: false };
+                const updatedUser = await updateEmail(userId, userData);
+                if (updatedUser.length) {
+                    // Send confirmation email
+                    sendConfirmationEmail(email, updatedUser[0].id);
+                    res.status(200).json(updatedUser[0]);
+                } else {
+                    res.status(400).json({ error: 'Não foi possível atualizar o email do usuário.' });
+                }
             }
         }
     } catch (error) {

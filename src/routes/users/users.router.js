@@ -17,7 +17,7 @@ usersRouter.post('/register', handleRegister);
 usersRouter.get('/listUsers', httpGetAllUsers); 
 usersRouter.get('/profile/:id', httpGetUser); 
 usersRouter.put('/update_user/:id',httpUpdateUser);
-usersRouter.get('/confirm/:id', handleEmailConfirmation); 
+usersRouter.put('/confirm_email/:id', handleEmailConfirmation); 
 usersRouter.put('/update_user_email/:id',httpUpdateUserEmail);
 // usersRouter.get('/forgot_password/:id', httpRenderForgotPassword);
 // usersRouter.post('/forgot_password/:id');
