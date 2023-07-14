@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificação de email</title>
+</head>
+<body>
+    <h2>Verificação de email</h2>
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const error = urlParams.get("error");
+        const message = urlParams.get("message");
+
+        const bodyContent = !error 
+            ?  `<div>
+                <h2>Seu email foi verificado!</h2>
+                <h3>Você já tem acesso ao New SAVIC!</h3>`
+                : `<h2>${message}</h2>
+            </div>` 
+    </script>
+</body>
+</html>

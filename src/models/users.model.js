@@ -6,7 +6,7 @@ async function getAllUsers() {
         .select('*').from('users');
         return recoveredUsers;
     } catch (error) {
-    console.log(`function getAllUsers(user): ${ error }`)
+    console.log(`getAllUsers(user): ${ error }`)
     throw error;
     }
 }
@@ -36,12 +36,52 @@ async function registerUser(user) {
     return registeredUser;
 
     } catch (error) {
-    console.log(`function registerUser(user): ${error}`);
+    console.log(`registerUser(user): ${error}`);
     throw error;
     }
 }
 
+async function newUserVerification(data) {
+    try {
+        const registeredVerification = await db('user_verification')
+            .insert({
+                user_id: data.user_id,
+                unique_string: data.unique_string,
+                email: data.email,
+                created_at: data.created_at,
+                expires_at: data.expires_at // 6 hours
+            })
+            .returning('*');
+        return registeredVerification;        
+    } catch (error) {
+    console.log(`newUserVerification(user): ${error}`);
+    throw error;
+    }
+}
+
+async function deleteUserVerification(id) {
+    try {
+        const registeredVerification = await db('user_verification')
+            .where({ id: id })
+            .del();
+    } catch (error) {
+    console.log(`newUserVerification(user): ${error}`);
+    throw error;
+    }
+}
+
+
 // Function to confirm user and update verified field
+async function getUserVerificationById(user_id) {
+    try {
+        const recoveredData = await db('user_verification')
+        .select('*').from('user_verification').where({ user_id });
+        return recoveredData;
+    } catch (error) {
+        console.log(`getUserVerificationById(id): ${ error }`)
+        throw error;
+    }
+}
 async function confirmUser(userId) {
     try {
         const updatedUser = await db('users')
@@ -50,7 +90,7 @@ async function confirmUser(userId) {
             .returning('*');
         return updatedUser;
     } catch (error) {
-        console.log(`function confirmUser(userId): ${error}`);
+        console.log(`confirmUser(userId): ${error}`);
         throw error;
     }
 }
@@ -61,7 +101,7 @@ async function getUserById(id) {
         .select('*').from('users').where({ id });
         return recoveredUser;
     } catch (error) {
-        console.log(`function getUserById(id): ${ error }`)
+        console.log(`getUserById(id): ${ error }`)
         throw error;
     }
 }
@@ -74,7 +114,7 @@ async function getUserByKey(key) {
             .where(key);
         return recoveredUser;
     } catch (error) {
-        console.log(`function getUserByKey(): ${ error }`)
+        console.log(`getUserByKey(): ${ error }`)
         throw error;
     }
 }
@@ -88,7 +128,7 @@ async function getKeyAlreadyUsedByAnotherId(id, key) {
 
         return recoveredUser;
     } catch (error) {
-        console.log(`function getUserByKey(): ${ error }`)
+        console.log(`getUserByKey(): ${ error }`)
         throw error;
     }
 }
@@ -105,12 +145,12 @@ async function updateUser(userId, userData) {
             .returning('*');
         return updatedUser;
     } catch (error) {
-        console.log(`function updateUser(): ${ error }`)
+        console.log(`updateUser(): ${ error }`)
         throw error;
     }
 }
 
-async function updateEmail(userId, userData) {
+async function updateEmail(userId, oldEmail, userData) {
     try {
         const updatedUserLogin = await db.transaction(async (trx) => {
             const updatedUser = await trx('users')
@@ -119,7 +159,7 @@ async function updateEmail(userId, userData) {
             .returning('*');
         
         const updatedLogin = await trx('login')
-            .where('email', '=', currentUserData[0].email)
+            .where('email', '=', oldEmail)
             .update({ email: updatedUser[0].email })
             .returning('*');
 
@@ -127,7 +167,7 @@ async function updateEmail(userId, userData) {
         });
         return updatedUserLogin;
     } catch (error) {
-        console.log(`function updateEmail(): ${ error }`)
+        console.log(`updateEmail(): ${ error }`)
         throw error;
     }
 }
@@ -151,7 +191,7 @@ async function signinUser(loginData, bcrypt, saltRounds) {
         }
         return recoveredUser[0];
     } catch (error) {
-    console.log(`function signinUser(user): ${ error }`)
+    console.log(`signinUser(user): ${ error }`)
     throw error;
     }
 }   
@@ -166,4 +206,7 @@ module.exports = {
     getUserByKey,
     getKeyAlreadyUsedByAnotherId,
     updateEmail,
+    newUserVerification,
+    getUserVerificationById,
+    deleteUserVerification,
 };

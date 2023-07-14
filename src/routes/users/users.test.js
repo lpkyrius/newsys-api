@@ -265,30 +265,30 @@ describe('Users API', () => {
     });
 
     // usersRouter.put('/confirm/:id', handleEmailConfirmation);
-    describe('Test PUT /confirm_email/:id', () => {
+    describe('Test GET /confirm_email/:id/:uniqueString', () => {
 
-        describe('Test PUT /confirm_email/:id with invalid id', () => {
+        describe('Test GET /confirm_email/:id with invalid id', () => {
             test('It should respond with 400 fail + Content-Type = json', async () => {
                 const response = await request(app)
-                    .put('/confirm_email/d')
+                    .get('/confirm_email/d/:uniqueString')
                     .expect('Content-Type', /json/)
                     .expect(400);
             });
         });
 
-        describe('Test PUT /confirm_email/:id with id that does not exist', () => {
+        describe('Test GET /confirm_email/:id with id that does not exist', () => {
             test('It should respond with 400 fail + Content-Type = json', async () => {
                 const response = await request(app)
-                    .put('/confirm_email/0')
+                    .get('/confirm_email/0/:uniqueString')
                     .expect('Content-Type', /json/)
                     .expect(400);
             });
         });
 
-        describe('Test PUT /confirm_email/:id with a valid id', () => {
+        describe('Test GET //confirm_email/:id/:uniqueString with a valid id', () => {
             test('It should respond with 200 success + Content-Type = json', async () => {
                 const response = await request(app)
-                    .put('/confirm_email/83')
+                    .get('/confirm/83/3de13c32-8aeb-4774-b040-0270d783d5e883')
                     .expect('Content-Type', /json/)
                     .expect(200);
             });
