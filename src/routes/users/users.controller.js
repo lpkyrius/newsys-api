@@ -108,12 +108,67 @@ const sendConfirmationEmail = async (email, userId) => {
         from: process.env.AUTH_EMAIL,
         to: email,
         subject: 'Confirme seu registro no New SAVIC',
-        html: `<p>Para ter o acesso liberado ao <b>New SAVIC da RCC Brasil</b>, 
-            por favor, confirme seu email através deste link abaixo.<br>
-            Você também pode confirmar copiando e colando o link abaixo<b> 
-            <p><b>Este link vai expirar em 6 horas</b>.<br>
-            <p><a href="${confirmationLink}">${confirmationLink}</a></p>`
-        };    
+        html: `
+        <html>
+            <head>
+            <style>
+                /* CSS styles for the email content */
+                body {
+                font-family: Arial, sans-serif;
+                background-color: #f6f6f6;
+                margin: 0;
+                padding: 0;
+                }
+                .container {
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                padding: 20px;
+                border-radius: 5px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                }
+                h1 {
+                color: #333333;
+                font-size: 24px;
+                margin-bottom: 20px;
+                text-align: center;
+                }
+                p {
+                color: #555555;
+                font-size: 16px;
+                line-height: 1.5;
+                margin-bottom: 10px;
+                }
+                b {
+                font-weight: bold;
+                }
+                a {
+                color: #ffffff;
+                background-color: #e9b722;
+                text-decoration: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                }
+                a:hover {
+                background-color: #45a049;
+                }
+            </style>
+            </head>
+            <body>
+            <div class="container" align="center">
+                <h1>Confirme seu registro no New SAVIC</h1>
+                <p>Para ter acesso liberado ao <b>New SAVIC da RCC Brasil</b>,
+                <br>por favor, confirme seu e-mail através do link abaixo:</p>
+                <p><b>Este link vai expirar em 6 horas.</b></p>
+                <p><a href="${confirmationLink}">Confirme aqui</a></p><br>
+                <p><b>Se tiver problemas com o botão acima, 
+                <br>copie e cole o link abaixo no seu navegador:</b></p>
+                ${confirmationLink}
+            </div>
+            </body>
+        </html>
+      `
+    };    
         const createdAt = Date.now();
         const expiresAt = Date.now() + Number(process.env.EMAIL_EXPIRATION); // 6 hours
         const hashedUniqueString = bcrypt.hashSync(uniqueString, saltRounds);
