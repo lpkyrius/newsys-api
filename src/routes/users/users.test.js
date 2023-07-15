@@ -264,35 +264,45 @@ describe('Users API', () => {
 
     });
 
-    // usersRouter.put('/confirm/:id', handleEmailConfirmation);
+    // usersRouter.put('/confirm_email/:id/:uniqueString', handleEmailConfirmation);
     describe('Test GET /confirm_email/:id/:uniqueString', () => {
 
-        describe('Test GET /confirm_email/:id with invalid id', () => {
-            test('It should respond with 400 fail + Content-Type = json', async () => {
+        describe('Test GET /confirm_email/:id/:uniqueString general test', () => {
+            test('It should respond with 200 + Content-Type = html', async () => {
                 const response = await request(app)
-                    .get('/confirm_email/d/:uniqueString')
-                    .expect('Content-Type', /json/)
-                    .expect(400);
+                    .get('/confirm_email/83/9a405464-bc99-4dc5-bf8d-1c5a596bf3b383')
+                    .expect('Content-Type', "text/plain; charset=utf-8")
+                    .expect(302)
+                    // .end((err, res) => {
+                    //     if (err) return done(err);
+                    //     // Make another request to the redirected URL
+                    //     request(app)
+                    //       .get(res.headers.location)
+                    //       .expect('Content-Type', /html/)
+                    //       .expect(200)
+                    //       .expect(/<p class="error">/) // This checks if the body contains the error message
+                    //       .end(done);
+                    //   });
             });
         });
+        // Since it sends a HTML file with success or error message, there is way to test it.
+        // describe('Test GET /confirm_email/:id/:uniqueString with id that does not exist', () => {
+        //     test('It should respond with 400 fail + Content-Type = json', async () => {
+        //         const response = await request(app)
+        //             .get('/confirm_email/0/:uniqueString')
+        //             .expect('Content-Type', /json/)
+        //             .expect(400);
+        //     });
+        // });
 
-        describe('Test GET /confirm_email/:id with id that does not exist', () => {
-            test('It should respond with 400 fail + Content-Type = json', async () => {
-                const response = await request(app)
-                    .get('/confirm_email/0/:uniqueString')
-                    .expect('Content-Type', /json/)
-                    .expect(400);
-            });
-        });
-
-        describe('Test GET //confirm_email/:id/:uniqueString with a valid id', () => {
-            test('It should respond with 200 success + Content-Type = json', async () => {
-                const response = await request(app)
-                    .get('/confirm/83/3de13c32-8aeb-4774-b040-0270d783d5e883')
-                    .expect('Content-Type', /json/)
-                    .expect(200);
-            });
-        });
+        // describe('Test GET //confirm_email/:id/:uniqueString with a valid id', () => {
+        //     test('It should respond with 200 success + Content-Type = json', async () => {
+        //         const response = await request(app)
+        //             .get('/confirm/83/3de13c32-8aeb-4774-b040-0270d783d5e883')
+        //             .expect('Content-Type', /json/)
+        //             .expect(200);
+        //     });
+        // });
     });
 
     
@@ -316,7 +326,7 @@ describe('Users API', () => {
             test('It should respond with 400 fail + Content-Type = json', async () => {
                 userData.email = "lpkyriusgmail.com"
                 const response = await request(app)
-                    .put('/update_user_email/d')
+                    .put('/update_user_email/83')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(400);
@@ -325,7 +335,7 @@ describe('Users API', () => {
 
         describe('Test PUT /update_user_email/:id with an id that does not exist', () => {
             test('It should respond with 400 fail + Content-Type = json', async () => {
-                userData.email = "lpkyriusgmail.com"
+                userData.email = "lpkyrius@hotmail.com"
                 const response = await request(app)
                     .put('/update_user_email/0')
                     .send(userData)

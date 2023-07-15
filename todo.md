@@ -26,10 +26,11 @@
 
 
 ##### [This video]('https://youtu.be/v6Ul3o8D-js?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t&t=286') and [this one]('https://youtu.be/XqOIjQ78oJA?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t') will help me to: 
-- [ ] I. Add a hash field on user table to save the key for verify user, avoiding emailing the real id as a param for the verification link. 
-- [ ] II. Add .env file and adjust email password and other current secret values to it.
-- [ ] III. Add expiration date for Register.
-- [ ] IV. Register -> if email already exists, suggest to login or reset password.
+- [x] I. Add a hash field on user table to save the key for verify user, avoiding emailing the real id as a param for the verification link. 
+- [x] II. Add .env file and adjust email password and other current secret values to it.
+- [x] III. Add expiration date for Register.
+- [x] IV. Register -> if email already exists, suggest to login or reset password.
+- [ ] IV. ⭐️ Register -> I've tested and updated the automated tests using updateEmail function. Still needs to do it with actual Register new User function
 
 ##### Still about the Register/SignIn
 - [ ] I. Complement to register: Forgot password (password recovery with email) [this video]('https://youtu.be/72JYhSoVYPc') seems to have JWT and other interesting logic like expiration date, etc. It worths to check.

@@ -6,7 +6,7 @@ async function getAllUsers() {
         .select('*').from('users');
         return recoveredUsers;
     } catch (error) {
-    console.log(`getAllUsers(user): ${ error }`)
+    console.log(`Error in getAllUsers(): ${ error }`)
     throw error;
     }
 }
@@ -36,7 +36,7 @@ async function registerUser(user) {
     return registeredUser;
 
     } catch (error) {
-    console.log(`registerUser(user): ${error}`);
+    console.log(`Error in registerUser(): ${error}`);
     throw error;
     }
 }
@@ -54,7 +54,7 @@ async function newUserVerification(data) {
             .returning('*');
         return registeredVerification;        
     } catch (error) {
-    console.log(`newUserVerification(user): ${error}`);
+    console.log(`Error in newUserVerification(): ${error}`);
     throw error;
     }
 }
@@ -65,7 +65,7 @@ async function deleteUserVerification(id) {
             .where({ id: id })
             .del();
     } catch (error) {
-    console.log(`newUserVerification(user): ${error}`);
+    console.log(`Error in newUserVerification(): ${error}`);
     throw error;
     }
 }
@@ -78,7 +78,7 @@ async function getUserVerificationById(user_id) {
         .select('*').from('user_verification').where({ user_id });
         return recoveredData;
     } catch (error) {
-        console.log(`getUserVerificationById(id): ${ error }`)
+        console.log(`Error in getUserVerificationById(): ${ error }`)
         throw error;
     }
 }
@@ -90,7 +90,7 @@ async function confirmUser(userId) {
             .returning('*');
         return updatedUser;
     } catch (error) {
-        console.log(`confirmUser(userId): ${error}`);
+        console.log(`Error in confirmUser(): ${error}`);
         throw error;
     }
 }
@@ -101,7 +101,7 @@ async function getUserById(id) {
         .select('*').from('users').where({ id });
         return recoveredUser;
     } catch (error) {
-        console.log(`getUserById(id): ${ error }`)
+        console.log(`Error in getUserById(): ${ error }`)
         throw error;
     }
 }
@@ -114,7 +114,7 @@ async function getUserByKey(key) {
             .where(key);
         return recoveredUser;
     } catch (error) {
-        console.log(`getUserByKey(): ${ error }`)
+        console.log(`Error in getUserByKey(): ${ error }`)
         throw error;
     }
 }
@@ -128,7 +128,7 @@ async function getKeyAlreadyUsedByAnotherId(id, key) {
 
         return recoveredUser;
     } catch (error) {
-        console.log(`getUserByKey(): ${ error }`)
+        console.log(`Error in getUserByKey(): ${ error }`)
         throw error;
     }
 }
@@ -145,7 +145,7 @@ async function updateUser(userId, userData) {
             .returning('*');
         return updatedUser;
     } catch (error) {
-        console.log(`updateUser(): ${ error }`)
+        console.log(`Error in updateUser(): ${ error }`)
         throw error;
     }
 }
@@ -167,7 +167,7 @@ async function updateEmail(userId, oldEmail, userData) {
         });
         return updatedUserLogin;
     } catch (error) {
-        console.log(`updateEmail(): ${ error }`)
+        console.log(`Error in updateEmail(): ${ error }`)
         throw error;
     }
 }
@@ -191,7 +191,7 @@ async function signinUser(loginData, bcrypt, saltRounds) {
         }
         return recoveredUser[0];
     } catch (error) {
-    console.log(`signinUser(user): ${ error }`)
+    console.log(`Error in signinUser(): ${ error }`)
     throw error;
     }
 }   

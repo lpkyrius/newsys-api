@@ -8,7 +8,8 @@ const  {
     httpUpdateUser,
     handleEmailConfirmation,
     httpUpdateUserEmail,
-    handleEmailConfirmationVerified
+    handleEmailConfirmationVerified,
+    handleEmailConfirmationError
 } =  require('./users.controller');
 
 const usersRouter = express.Router();
@@ -19,7 +20,7 @@ usersRouter.get('/listUsers', httpGetAllUsers);
 usersRouter.get('/profile/:id', httpGetUser); 
 usersRouter.put('/update_user/:id',httpUpdateUser);
 usersRouter.get('/confirm_email/:id/:uniqueString', handleEmailConfirmation); 
-usersRouter.put('/verified', handleEmailConfirmationVerified); 
+usersRouter.get('/email_verified', handleEmailConfirmationVerified); 
 usersRouter.put('/update_user_email/:id',httpUpdateUserEmail);
 // usersRouter.get('/forgot_password/:id', httpRenderForgotPassword);
 // usersRouter.post('/forgot_password/:id');

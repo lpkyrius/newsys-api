@@ -116,7 +116,6 @@ const sendConfirmationEmail = async (email, userId) => {
         };    
         const createdAt = Date.now();
         const expiresAt = Date.now() + Number(process.env.EMAIL_EXPIRATION); // 6 hours
-
         const hashedUniqueString = bcrypt.hashSync(uniqueString, saltRounds);
         const newVerification = {
                     user_id: userId,
@@ -146,7 +145,7 @@ const sendConfirmationEmail = async (email, userId) => {
         } else {
             console.log('sendConfirmationEmail can not save userVerification data');
             let message = "Ocorreu um problema ao acessar sua verificação de email.";
-            res.redirect(`/verified/error=true&message=${message}`);
+            res.redirect(`/verified/?error=true&message=${message}`);
         }
           
     } catch (error) {
@@ -158,51 +157,65 @@ function handleEmailConfirmationVerified(req, res){
     res.sendFile(path.join(__dirname, "../../views/verified.html"));
 }
 
+function handleEmailConfirmationError(req, res, message){
+    message = (message === undefined) ? "" : '?error=true&message='+message;
+    const redirectUrl = '/email_verified' + message;
+    res.redirect(redirectUrl);
+}
+
 // Function to handle user confirmation (return from the user register confirmation email)
 async function handleEmailConfirmation(req, res) {
-    // try {
+    try {
         let {id, uniqueString} = req.params;
         if (isNaN(id)){
-            let message = "Problemas na id. Por favor, verifique novamente o link enviado.";
-            res.redirect(`/verified/error=true&message=${message}`);
-            return res.status(400).json({ error: 'Problemas na id. Por favor, verifique novamente o link enviado.' });
-        };
-        const verificationData = await getUserVerificationById(id);
-        if (verificationData.length) {
-            const { expires_at } = verificationData[0];
-            const hashedUniqueString = verificationData[0].unique_string;
-            if (expires_at < Date.now()){
-                deleteUserVerification(verificationData[0].id);
-                let message = "O prazo para confirmação do email expirou. Para receber um novo email, utilize a opção [esqueci minha senha]";
-                res.redirect(`/verified/error=true&message=${message}`);
-            } else {
-                const match = await bcrypt.compare(uniqueString, hashedUniqueString);
-                if (match){
-                    const updatedUser = await confirmUser(id);
-                    if (updatedUser.length) {
-                        // The verification record is not necessary any more
-                        deleteUserVerification(verificationData[0].id);
-                        res.sendFile(path.join(__dirname, "../../views/verified.html"));
-                        res.status(200).json({ message: 'Sucesso na confirmação do email do usuário.' });
-                    } else {
-                        res.status(400).json({ error: 'Não foi possível alterar o registro de confirmação do email do usuário.' });
-                        let message = "Não foi possível alterar o registro de confirmação do email do usuário. Por favor, tente iniciar a sessão no New SAVIC ou registrar-se novamente.";
-                        res.redirect(`/verified/error=true&message=${message}`);
-                    }
-                } else {
-                    res.status(400).json({ error: 'Não foi possível confirmar o email do usuário.' });
-                    let message = "Problema nas chaves de segurança. Por favor, confira o link de verificação novamente.";
-                    res.redirect(`/verified/error=true&message=${message}`);
-                }
-            }
+            let message = `Problemas na id. 
+                <br>Por favor, verifique novamente o link enviado.`;
+            const errorQueryString = `?error=true&message=${message}`;
+            handleEmailConfirmationError(req, res, message);
         } else {
-            res.status(400).json({ error: 'Não foi possível confirmar o email do usuário.' });
-            let message = "A conta vinculada a essa verificação não existe ou já foi verificada. Por favor, tente iniciar a sessão no New SAVIC ou registrar-se novamente";
-            res.redirect(`/verified/error=true&message=${message}`);
+            const verificationData = await getUserVerificationById(id);
+            if (verificationData.length) {
+                // force testing with expirated record
+                // let expiresAt2 = Date.now() - Number(process.env.EMAIL_EXPIRATION); 
+                // const expires_at = new Date(expiresAt2);
+                const { expires_at } = verificationData[0];
+                const hashedUniqueString = verificationData[0].unique_string;
+
+                if (expires_at < Date.now()){
+                    deleteUserVerification(verificationData[0].id);
+                    let message = `O prazo para confirmação do email expirou. 
+                        <br>Para receber um novo email, <br>utilize a opção [esqueci minha senha]`;
+                    handleEmailConfirmationError(req, res, message);
+                } else {
+                    const match = await bcrypt.compare(uniqueString, hashedUniqueString);
+                    if (match){
+                        const updatedUser = await confirmUser(id);
+                        if (updatedUser.length) {
+                            // The verification record is not necessary any more
+                            deleteUserVerification(verificationData[0].id);
+                            handleEmailConfirmationError(req, res);
+                        } else {
+                            let message = `<p>Não foi possível alterar o registro de confirmação do email do usuário.
+                            <br>Por favor, tente iniciar a sessão no New SAVIC ou registrar-se novamente.`;
+                            handleEmailConfirmationError(req, res, message);
+                        }
+                    } else {
+                        let message = `Problema nas chaves de segurança. 
+                            <br>Por favor, confira o link de verificação novamente.`;
+                        handleEmailConfirmationError(req, res, message);
+                    }
+                }
+            } else {
+                let message = `A conta vinculada a essa verificação não existe ou já foi verificada.
+                    <br>Por favor, tente iniciar a sessão no New SAVIC ou registrar-se novamente.`;
+                handleEmailConfirmationError(req, res, message);
+            }
         }
-    // } catch (error) {
-    //   res.status(500).json({ error: 'Falha ao confirmar usuário.' });
-    // }
+    } catch (error) {
+        let message = `Falha ao confirmar usuário.
+                    <br>Por favor, confira o link de verificação ou tente registrar-se novamente.`;
+                handleEmailConfirmationError(req, res, message);
+    }
 }
 
 async function httpGetAllUsers(req, res) {
@@ -277,20 +290,25 @@ async function httpUpdateUserEmail(req, res) {
         } else if (await checkEmailAlreadyUsed(userId,email)){
             res.status(400).json({ error: 'Email já cadastrado.' });
         } else {
-            const checkIfEmailChanged = await getUserByKey({id: userId});
-            // To verify if we are actually changing the email or if it's still the same
-            if (checkIfEmailChanged.length && checkIfEmailChanged[0].email == email){
-                res.status(200).json(checkIfEmailChanged[0]);
+            const recoveredUser = await getUserByKey({ id: userId});
+            if (!recoveredUser.length) {
+                res.status(400).json({ error: 'Não foi possível localizar o usuário.' });
             } else {
-                // update email and update verified=false in order to force validate the email again
-                const userData = { email: email, verified: false };
-                const updatedUser = await updateEmail(userId, checkIfEmailChanged[0].email, userData);
-                if (updatedUser.length) {
-                    // Send confirmation email
-                    await sendConfirmationEmail(email, updatedUser[0].id);
-                    res.status(200).json(updatedUser[0]);
+                const checkIfEmailChanged = await getUserByKey({id: userId});
+                // To verify if we are actually changing the email or if it's still the same
+                if (checkIfEmailChanged.length && checkIfEmailChanged[0].email == email){
+                    res.status(200).json(checkIfEmailChanged[0]);
                 } else {
-                    res.status(400).json({ error: 'Não foi possível atualizar o email do usuário.' });
+                    // update email and update verified=false in order to force validate the email again
+                    const userData = { email: email, verified: false };
+                    const updatedUser = await updateEmail(userId, checkIfEmailChanged[0].email, userData);
+                    if (updatedUser.length) {
+                        // Send confirmation email
+                        await sendConfirmationEmail(email, updatedUser[0].id);
+                        res.status(200).json(updatedUser[0]);
+                    } else {
+                        res.status(400).json({ error: 'Não foi possível atualizar o email do usuário.' });
+                    }
                 }
             }
         }
@@ -400,5 +418,6 @@ module.exports = {
     handleEmailConfirmation,
     httpUpdateUserEmail,
     httpRenderForgotPassword,
-    handleEmailConfirmationVerified
+    handleEmailConfirmationVerified,
+    handleEmailConfirmationError
 };

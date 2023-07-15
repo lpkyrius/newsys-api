@@ -1,24 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verificação de email</title>
+    <title>Email Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            text-align: center;
+            padding-top: 100px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .content {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .error {
+            color: #ff4a4a;
+        }
+
+        .success {
+            color: #39b54a;
+        }
+    </style>
 </head>
 <body>
-    <h2>Verificação de email</h2>
-    <script>
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        const error = urlParams.get("error");
-        const message = urlParams.get("message");
+    <div class="content">
+        <h1>Verificação de Email</h1>
+        <script>
+            var error = false;
+            var message = "";
+            var bodyContent = "";
 
-        const bodyContent = !error 
-            ?  `<div>
-                <h2>Seu email foi verificado!</h2>
-                <h3>Você já tem acesso ao New SAVIC!</h3>`
-                : `<h2>${message}</h2>
-            </div>` 
-    </script>
+            // Get the query parameters from the URL
+            var params = new URLSearchParams(window.location.search);
+            if (params.has("error")) {
+                // Extract the values of error and message parameters
+                error = params.get("error") === "true";
+                message = "Infelizmente ocorreu um problema durante a verificação do email."
+            }
+            if (params.has("message")) {
+                message = params.get("message");
+            }
+
+            // Check if error is true and set the body content accordingly
+            if (error) {
+                bodyContent = '<p class="error">' + message + '</p>';
+            } else {
+                bodyContent = `<p class="success">Seu email foi verificado com sucesso.
+                    <br><br>Você já pode acessar o New SAVIC!</p>`;
+            }
+
+            // Display the body content
+            document.write(bodyContent);
+        </script>
+    </div>
 </body>
 </html>
