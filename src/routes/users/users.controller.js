@@ -63,6 +63,9 @@ async function handleRegister(req, res) {
         const joined = new Date();
         
         // data validation
+        email = email.slice(0,100);
+        name = name.slice(0,100);
+        cpf = cpf.slice(0,11); 
         if (email == "" || name == "" || cpf == "" || password == ""){
             res.status(400).json({ error: 'Dados inválidos.' });
         } else if (isNaN(joined)) {
@@ -308,9 +311,10 @@ async function httpGetUser(req, res) {
 async function httpUpdateUser(req, res) {
     try {
         const userId = req.params.id;
-        let { name, cpf } = req.body;
-        
+        let { name, cpf } = req.body;      
         // Validation
+        name = name.slice(0,100);
+        cpf = cpf.slice(0,11);  
         if (isNaN(Number(userId))){
             res.status(400).json({ error: 'Id de usuário deve ser em formato numérico.'});
         } else if (!checkUserName(name)){
@@ -438,22 +442,27 @@ async function checkEmailAlreadyUsed(id, email){
 function TestaCPF(strCPF) {
     let Soma;
     let Resto;
-    Soma = 0;
-  if (strCPF == "00000000000") return false;
-
-  for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
-  Resto = (Soma * 10) % 11;
-
-    if ((Resto == 10) || (Resto == 11))  Resto = 0;
-    if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
-
-  Soma = 0;
-    for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
-    Resto = (Soma * 10) % 11;
-
-    if ((Resto == 10) || (Resto == 11))  Resto = 0;
-    if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
-    return true;
+    let validaKey = ((process.env.CPF_VALIDATION || "1") == "1") ? true : false;
+    if (!validaKey) {
+        return true; // validation has been turned off.
+    } else {
+        Soma = 0;
+        if (strCPF == "00000000000") return false;
+    
+        for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+        Resto = (Soma * 10) % 11;
+    
+        if ((Resto == 10) || (Resto == 11))  Resto = 0;
+        if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
+    
+        Soma = 0;
+        for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+        Resto = (Soma * 10) % 11;
+    
+        if ((Resto == 10) || (Resto == 11))  Resto = 0;
+        if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
+        return true;
+    }
 }
 
 async function httpRenderForgotPassword(req, res, next){

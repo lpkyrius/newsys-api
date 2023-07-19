@@ -30,11 +30,14 @@
 - [x] II. Add .env file and adjust email password and other current secret values to it.
 - [x] III. Add expiration date for Register.
 - [x] IV. Register -> if email already exists, suggest to login or reset password.
-- [ ] IV. ⭐️ Register -> I've tested and updated the automated tests using updateEmail function. Still needs to do it with actual Register new User function
+- [x] IV. ⭐️ Register -> I've tested and updated the automated tests using updateEmail function. Still needs to do **the whole process** with actual Register new User function
 
 ##### Still about the Register/SignIn
 - [ ] I. Complement to register: Forgot password (password recovery with email) [this video]('https://youtu.be/72JYhSoVYPc') seems to have JWT and other interesting logic like expiration date, etc. It worths to check.
-- [ ] II. Review (best practices) data validation when receiving Register and Login requests. How to avoid SQL injections, etc. Same to avoid several requisitions attacks. For example, **create an user with limited privileges such as no access to create/drop/truncate tables/databases**.
+1st step without template, just a call with JSON "email"
+2nd step send an email working as the register confirmation (with expiration date and user_key) with a link to a page where the user creates the new password (validating it) and gets a confirmation message.
+- [ ] II. Review (best practices) data validation when receiving Register and Login requests. How to avoid SQL injections, etc. Same to avoid several requisitions attacks. 
+- [ ] ⭐️ **Create an user with limited privileges such as no access to create/drop/truncate tables/databases**.
 - [ ] III. Captcha [check this video]('https://youtu.be/u_QXNT4o_64')
 - [ ] IV. Disable (excluir ou desativar conta?)
 
