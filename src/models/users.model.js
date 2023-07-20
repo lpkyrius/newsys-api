@@ -180,18 +180,35 @@ async function signinUser(loginData, bcrypt, saltRounds) {
         .select('*')
         .from('login')
         .where('email', '=', loginData.email);
-        if (recoveredLogin.length){   
-            match = await bcrypt.compare(loginData.password, recoveredLogin[0].hash);
-            if (match){
-                recoveredUser = await db('users')
-                .select('*')
-                .from('users')
-                .where('email', '=', recoveredLogin[0].email);
+        if (recoveredLogin.length){
+            if (loginData.action === 'signin'){ // login
+                match = await bcrypt.compare(loginData.password, recoveredLogin[0].hash);
+                if (match){
+                    recoveredUser = await db('users')
+                    .select('*')
+                    .from('users')
+                    .where('email', '=', recoveredLogin[0].email);
+                }
+            } else { // get password for reset
+                return recoveredLogin;
             }
         }
         return recoveredUser[0];
     } catch (error) {
     console.log(`Error in signinUser(): ${ error }`)
+    throw error;
+    }
+}   
+
+async function resetLoginPassword(loginData, bcrypt, saltRounds) {
+    try {
+        const updatedLogin = await db('login')
+            .where('email', '=', loginData.email)
+            .update({ hash: loginData.password })
+            .returning('*');
+        return updatedLogin[0];
+    } catch (error) {
+    console.log(`Error in resetLoginPassword(): ${ error }`)
     throw error;
     }
 }   
@@ -209,4 +226,5 @@ module.exports = {
     newUserVerification,
     getUserVerificationById,
     deleteUserVerification,
+    resetLoginPassword,
 };

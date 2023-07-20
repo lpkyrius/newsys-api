@@ -9,9 +9,11 @@ const {
     updateEmail,
     newUserVerification,
     getUserVerificationById,
-    deleteUserVerification
+    deleteUserVerification,
+    resetLoginPassword
 } = require('../../models/users.model');
-const passwordSize = 5;
+
+const passwordSize = Number(process.env.PASSWORD_MIN_SIZE || 8);
 
 // hash handler
 const bcrypt = require('bcrypt');
@@ -29,6 +31,9 @@ require('dotenv').config();
 // path for static verified page
 const path = require("path");
 
+// web token
+const jwt = require('jsonwebtoken');
+
 async function handleSignin(req, res) {
     try {
         let {email, password } = req.body;
@@ -40,7 +45,11 @@ async function handleSignin(req, res) {
         } else if (!checkEmail(email)){
             res.status(400).json({ error: 'Email inválido.' });
         } else {
-            const loginData = {email, password };
+            const loginData = {
+                email: email, 
+                password: password,
+                action: 'signin'
+            };
             const user = await signinUser(loginData, bcrypt, saltRounds) || [];
             if (user.id){
                 if (!user.verified){
@@ -173,7 +182,7 @@ const sendConfirmationEmail = async (email, userId) => {
       `
     };    
         const createdAt = Date.now();
-        const expiresAt = Date.now() + Number(process.env.EMAIL_EXPIRATION); // 6 hours
+        const expiresAt = Date.now() + Number(process.env.EMAIL_EXPIRATION || 21600000); // 6 hours
         const hashedUniqueString = bcrypt.hashSync(uniqueString, saltRounds);
         const newVerification = {
                     user_id: userId,
@@ -233,8 +242,8 @@ async function handleEmailConfirmation(req, res) {
         } else {
             const verificationData = await getUserVerificationById(id);
             if (verificationData.length) {
-                // force testing with expirated record
-                // let expiresAt2 = Date.now() - Number(process.env.EMAIL_EXPIRATION); 
+                // force testing with expired record
+                // let expiresAt2 = Date.now() - Number(process.env.EMAIL_EXPIRATION || 21600000); 
                 // const expires_at = new Date(expiresAt2);
                 const { expires_at } = verificationData[0];
                 const hashedUniqueString = verificationData[0].unique_string;
@@ -338,7 +347,7 @@ async function httpUpdateUser(req, res) {
 }
 
 async function httpUpdateUserEmail(req, res) {
-    // try {
+    try {
         const userId = req.params.id;
         let { email } = req.body;
         // Validation
@@ -371,9 +380,9 @@ async function httpUpdateUserEmail(req, res) {
                 }
             }
         }
-    // } catch (error) {
-    //     res.status(500).json(error);
-    // }   
+    } catch (error) {
+        res.status(500).json(error);
+    }   
 }
 
 // Block of validation functions
@@ -466,12 +475,161 @@ function TestaCPF(strCPF) {
 }
 
 async function httpRenderForgotPassword(req, res, next){
-    res.render('./src/views/forgot_password');
+    res.render(path.join(__dirname, "../../views/forgot_password"));
 }
 
-// async function httpRenderForgotPassword(req, res, next){
+async function httpPostForgotPassword(req, res, next){
+    try {
+        const { email } = req.body;
+        if (email == ""){
+            res.status(400).json({ error: 'Email inválido.' });
+        } else if (!checkEmail(email)){
+            res.status(400).json({ error: 'Email inválido.' });
+        } else {
+            const recoveredUser = await getUserByKey({ email: email });
+            if (!recoveredUser.length) {
+                res.status(400).json({ error: 'Email inválido.' });
+            } else {
+                const loginData = {
+                    email: email,
+                    action: 'reset_password'
+                };
+                const login = await signinUser(loginData, bcrypt, saltRounds) || [];
+                if (login.length){
+                    // Create a one time link valid for 30 minutes
+                    const JWT_SECRET = process.env.JWT_SECRET || 'new_savic';
+                    // Let's use the current password making this link one time valid
+                    const secret = JWT_SECRET + login.password; 
+                    const payload = {
+                        email: login[0].email,
+                        id: login[0].id
+                    }
+                    const expiresIn = process.env.EMAIL_RESET_LINK_EXPIRATION || '15m';
+                    const token = jwt.sign(payload,secret, { expiresIn: expiresIn });
+                    const serverAddress = `${process.env.SERVER_ADDRESS || 'http://localhost'}:${process.env.PORT || '8000'}`;
+                    const resetPasswordLink = `${serverAddress}/reset_password/${recoveredUser[0].id}/${token}`;
+                    console.log('debug httpPostForgotPassword resetPasswordLink', resetPasswordLink);
+                    res.status(200).json({ message: 'O link para redefinir a senha foi enviado para o seu email.' });
+                } else {
+                    res.status(400).json({ error: 'Não foi possível localizar o usuário.' });
+                }
+            }
+        }
+    } catch (error) {
+        res.status(500).json(error);
+    }
+}
 
-// }
+async function httpResetPassword(req, res, next){
+    try {
+        const { id, token } = req.params;
+        if (id == "" || token == ""){
+            res.status(400).json({ error: 'Parametros inválidos.' });
+        } else if (isNaN(Number(id))){
+            res.status(400).json({ error: 'Formato id inválido.'});
+        } else {
+            const recoveredUser = await getUserByKey({ id });
+            if (!recoveredUser.length) {
+                res.status(400).json({ error: 'Id inválida.' });
+            } else {
+                const loginData = {
+                    email: recoveredUser[0].email,
+                    action: 'reset_password'
+                };
+                const login = await signinUser(loginData, bcrypt, saltRounds) || [];
+                if (login.length){
+                    // Create a one time link valid for 30 minutes
+                    const JWT_SECRET = process.env.JWT_SECRET || 'new_savic';
+                    // Let's use the current password making this link one time valid
+                    const secret = JWT_SECRET + login[0].password; 
+                    try {
+                        const payload = jwt.verify(token, secret);
+                        res.render(path.join(__dirname, "../../views/reset_password"), {email: login[0].email});
+                    } catch (error) {
+                        // Handle TokenExpiredError
+                        if (error.name === 'TokenExpiredError') {
+                            res.status(400).json({ error: 'O link de redefinição de senha expirou. Por favor, solicite um novo link.' });
+                        } else if (error.name === 'JsonWebTokenError') {
+                            res.status(400).json({ error: 'O link de redefinição de senha é inválido. Verifique se o link está correto ou solicite um novo link.' });
+                        } else {
+                            console.log(error.message);
+                            res.status(400).json({ error: 'Não foi possível localizar o usuário.' });
+                            // throw error; // Rethrow other unexpected errors
+                        }
+                    }
+                } else {
+                    res.status(400).json({ error: 'Não foi possível localizar o usuário.' });
+                }    
+            }
+        }
+    } catch (error) {
+        res.status(500).json(error);
+    }
+}
+
+async function httpPostResetPassword(req, res, next){
+    try {
+        const { id, token } = req.params;
+        const { password, password2 } = req.body;
+        if (id == "" || token == ""){
+            res.status(400).json({ error: 'Parametros inválidos.' });
+        } else if (isNaN(Number(id))){
+            res.status(400).json({ error: 'Formato id inválido.'});
+        } else if (password.length < passwordSize){
+            res.status(400).json({ error: `Senha deve ter ao menos ${ passwordSize } caracteres.` });
+        } else if (password !== password2){
+            res.status(400).json({ error: 'Senha definida e senha confirmada são diferentes.'});
+        }else {    
+
+            const recoveredUser = await getUserByKey({ id });
+            if (!recoveredUser.length) {
+                res.status(400).json({ error: 'Id inválida.' });
+            } else {
+                const loginData = {
+                    email: recoveredUser[0].email,
+                    action: 'reset_password'
+                };
+                const login = await signinUser(loginData, bcrypt, saltRounds) || [];
+                if (login.length){
+                    // Create a one time link valid for 30 minutes
+                    const JWT_SECRET = process.env.JWT_SECRET || 'new_savic';
+                    // Let's use the current password making this link one time valid
+                    const secret = JWT_SECRET + login[0].password; 
+                    try {
+                        const payload = jwt.verify(token, secret);
+                        // req.checkBody('password', 'Senha não informada.').notEmpty();
+                        // req.checkBody('password', 'Senha deve possuir ao menos 6 posições.').isLength({min:6});
+                        // req.checkBody('password2', 'Senhas informadas não conferem.').equals(req.body.password);
+                        const newPassword = bcrypt.hashSync(password, saltRounds);
+                        const loginData = { 
+                            email: recoveredUser[0].email,
+                            password: newPassword
+                        };
+                        const resetedPassword = await resetLoginPassword(loginData, bcrypt, saltRounds);
+                        if (!resetedPassword.email){
+                            res.status(400).json({ error: 'Não foi possível atualizar o email. Verifique se informou a nova senha corretamente ou tente redefinir novamente.' });
+                        } else {
+                            res.status(200).json({ message: `Senha redefinida com sucesso para ${ resetedPassword.email }` });
+                        }                      
+                        // res.render(path.join(__dirname, "../../views/reset_password"), {email: login[0].email});
+                    } catch (error) {
+                        // Handle TokenExpiredError
+                        if (error.name === 'TokenExpiredError') {
+                            res.status(400).json({ error: 'O link de redefinição de senha expirou. Por favor, solicite um novo link.' });
+                        } else if (error.name === 'JsonWebTokenError') {
+                            res.status(400).json({ error: 'O link de redefinição de senha é inválido. Verifique se o link está correto ou solicite um novo link.' });
+                        } else {
+                            console.log(error.message);
+                            throw error; // Rethrow other unexpected errors
+                        }
+                    }
+                }
+            }            
+        }
+    } catch (error) {
+        res.status(500).json(error);
+    }
+}
 
 module.exports = {
     handleSignin,
@@ -481,7 +639,10 @@ module.exports = {
     httpUpdateUser, 
     handleEmailConfirmation,
     httpUpdateUserEmail,
-    httpRenderForgotPassword,
     handleEmailConfirmationVerified,
-    handleEmailConfirmationError
+    handleEmailConfirmationError,
+    httpRenderForgotPassword, 
+    httpPostForgotPassword,
+    httpResetPassword,
+    httpPostResetPassword
 };
