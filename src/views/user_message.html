@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Email Verification</title>
+    <title>New SAVIC</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,7 +34,7 @@
 </head>
 <body>
     <div class="content">
-        <h1>Verificação de Email</h1>
+        <h1>New SAVIC</h1>
         <script>
             var error = false;
             var message = "";
@@ -45,7 +45,8 @@
             if (params.has("error")) {
                 // Extract the values of error and message parameters
                 error = params.get("error") === "true";
-                message = "Infelizmente ocorreu um problema durante a verificação do email."
+                // default
+                message = "Infelizmente ocorreu um problema durante o processo." 
             }
             if (params.has("message")) {
                 message = params.get("message");
@@ -55,8 +56,7 @@
             if (error) {
                 bodyContent = '<p class="error">' + message + '</p>';
             } else {
-                bodyContent = `<p class="success">Seu email foi verificado com sucesso.
-                    <br><br>Você já pode acessar o New SAVIC!</p>`;
+                bodyContent = '<p class="success">' + message + '</p>';
             }
 
             // Display the body content

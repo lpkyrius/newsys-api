@@ -23,7 +23,7 @@ usersRouter.get('/listUsers', httpGetAllUsers);
 usersRouter.get('/profile/:id', httpGetUser); 
 usersRouter.put('/update_user/:id',httpUpdateUser);
 usersRouter.get('/confirm_email/:id/:uniqueString', handleEmailConfirmation); 
-usersRouter.get('/email_verified', handleEmailConfirmationVerified); 
+usersRouter.get('/user_message', handleEmailConfirmationVerified); 
 usersRouter.put('/update_user_email/:id',httpUpdateUserEmail);
 usersRouter.get('/forgot_password', httpRenderForgotPassword);
 usersRouter.post('/forgot_password', httpPostForgotPassword);

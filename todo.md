@@ -35,6 +35,7 @@
 ##### Still about the Register/SignIn
 - [x] I. Complement to register: Forgot password (password recovery with email) [this video]('https://youtu.be/72JYhSoVYPc') 
 - [ ] Check why the same link still works twice (it shouldn't).
+- [ ] All possible messages when using register and reset password links are being shown in html?
 - [ ] Still need to actually send the link by email like the confirmation link.
 - [ ] Check if the length of password is ok. [check this]('https://www.tabnine.com/code/javascript/functions/express-validator/Validator/equals')
 - [ ] II. Review (best practices) data validation when receiving Register and Login requests. How to avoid SQL injections, etc. Same to avoid several requisitions attacks. 
