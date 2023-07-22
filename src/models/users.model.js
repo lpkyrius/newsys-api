@@ -59,10 +59,10 @@ async function newUserVerification(data) {
     }
 }
 
-async function deleteUserVerification(id) {
+async function deleteUserVerification(user_id) {
     try {
         const registeredVerification = await db('user_verification')
-            .where({ id: id })
+            .where({ user_id })
             .del();
     } catch (error) {
     console.log(`Error in newUserVerification(): ${error}`);
@@ -75,7 +75,10 @@ async function deleteUserVerification(id) {
 async function getUserVerificationById(user_id) {
     try {
         const recoveredData = await db('user_verification')
-        .select('*').from('user_verification').where({ user_id });
+            .select('*')
+            .from('user_verification')
+            .where({ user_id })
+            .orderBy('id', 'desc'); // the most recent one
         return recoveredData;
     } catch (error) {
         console.log(`Error in getUserVerificationById(): ${ error }`)

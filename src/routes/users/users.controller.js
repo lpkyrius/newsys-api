@@ -96,7 +96,7 @@ async function handleRegister(req, res) {
             const userData = { email, name, cpf, joined, password };
             const registeredUser = await registerUser(userData);
             // Send confirmation email
-            sendConfirmationEmail(email, registeredUser[0].id);
+            sendConfirmationEmail(email, registeredUser[0].id, 'register');
             res.status(201).json(registeredUser);
         }
     } catch (error) {
@@ -105,8 +105,32 @@ async function handleRegister(req, res) {
 }
 
 // Function to send confirmation email when a new user sign on
-const sendConfirmationEmail = async (email, userId) => {
+const sendConfirmationEmail = async (email, userId, goal) => {
     try {
+        let expiresAt = 0;
+        let routeLink = '';
+        let subject = '';
+        let titulo = '';
+        let body_message ='';
+        if (goal==='register' || goal === 'update_user_email'){
+            expiresAt = Date.now() + Number(process.env.EMAIL_EXPIRATION || 21600000); // 6 hours
+            routeLink = 'confirm_email';
+            subject = 'Confirme seu registro no New SAVIC';
+            titulo = 'Confirme seu registro no New SAVIC';
+            body_message = `<p>Para ter acesso liberado ao <b>New SAVIC da RCC Brasil</b>,
+            <br>por favor, confirme seu e-mail através do link abaixo:</p>
+            <p><b>Este link vai expirar em ${Math.round(expiresAt/3600000)} horas.</b></p>`
+        } else {
+            // reset_password
+            let resetExpiration = Number(process.env.RESET_EXPIRATION || 1800000);
+            expiresAt = Date.now() + resetExpiration; // 30 min
+            routeLink = 'reset_password';
+            subject = 'Redefina sua senha no New SAVIC';
+            titulo = 'Redefinir senha - New SAVIC'
+            body_message = `<p>Para redefinir sua senha no <b>New SAVIC da RCC Brasil</b>,
+            <br>por favor, utilize o link abaixo:</p>
+            <p><b>Este link vai expirar em ${Math.round(resetExpiration/3600000*60)} minutos.</b></p>`
+        }
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -115,11 +139,11 @@ const sendConfirmationEmail = async (email, userId) => {
             }
         });
         const uniqueString = uuidv4() + userId;
-        const confirmationLink = `http://localhost:8000/confirm_email/${userId}/${uniqueString}`;
+        const confirmationLink = `http://localhost:8000/${routeLink}/${userId}/${uniqueString}`;
         const mailOptions = {
         from: process.env.AUTH_EMAIL,
         to: email,
-        subject: 'Confirme seu registro no New SAVIC',
+        subject: subject,
         html: `
         <html>
             <head>
@@ -168,21 +192,17 @@ const sendConfirmationEmail = async (email, userId) => {
             </head>
             <body>
             <div class="container" align="center">
-                <h1>Confirme seu registro no New SAVIC</h1>
-                <p>Para ter acesso liberado ao <b>New SAVIC da RCC Brasil</b>,
-                <br>por favor, confirme seu e-mail através do link abaixo:</p>
-                <p><b>Este link vai expirar em 6 horas.</b></p>
+                <h1>${titulo}</h1>
+                ${body_message}
                 <p><a href="${confirmationLink}">Confirme aqui</a></p><br>
                 <p><b>Se tiver problemas com o botão acima, 
                 <br>copie e cole o link abaixo no seu navegador:</b></p>
                 ${confirmationLink}
             </div>
             </body>
-        </html>
-      `
-    };    
+        </html>`
+        };    
         const createdAt = Date.now();
-        const expiresAt = Date.now() + Number(process.env.EMAIL_EXPIRATION || 21600000); // 6 hours
         const hashedUniqueString = bcrypt.hashSync(uniqueString, saltRounds);
         const newVerification = {
                     user_id: userId,
@@ -204,6 +224,7 @@ const sendConfirmationEmail = async (email, userId) => {
                             // turning off this console to avoid warnings messages in SuperJest automated tests
                             if (process.env.SHOW_CONSOLE_EMAIL==='1') {
                                 console.log('Email enviado: ' + info.response);
+                                console.log(confirmationLink);
                             }
                         }
                     });     
@@ -212,7 +233,7 @@ const sendConfirmationEmail = async (email, userId) => {
         } else {
             console.log('sendConfirmationEmail can not save userVerification data');
             let message = "Ocorreu um problema ao acessar sua verificação de email.";
-            res.redirect(`/verified/?error=true&message=${message}`);
+            res.redirect(`/user_message/?error=true&message=${message}`);
         }
           
     } catch (error) {
@@ -229,11 +250,23 @@ function handleEmailConfirmationError(req, res, message){
     res.redirect(redirectUrl);
 }
 
-// Function to handle user confirmation (return from the user register confirmation email)
-async function handleEmailConfirmation(req, res) {
+// Function to handle user confirmation, 
+// it returns the confirmation email from:
+// user register || update user email 
+async function handleRegisterOrUpdateEmailConfirmation(req, res) {
+    await handleEmailConfirmation(req, res, 'register_or_update_email');
+}
+
+// Function to handle user confirmation, 
+// it returns the confirmation email from:
+// forgot password 
+async function handleForgotPasswordConfirmation(req, res) {
+    await handleEmailConfirmation(req, res, 'forgot_password');
+}
+async function handleEmailConfirmation(req, res, goal) {
     try {
         let {id, uniqueString} = req.params;
-        const messageQueryString = "";
+        let messageQueryString = "";
         if (isNaN(id)){
             messageQueryString = `?error=true&message=Problemas na id. 
             <br>Por favor, verifique novamente o link enviado.`;
@@ -241,36 +274,40 @@ async function handleEmailConfirmation(req, res) {
         } else {
             const verificationData = await getUserVerificationById(id);
             if (verificationData.length) {
-                // force testing with expired record
-                // let expiresAt2 = Date.now() - Number(process.env.EMAIL_EXPIRATION || 21600000); 
-                // const expires_at = new Date(expiresAt2);
                 const { expires_at } = verificationData[0];
                 const hashedUniqueString = verificationData[0].unique_string;
-
                 if (expires_at < Date.now()){
+                    // The verification record is not necessary any more, 
+                    // also should be deleted to avoid using the same link again
                     deleteUserVerification(verificationData[0].id);
-                        messageQueryString = `?error=true&message=
-                        O prazo para confirmação do email expirou. 
-                        <br>Para receber um novo email, <br>utilize a opção [esqueci minha senha]`;
-                        handleEmailConfirmationError(req, res, messageQueryString);
+                    messageQueryString = `?error=true&message=
+                    O prazo para confirmação do email expirou. 
+                    <br>Para receber um novo email, <br>utilize a opção [esqueci minha senha]`;
+                    handleEmailConfirmationError(req, res, messageQueryString);
                 } else {
                     const match = await bcrypt.compare(uniqueString, hashedUniqueString);
                     if (match){
-                        const updatedUser = await confirmUser(id);
-                        if (updatedUser.length) {
-                            // The verification record is not necessary any more
-                            deleteUserVerification(verificationData[0].id);
-                            messageQueryString = `?error=false&message=
-                            Seu email foi verificado com sucesso.
-                            <br><br>Você já pode acessar o New SAVIC!`;
-                            handleEmailConfirmationError(req, res, messageQueryString);
+                        if (goal==='register_or_update_email'){
+                            const updatedUser = await confirmUser(id);
+                            if (updatedUser.length){
+                                // The verification record is not necessary any more, 
+                                // also should be deleted to avoid using the same link again
+                                deleteUserVerification(verificationData[0].id);
+                                messageQueryString = `?error=false&message=
+                                Seu email foi verificado com sucesso.
+                                <br><br>Você já pode acessar o New SAVIC!`;
+                                handleEmailConfirmationError(req, res, messageQueryString);
+                            } else {
+                                messageQueryString = `?error=true&message=
+                                <p>Não foi possível alterar o registro de confirmação do email do usuário.
+                                <br>Por favor, tente iniciar a sessão no New SAVIC ou registrar-se novamente.`;
+                                handleEmailConfirmationError(req, res, messageQueryString);                                
+                            }                        
                         } else {
-                            messageQueryString = `?error=true&message=
-                            <p>Não foi possível alterar o registro de confirmação do email do usuário.
-                            <br>Por favor, tente iniciar a sessão no New SAVIC ou registrar-se novamente.`;
-                            handleEmailConfirmationError(req, res, messageQueryString);
+                            // forgot_password
+                            res.render(path.join(__dirname, "../../views/reset_password"), {email: verificationData[0].email});
                         }
-                    } else {
+                    } else {                    
                         messageQueryString = `?error=true&message=
                         Problema nas chaves de segurança. 
                         <br>Por favor, confira o link de verificação novamente.`;
@@ -279,15 +316,15 @@ async function handleEmailConfirmation(req, res) {
                 }
             } else {
                 messageQueryString = `?error=true&message=
-                A conta vinculada a essa verificação não existe ou já foi verificada.
-                <br>Por favor, tente iniciar a sessão no New SAVIC ou registrar-se novamente.`;
+                A conta vinculada a essa verificação não existe ou o processo já foi realizado anteriormente.
+                <br>Por favor, tente iniciar a sessão no New SAVIC ou reinicie o processo.`;
                 handleEmailConfirmationError(req, res, messageQueryString);
             }
         }
     } catch (error) {
         messageQueryString = `?error=true&message=
         Falha ao confirmar usuário.
-        <br>Por favor, confira o link de verificação ou tente registrar-se novamente`;
+        <br>Por favor, confira o link de verificação ou reinicie o processo`;
         handleEmailConfirmationError(req, res, messageQueryString);
     }
 }
@@ -379,7 +416,7 @@ async function httpUpdateUserEmail(req, res) {
                     const updatedUser = await updateEmail(userId, checkIfEmailChanged[0].email, userData);
                     if (updatedUser.length) {
                         // Send confirmation email
-                        await sendConfirmationEmail(email, updatedUser[0].id);
+                        await sendConfirmationEmail(email, updatedUser[0].id,'update_user_email');
                         res.status(200).json(updatedUser[0]);
                     } else {
                         res.status(400).json({ error: 'Não foi possível atualizar o email do usuário.' });
@@ -510,20 +547,9 @@ async function httpPostForgotPassword(req, res, next){
                 };
                 const login = await signinUser(loginData, bcrypt, saltRounds) || [];
                 if (login.length){
-                    // Create a one time link valid for 30 minutes
-                    const JWT_SECRET = process.env.JWT_SECRET || 'new_savic';
-                    // Let's use the current password making this link one time valid
-                    const secret = JWT_SECRET + login.password; 
-                    const payload = {
-                        email: login[0].email,
-                        id: login[0].id
-                    }
-                    const expiresIn = process.env.EMAIL_RESET_LINK_EXPIRATION || '15m';
-                    const token = jwt.sign(payload,secret, { expiresIn: expiresIn });
-                    console.log('debug httpPostForgotPassword token', token);
-                    const serverAddress = `${process.env.SERVER_ADDRESS || 'http://localhost'}:${process.env.PORT || '8000'}`;
-                    const resetPasswordLink = `${serverAddress}/reset_password/${recoveredUser[0].id}/${token}`;
-                    console.log(resetPasswordLink);
+                    // Create a one time link valid for 30 minutes (inside sendConfirmationEmail() )
+                    // Send confirmation email
+                    sendConfirmationEmail(email, recoveredUser[0].id, 'reset_password');                    
                     messageQueryString = `?error=false&message=
                     O link para redefinir a senha foi enviado para o seu email.`;
                     handleEmailConfirmationError(req, res, messageQueryString);
@@ -539,6 +565,7 @@ async function httpPostForgotPassword(req, res, next){
     }
 }
 
+// not used anymore switched to handleForgotPasswordConfirmation
 async function httpResetPassword(req, res, next){
     try {
         const { id, token } = req.params;
@@ -570,7 +597,6 @@ async function httpResetPassword(req, res, next){
                     const secret = JWT_SECRET + login[0].password; 
                     try {
                         const payload = jwt.verify(token, secret);
-                        console.log('debug httpResetPassword payload', payload);
                         res.render(path.join(__dirname, "../../views/reset_password"), {email: login[0].email});
                     } catch (error) {
                         // Handle TokenExpiredError
@@ -604,10 +630,10 @@ async function httpResetPassword(req, res, next){
 
 async function httpPostResetPassword(req, res, next){
     try {
-        const { id, token } = req.params;
+        let {id, uniqueString} = req.params;
         const { password, password2 } = req.body;
         let messageQueryString = "";
-        if (id == "" || token == ""){
+        if (id == "" || uniqueString == ""){
             messageQueryString = `?error=true&message=
             Parametros inválidos.`;
             handleEmailConfirmationError(req, res, messageQueryString);
@@ -624,7 +650,6 @@ async function httpPostResetPassword(req, res, next){
             Senha definida e senha confirmada são diferentes.`;
             handleEmailConfirmationError(req, res, messageQueryString);
         }else {    
-
             const recoveredUser = await getUserByKey({ id });
             if (!recoveredUser.length) {
                 messageQueryString = `?error=true&message=
@@ -637,50 +662,32 @@ async function httpPostResetPassword(req, res, next){
                 };
                 const login = await signinUser(loginData, bcrypt, saltRounds) || [];
                 if (login.length){
-                    // Create a one time link valid for 30 minutes
-                    const JWT_SECRET = process.env.JWT_SECRET || 'new_savic';
-                    // Let's use the current password making this link one time valid
-                    const secret = JWT_SECRET + login[0].password; 
-                    console.log('debug httpPostResetPassword token', token);
-                    try {
-                        const payload = jwt.verify(token, secret);
-                        console.log('debug httpPostResetPassword payload', payload);
-                        const newPassword = bcrypt.hashSync(password, saltRounds);
-                        const loginData = { 
-                            email: recoveredUser[0].email,
-                            password: newPassword
-                        };
-                        const resetedPassword = await resetLoginPassword(loginData, bcrypt, saltRounds);
-                        if (!resetedPassword.email){
-                            messageQueryString = `?error=true&message=
-                            Não foi possível atualizar o email. <br>
-                            Verifique se informou a nova senha corretamente ou tente redefinir novamente.`;
-                            handleEmailConfirmationError(req, res, messageQueryString);
-                        } else {
-                            messageQueryString = `?error=false&message=
-                            Senha redefinida com sucesso para ${ resetedPassword.email }. <br>
-                            Você já pode se conectar com a nova senha.`;
-                            handleEmailConfirmationError(req, res, messageQueryString);
-                        }                      
-                    } catch (error) {
-                        // Handle TokenExpiredError
-                        if (error.name === 'TokenExpiredError') {
-                            messageQueryString = `?error=true&message=
-                            O link de redefinição de senha expirou. Por favor, solicite um novo link.`;
-                            handleEmailConfirmationError(req, res, messageQueryString);
-                        } else if (error.name === 'JsonWebTokenError') {
-                            messageQueryString = `?error=true&message=
-                            O link de redefinição de senha é inválido. <br>
-                            Verifique se o link está correto ou solicite um novo link.`;
-                            handleEmailConfirmationError(req, res, messageQueryString);
-                        } else {
-                            messageQueryString = `?error=true&message=
-                            Ocorreu um erro durante o processo.`;
-                            handleEmailConfirmationError(req, res, messageQueryString);
-                            console.log(error.message);
-                            throw error; // Rethrow other unexpected errors
-                        }
-                    }
+                    // // Create a one time link valid for 30 minutes
+                    // This link is one time valid
+                    const newPassword = bcrypt.hashSync(password, saltRounds);
+                    const loginData = { 
+                        email: recoveredUser[0].email,
+                        password: newPassword
+                    };
+                    const resetedPassword = await resetLoginPassword(loginData, bcrypt, saltRounds);
+                    if (!resetedPassword.email){
+                        messageQueryString = `?error=true&message=
+                        Não foi possível atualizar o email. <br>
+                        Verifique se informou a nova senha corretamente ou tente redefinir novamente.`;
+                        handleEmailConfirmationError(req, res, messageQueryString);
+                    } else {
+                        // Just in case the user had registered 
+                        // but before confirm his email has requested
+                        // reset password
+                        const updatedUser = await confirmUser(id);
+                        // The verification record is not necessary any more, 
+                        // also should be deleted to avoid using the same link again
+                        deleteUserVerification(recoveredUser[0].id);
+                        messageQueryString = `?error=false&message=
+                        Senha redefinida com sucesso para ${ resetedPassword.email }. <br>
+                        Você já pode se conectar com a nova senha.`;
+                        handleEmailConfirmationError(req, res, messageQueryString);
+                    }                      
                 }
             }            
         }
@@ -695,12 +702,13 @@ module.exports = {
     httpGetAllUsers,
     httpGetUser, 
     httpUpdateUser, 
-    handleEmailConfirmation,
+    handleRegisterOrUpdateEmailConfirmation,
     httpUpdateUserEmail,
     handleEmailConfirmationVerified,
     handleEmailConfirmationError,
     httpRenderForgotPassword, 
     httpPostForgotPassword,
     httpResetPassword,
-    httpPostResetPassword
+    httpPostResetPassword,
+    handleForgotPasswordConfirmation
 };

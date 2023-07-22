@@ -1,91 +1,48 @@
 # ToDo
 <!-- ![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNgS4NjTHOlP7WmZ3pIngUGbEa8IQ3yOVvfg&usqp=CAU) -->
  
-## Next Steps
 
 - [x] User register
+- Expiration date
+- Email confirmation 
+- Hash unique string
 - [x] User login
-- [x] CheckEmail
-- [x] Password minimum size
-- [x] CheckName
 - [x] TestaCPF
-- [x] httpUpdateUser validation
-- [x] httpUpdateUserEmail (1st verifies if it's actually a diff email address)
-- [x] httpUpdateCpf
-- [x] [Review GitHub vulnerabilities]('https://github.com/lpkyrius/newsavic-api/security/dependabot')
-- [x] I. Finish users.controller > checkEmailExists(email) [based on this video]('https://youtu.be/yY2gXnRGVUw?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t')
-- [x] II. Finish users.controller > checkCPFExists(cpf) [based on this video]('https://youtu.be/yY2gXnRGVUw?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t')
-- [x] III. Test changes/validations for Register & SignIn [based on this video]('https://youtu.be/yY2gXnRGVUw?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t')
-- [x] Complement tests Users > SignIn (success + fail)
-- [x] Complement tests Users > Register  (success + fail)
-- [x] Complement tests Users > ListUsers (success + fail)
-- [x] Complement tests Users > Profile (success + fail)
-- [x] Complement tests Users > update_user (success + fail)
-- [x] Complement tests Users > confirm (success + fail)
-- [x] Complement tests Users > update_user_email (success + fail)
+- [x] User data update
+- [x] Automated tests Users
+- [x] Forgot password
+- [ ] **Create an user with limited privileges such as no access to create/drop/truncate tables/databases**.
+- User roles, token: [check this video]('https://youtu.be/Tw5LupcpKS4')
 
-
-##### [This video]('https://youtu.be/v6Ul3o8D-js?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t&t=286') and [this one]('https://youtu.be/XqOIjQ78oJA?list=PLk8gdrb2DmCi-9ys7sVZvKNQISs5Bkw-t') will help me to: 
-- [x] I. Add a hash field on user table to save the key for verify user, avoiding emailing the real id as a param for the verification link. 
-- [x] II. Add .env file and adjust email password and other current secret values to it.
-- [x] III. Add expiration date for Register.
-- [x] IV. Register -> if email already exists, suggest to login or reset password.
-- [x] IV. ⭐️ Register -> I've tested and updated the automated tests using updateEmail function. Still needs to do **the whole process** with actual Register new User function
-
-##### Still about the Register/SignIn
-- [x] I. Complement to register: Forgot password (password recovery with email) [this video]('https://youtu.be/72JYhSoVYPc') 
-- [ ] Check why the same link still works twice (it shouldn't).
-- [ ] All possible messages when using register and reset password links are being shown in html?
-- [ ] Still need to actually send the link by email like the confirmation link.
-- [ ] Check if the length of password is ok. [check this]('https://www.tabnine.com/code/javascript/functions/express-validator/Validator/equals')
-- [ ] II. Review (best practices) data validation when receiving Register and Login requests. How to avoid SQL injections, etc. Same to avoid several requisitions attacks. 
-- [ ] ⭐️ **Create an user with limited privileges such as no access to create/drop/truncate tables/databases**.
-- [ ] III. Captcha [check this video]('https://youtu.be/u_QXNT4o_64')
-- [ ] IV. Disable (excluir ou desativar conta?)
-
-Note: In case I need another example [here we go]('https://youtu.be/T6rElSLldyc')
-
-##### And ...
-
-- [ ] ⭐️ Jogar o sistema para um Docker e subir no Docker Playground - assim disponibilizo online
-- [x] NodeJS  132. Jest:  3’20
-```
-npm install jest --save-dev
-npm install supertest --save-dev
-```
-- [x] NodeJS  133. SuperTest: 1’10 ⚠️
-* I've already installed and created the 1st test (GET)
-* For POST test, as soon as the POST is done, check [Class 134]('https://www.udemy.com/course/complete-nodejs-developer-zero-to-mastery/learn/lecture/26199790#overview') 
+- [ ] Captcha [check this video]('https://youtu.be/u_QXNT4o_64')
+- [ ] Validations: [check this]('https://www.tabnine.com/code/javascript/functions/express-validator/Validator/equals')
+- [ ] Disable User Account (to-do not urgent - just avoid the user to log in)
+- [ ] ⭐️ Use one Docker to deploy it at Docker Playground
 - [ ] TypeScript NodeJS 394. TypeScript Installation implementation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428') => Let's do it before continue.
 - [ ] Knex.js Migration [for example]('https://youtu.be/6HmC32AY41k')
-- [ ] User roles, token: [check this video]('https://youtu.be/Tw5LupcpKS4')
 - [ ] Performance (PM2 Cluster) & Deploy scripts. [149. Improving Performance Of Our NASA Project]('https://www.udemy.com/course/complete-nodejs-developer-zero-to-mastery/learn/lecture/26009832#overview')
 
 <br>
+# Done!
 - [x] Create Project with NodeJS 107. API Server Setup 
 ```
 npm init -y
 npm install express 
 npm install --save-dev nodemon
 ```
+1. Server > App
+2. Forward approach: Router > Controller > Model
+3. Bottom UP approach: Model > Router > Controller
+
 #### Focus on essentials only!!! 👀
 * What are the **trully main features** we need as a 1st version?
 * What's the **priority**?
 * After that, **review if the next features still make sense**.
 * What's the **priority now**?
 
+<br>
 
-
-#### Note about the sequence:
-1. Server > App
-2.1 Forward approach: Router > Controller > Model
-2.2 Bottom UP approach: Model > Router > Controller
-
-## Testing Area
-Access _localhost_ [here](http://localhost:8000/grupos)
-
-
-## Next Steps
+# Next Steps
 #### Frontend 
 * Check [Class vs Hooks]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/26127202#overview') and mainly [here]('https://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/36906286#overview')
 * NextJS? May be it'd be better 
