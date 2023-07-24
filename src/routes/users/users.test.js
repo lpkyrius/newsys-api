@@ -175,8 +175,8 @@ describe('Users API', () => {
             //         .expect(201);
                 
             //     // For any date data
-            //     const requestDate = new Date().valueOf(); // user.joined 
-            //     const responseDate = new Date(response.body.joined).valueOf();
+            //     const requestDate = new Date().valueOf(); // user.created_at 
+            //     const responseDate = new Date(response.body.created_at).valueOf();
             //     expect(responseDate).toBe(requestDate);
 
             //     expect(response.body).toMatchObject(userDataWithoutDate);
@@ -195,10 +195,10 @@ describe('Users API', () => {
     });
 
     // usersRouter.get('/profile/:id', httpGetUser); 
-    describe('Test GET /profile/82', () => {
+    describe('Test GET /profile/1', () => {
         test('It should respond with 200 success + Content-Type = json', async () => {
             const response = await request(app)
-                .get('/profile/82')
+                .get('/profile/1')
                 .expect('Content-Type', /json/)
                 .expect(200);
         });
@@ -218,7 +218,7 @@ describe('Users API', () => {
                 userData.name = "test#$";
                 userData.cpf = cpf;
                 const response = await request(app)
-                    .put('/update_user/82')
+                    .put('/update_user/1')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(400);
@@ -230,7 +230,7 @@ describe('Users API', () => {
                 userData.name = "";
                 userData.cpf = cpf;
                 const response = await request(app)
-                    .put('/update_user/82')
+                    .put('/update_user/1')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(400);
@@ -242,7 +242,7 @@ describe('Users API', () => {
                 userData.name = name
                 userData.cpf = "";
                 const response = await request(app)
-                    .put('/update_user/82')
+                    .put('/update_user/1')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(400);
@@ -254,7 +254,7 @@ describe('Users API', () => {
                 userData.name = name
                 userData.cpf = cpf;
                 const response = await request(app)
-                    .put('/update_user/82')
+                    .put('/update_user/1')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(200);
@@ -270,7 +270,7 @@ describe('Users API', () => {
         describe('Test GET /confirm_email/:id/:uniqueString general test', () => {
             test('It should respond with 200 + Content-Type = html', async () => {
                 const response = await request(app)
-                    .get('/confirm_email/83/9a405464-bc99-4dc5-bf8d-1c5a596bf3b383')
+                    .get('/confirm_email/1/9a405464-bc99-4dc5-bf8d-1c5a596bf3b383')
                     .expect('Content-Type', "text/plain; charset=utf-8")
                     .expect(302)
                     // .end((err, res) => {
@@ -315,7 +315,7 @@ describe('Users API', () => {
         describe('Test PUT /confirm_email/:id with an email already used', () => {
             test('It should respond with 400 fail + Content-Type = json', async () => {
                 const response = await request(app)
-                    .put('/update_user_email/83')
+                    .put('/update_user_email/2')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(400);
@@ -326,7 +326,7 @@ describe('Users API', () => {
             test('It should respond with 400 fail + Content-Type = json', async () => {
                 userData.email = "lpkyriusgmail.com"
                 const response = await request(app)
-                    .put('/update_user_email/83')
+                    .put('/update_user_email/1')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(400);
@@ -346,9 +346,9 @@ describe('Users API', () => {
 
         describe('Test PUT /update_user_email/:id with a valid email', () => {
             test('It should respond with 200 success + Content-Type = json', async () => {
-                userData.email = "lpkyrius@hotmail.com"
+                userData.email = "lpkyrius@gmail.com"
                 const response = await request(app)
-                    .put('/update_user_email/83')
+                    .put('/update_user_email/1')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(200);

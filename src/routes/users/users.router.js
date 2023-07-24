@@ -11,7 +11,6 @@ const  {
     handleEmailConfirmationVerified,
     httpRenderForgotPassword,
     httpPostForgotPassword,
-    httpResetPassword,
     httpPostResetPassword,
     handleForgotPasswordConfirmation
 } =  require('./users.controller');

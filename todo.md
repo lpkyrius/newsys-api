@@ -11,7 +11,11 @@
 - [x] User data update
 - [x] Automated tests Users
 - [x] Forgot password
-- [ ] Update documentation -> flows (currently in FreeForm)
+- [x] Knex.js Migration 
+- [ ] Create process for field users.updated_at
+- [ ] Update documentation -> flows 
+- Currently in FreeForm
+- Check [dbdiagram.io]('https://dbdiagram.io/d/64be660f02bd1c4a5e97415f')
 - [ ] **Create an user with limited privileges such as no access to create/drop/truncate tables/databases**.
 - User roles, token: [check this video]('https://youtu.be/Tw5LupcpKS4')
 
@@ -20,7 +24,6 @@
 - [ ] Disable User Account (to-do not urgent - just avoid the user to log in)
 - [ ] ⭐️ Use one Docker to deploy it at Docker Playground
 - [ ] TypeScript NodeJS 394. TypeScript Installation implementation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428') => Let's do it before continue.
-- [ ] Knex.js Migration [for example]('https://youtu.be/6HmC32AY41k')
 - [ ] Performance (PM2 Cluster) & Deploy scripts. [149. Improving Performance Of Our NASA Project]('https://www.udemy.com/course/complete-nodejs-developer-zero-to-mastery/learn/lecture/26009832#overview')
 
 <br>

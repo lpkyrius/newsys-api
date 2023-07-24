@@ -1,15 +1,15 @@
+require('dotenv').config();
 
 const db = require('knex')({
     client: 'pg',
     connection: {
-      host : '127.0.0.1',
-      port : 5432, // double-check the right PORT
-      user : 'postgres',
-      password : '',
-      database : 'newsavic'
+    host :    process.env.DB_HOST,
+    port :    Number(process.env.DB_PORT),
+    database: process.env.DB_NAME,
+    user:     process.env.SERVER_USER,
+    password: process.env.DB_PASSWORD
     }
 });
-
 
 module.exports = {
     db,

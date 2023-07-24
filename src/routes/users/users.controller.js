@@ -69,7 +69,7 @@ async function handleSignin(req, res) {
 async function handleRegister(req, res) {
     try {
         let {email, name, cpf, password } = req.body;
-        const joined = new Date();
+        const created_at = new Date();
         
         // data validation
         email = email.slice(0,100);
@@ -77,7 +77,7 @@ async function handleRegister(req, res) {
         cpf = cpf.slice(0,11); 
         if (email == "" || name == "" || cpf == "" || password == ""){
             res.status(400).json({ error: 'Dados inválidos.' });
-        } else if (isNaN(joined)) {
+        } else if (isNaN(created_at)) {
             res.status(400).json({ error: 'Data de registro inválida.' });
         } else if (!checkUserName(name)){
             res.status(400).json({ error: 'Nome inválido.' });
@@ -93,7 +93,7 @@ async function handleRegister(req, res) {
             res.status(400).json({ error: 'Email já cadastrado.' });
         } else {
             password = bcrypt.hashSync(password, saltRounds);
-            const userData = { email, name, cpf, joined, password };
+            const userData = { email, name, cpf, created_at, password };
             const registeredUser = await registerUser(userData);
             // Send confirmation email
             sendConfirmationEmail(email, registeredUser[0].id, 'register');
@@ -108,21 +108,23 @@ async function handleRegister(req, res) {
 const sendConfirmationEmail = async (email, userId, goal) => {
     try {
         let expiresAt = 0;
+        let resetExpiration = 0;
         let routeLink = '';
         let subject = '';
         let titulo = '';
         let body_message ='';
         if (goal==='register' || goal === 'update_user_email'){
-            expiresAt = Date.now() + Number(process.env.EMAIL_EXPIRATION || 21600000); // 6 hours
+            resetExpiration = Number(process.env.EMAIL_EXPIRATION || 21600000);
+            expiresAt = Date.now() + resetExpiration; // 6 hours
             routeLink = 'confirm_email';
             subject = 'Confirme seu registro no New SAVIC';
             titulo = 'Confirme seu registro no New SAVIC';
             body_message = `<p>Para ter acesso liberado ao <b>New SAVIC da RCC Brasil</b>,
             <br>por favor, confirme seu e-mail através do link abaixo:</p>
-            <p><b>Este link vai expirar em ${Math.round(expiresAt/3600000)} horas.</b></p>`
+            <p><b>Este link vai expirar em ${Math.round(resetExpiration/3600000)} horas.</b></p>`
         } else {
             // reset_password
-            let resetExpiration = Number(process.env.RESET_EXPIRATION || 1800000);
+            resetExpiration = Number(process.env.RESET_EXPIRATION || 1800000);
             expiresAt = Date.now() + resetExpiration; // 30 min
             routeLink = 'reset_password';
             subject = 'Redefina sua senha no New SAVIC';
@@ -565,69 +567,6 @@ async function httpPostForgotPassword(req, res, next){
     }
 }
 
-// not used anymore switched to handleForgotPasswordConfirmation
-async function httpResetPassword(req, res, next){
-    try {
-        const { id, token } = req.params;
-        let messageQueryString = ""
-        if (id == "" || token == ""){
-            messageQueryString = `?error=true&message=
-            Parametros inválidos.`;
-            handleEmailConfirmationError(req, res, messageQueryString);
-        } else if (isNaN(Number(id))){
-            messageQueryString = `?error=true&message=
-            Formato id inválido.`;
-            handleEmailConfirmationError(req, res, messageQueryString);
-        } else {
-            const recoveredUser = await getUserByKey({ id });
-            if (!recoveredUser.length) {
-                messageQueryString = `?error=true&message=
-                Id inválida.`;
-                handleEmailConfirmationError(req, res, messageQueryString);
-            } else {
-                const loginData = {
-                    email: recoveredUser[0].email,
-                    action: 'reset_password'
-                };
-                const login = await signinUser(loginData, bcrypt, saltRounds) || [];
-                if (login.length){
-                    // Create a one time link valid for 30 minutes
-                    const JWT_SECRET = process.env.JWT_SECRET || 'new_savic';
-                    // Let's use the current password making this link one time valid
-                    const secret = JWT_SECRET + login[0].password; 
-                    try {
-                        const payload = jwt.verify(token, secret);
-                        res.render(path.join(__dirname, "../../views/reset_password"), {email: login[0].email});
-                    } catch (error) {
-                        // Handle TokenExpiredError
-                        if (error.name === 'TokenExpiredError') {
-                            messageQueryString = `?error=true&message=
-                            O link de redefinição de senha expirou. Por favor, solicite um novo link.`;
-                            handleEmailConfirmationError(req, res, messageQueryString);
-                        } else if (error.name === 'JsonWebTokenError') {
-                            messageQueryString = `?error=true&message=
-                            O link de redefinição de senha é inválido. 
-                            <br>Verifique se o link está correto ou solicite um novo link.`;
-                            handleEmailConfirmationError(req, res, messageQueryString);
-                        } else {
-                            console.log(error.message);
-                            messageQueryString = `?error=true&message=
-                            Não foi possível localizar o usuário.`;
-                            handleEmailConfirmationError(req, res, messageQueryString);
-                        }
-                    }
-                } else {
-                    messageQueryString = `?error=true&message=
-                    Não foi possível localizar o usuário.`;
-                    handleEmailConfirmationError(req, res, messageQueryString);
-                }    
-            }
-        }
-    } catch (error) {
-        res.status(500).json(error);
-    }
-}
-
 async function httpPostResetPassword(req, res, next){
     try {
         let {id, uniqueString} = req.params;
@@ -678,7 +617,7 @@ async function httpPostResetPassword(req, res, next){
                     } else {
                         // Just in case the user had registered 
                         // but before confirm his email has requested
-                        // reset password
+                        // reset password - it also update users.updated_at field
                         const updatedUser = await confirmUser(id);
                         // The verification record is not necessary any more, 
                         // also should be deleted to avoid using the same link again
@@ -708,7 +647,6 @@ module.exports = {
     handleEmailConfirmationError,
     httpRenderForgotPassword, 
     httpPostForgotPassword,
-    httpResetPassword,
     httpPostResetPassword,
     handleForgotPasswordConfirmation
 };

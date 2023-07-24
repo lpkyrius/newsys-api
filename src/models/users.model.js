@@ -24,7 +24,7 @@ async function registerUser(user) {
                 email: user.email,
                 name: user.name,
                 cpf: user.cpf,
-                joined: user.joined
+                created_at: user.created_at
             })
             .returning('*');
 
@@ -89,7 +89,10 @@ async function confirmUser(userId) {
     try {
         const updatedUser = await db('users')
             .where('id', '=', userId)
-            .update({ verified: true })
+            .update({ 
+                verified: true,
+                updated_at: new Date()
+            })
             .returning('*');
         return updatedUser;
     } catch (error) {
@@ -143,7 +146,8 @@ async function updateUser(userId, userData) {
             .where('id', '=', userId)
             .update({
                 name: name,
-                cpf: cpf
+                cpf: cpf,
+                updated_at: new Date()
               })
             .returning('*');
         return updatedUser;
@@ -158,12 +162,18 @@ async function updateEmail(userId, oldEmail, userData) {
         const updatedUserLogin = await db.transaction(async (trx) => {
             const updatedUser = await trx('users')
             .where('id', '=', userId)
-            .update(userData)
+            .update({
+                email: userData.email, 
+                verified: userData.verified,
+                updated_at: new Date()
+            })
             .returning('*');
         
         const updatedLogin = await trx('login')
             .where('email', '=', oldEmail)
-            .update({ email: updatedUser[0].email })
+            .update({ 
+                email: updatedUser[0].email
+             })
             .returning('*');
 
             return updatedUser;
