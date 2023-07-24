@@ -11,6 +11,7 @@
 - [x] User data update
 - [x] Automated tests Users
 - [x] Forgot password
+- [ ] Update documentation -> flows (currently in FreeForm)
 - [ ] **Create an user with limited privileges such as no access to create/drop/truncate tables/databases**.
 - User roles, token: [check this video]('https://youtu.be/Tw5LupcpKS4')
 
