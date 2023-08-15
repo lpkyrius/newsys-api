@@ -1,8 +1,9 @@
 import express from 'express'; 
 
 // const cors = require('cors'); 
-
-const usersRouter = require('./routes/users/users.router');
+import usersRouter from './routes/users/users.router';
+// import gruposRouter from './routes/grupos/grupos.router';
+// const usersRouter = require('./routes/users/users.router');
 const gruposRouter = require('./routes/grupos/grupos.router');
 
 const app = express();

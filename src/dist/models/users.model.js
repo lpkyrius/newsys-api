@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -208,7 +209,7 @@ function updateEmail(userId, oldEmail, userData) {
         }
     });
 }
-function signinUser(loginData, bcrypt, saltRounds) {
+function SignInUser(loginData, bcrypt) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let recoveredUser = [];
@@ -218,7 +219,7 @@ function signinUser(loginData, bcrypt, saltRounds) {
                 .from('login')
                 .where('email', '=', loginData.email);
             if (recoveredLogin.length) {
-                if (loginData.action === 'signin') { // login
+                if (loginData.action === 'SignIn') { // login
                     match = yield bcrypt.compare(loginData.password, recoveredLogin[0].hash);
                     if (match) {
                         recoveredUser = yield db('users')
@@ -234,12 +235,12 @@ function signinUser(loginData, bcrypt, saltRounds) {
             return recoveredUser[0];
         }
         catch (error) {
-            console.log(`Error in signinUser(): ${error}`);
+            console.log(`Error in SignInUser(): ${error}`);
             throw error;
         }
     });
 }
-function resetLoginPassword(loginData, bcrypt, saltRounds) {
+function resetLoginPassword(loginData) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const updatedLogin = yield db('login')
@@ -259,7 +260,7 @@ module.exports = {
     registerUser,
     getUserById,
     updateUser,
-    signinUser,
+    SignInUser,
     confirmUser,
     getUserByKey,
     getKeyAlreadyUsedByAnotherId,

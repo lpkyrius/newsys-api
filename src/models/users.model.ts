@@ -1,5 +1,18 @@
 const { db } = require('../services/postgresql');
 
+interface User {
+    email: string;
+    name: string;
+    cpf?: string;
+    created_at?: Date;
+    password?: string;
+    user_id?: number;
+    unique_string?: string;
+    expires_at?: Date; 
+    verified?: boolean;
+    action?: string;
+}
+
 async function getAllUsers() {
     try {
         const recoveredUsers = await db('users')
@@ -11,14 +24,14 @@ async function getAllUsers() {
     }
 }
 
-async function registerUser(user) {
+async function registerUser(user: User) {
     /*
         If the transaction function completes without throwing an error, 
         it automatically commits the changes made within the transaction. 
         If an error occurs, it automatically rolls back the transaction.
     */
     try {
-        const registeredUser = await db.transaction(async (trx) => {
+        const registeredUser = await db.transaction(async (trx: any) => {
             const insertedUser = await trx('users')
             .insert({
                 email: user.email,
@@ -41,7 +54,7 @@ async function registerUser(user) {
     }
 }
 
-async function newUserVerification(data) {
+async function newUserVerification(data: User) {
     try {
         const registeredVerification = await db('user_verification')
             .insert({
@@ -59,7 +72,7 @@ async function newUserVerification(data) {
     }
 }
 
-async function deleteUserVerification(user_id) {
+async function deleteUserVerification(user_id: any) {
     try {
         const registeredVerification = await db('user_verification')
             .where({ user_id })
@@ -72,7 +85,7 @@ async function deleteUserVerification(user_id) {
 
 
 // Function to confirm user and update verified field
-async function getUserVerificationById(user_id) {
+async function getUserVerificationById(user_id: any) {
     try {
         const recoveredData = await db('user_verification')
             .select('*')
@@ -85,7 +98,7 @@ async function getUserVerificationById(user_id) {
         throw error;
     }
 }
-async function confirmUser(userId) {
+async function confirmUser(userId: number) {
     try {
         const updatedUser = await db('users')
             .where('id', '=', userId)
@@ -101,7 +114,7 @@ async function confirmUser(userId) {
     }
 }
 
-async function getUserById(id) {
+async function getUserById(id: any) {
     try {
         const recoveredUser = await db('users')
         .select('*').from('users').where({ id });
@@ -112,7 +125,7 @@ async function getUserById(id) {
     }
 }
 
-async function getUserByKey(key) {
+async function getUserByKey(key: any) {
     try {
         const recoveredUser = await db('users')
             .select('*')
@@ -125,7 +138,7 @@ async function getUserByKey(key) {
     }
 }
 
-async function getKeyAlreadyUsedByAnotherId(id, key) {
+async function getKeyAlreadyUsedByAnotherId(id: any, key: any) {
     try {
         const recoveredUser = await db('users')
         .select('*').from('users')
@@ -139,7 +152,7 @@ async function getKeyAlreadyUsedByAnotherId(id, key) {
     }
 }
 
-async function updateUser(userId, userData) {
+async function updateUser(userId: number, userData: User) {
     try {
         const {name, cpf } = userData
         const updatedUser = await db('users')
@@ -157,9 +170,9 @@ async function updateUser(userId, userData) {
     }
 }
 
-async function updateEmail(userId, oldEmail, userData) {
+async function updateEmail(userId: number, oldEmail: string, userData: User) {
     try {
-        const updatedUserLogin = await db.transaction(async (trx) => {
+        const updatedUserLogin = await db.transaction(async (trx: any) => {
             const updatedUser = await trx('users')
             .where('id', '=', userId)
             .update({
@@ -185,7 +198,7 @@ async function updateEmail(userId, oldEmail, userData) {
     }
 }
 
-async function signinUser(loginData, bcrypt, saltRounds) {
+async function SignInUser(loginData: User, bcrypt: any) {
     try {
         let recoveredUser = [];
         let match = false;
@@ -194,7 +207,7 @@ async function signinUser(loginData, bcrypt, saltRounds) {
         .from('login')
         .where('email', '=', loginData.email);
         if (recoveredLogin.length){
-            if (loginData.action === 'signin'){ // login
+            if (loginData.action === 'SignIn'){ // login
                 match = await bcrypt.compare(loginData.password, recoveredLogin[0].hash);
                 if (match){
                     recoveredUser = await db('users')
@@ -208,12 +221,12 @@ async function signinUser(loginData, bcrypt, saltRounds) {
         }
         return recoveredUser[0];
     } catch (error) {
-    console.log(`Error in signinUser(): ${ error }`)
+    console.log(`Error in SignInUser(): ${ error }`)
     throw error;
     }
 }   
 
-async function resetLoginPassword(loginData, bcrypt, saltRounds) {
+async function resetLoginPassword(loginData: User) {
     try {
         const updatedLogin = await db('login')
             .where('email', '=', loginData.email)
@@ -231,7 +244,7 @@ module.exports = {
     registerUser,
     getUserById,
     updateUser,
-    signinUser,
+    SignInUser,
     confirmUser,
     getUserByKey,
     getKeyAlreadyUsedByAnotherId,

@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,7 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const { registerUser, getUserByKey, getAllUsers, updateUser, signinUser, confirmUser, getKeyAlreadyUsedByAnotherId, updateEmail, newUserVerification, getUserVerificationById, deleteUserVerification, resetLoginPassword } = require('../../models/users.model');
+Object.defineProperty(exports, "__esModule", { value: true });
+const { registerUser, getUserByKey, getAllUsers, updateUser, SignInUser, confirmUser, getKeyAlreadyUsedByAnotherId, updateEmail, newUserVerification, getUserVerificationById, deleteUserVerification, resetLoginPassword } = require('../../models/users.model');
 const passwordSize = Number(process.env.PASSWORD_MIN_SIZE || 8);
 // hash handler
 const bcrypt = require('bcrypt');
@@ -22,7 +24,7 @@ require('dotenv').config();
 const path = require("path");
 // web token
 const jwt = require('jsonwebtoken');
-function handleSignin(req, res) {
+function handleSignIn(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let { email, password } = req.body;
@@ -40,9 +42,9 @@ function handleSignin(req, res) {
                 const loginData = {
                     email: email,
                     password: password,
-                    action: 'signin'
+                    action: 'SignIn'
                 };
-                const user = (yield signinUser(loginData, bcrypt, saltRounds)) || [];
+                const user = (yield SignInUser(loginData, bcrypt)) || [];
                 if (user.id) {
                     if (!user.verified) {
                         res.status(400).json({ error: 'Usuário ainda não confirmado via email de confirmação.' });
@@ -73,9 +75,6 @@ function handleRegister(req, res) {
             if (email == "" || name == "" || cpf == "" || password == "") {
                 res.status(400).json({ error: 'Dados inválidos.' });
             }
-            else if (isNaN(created_at)) {
-                res.status(400).json({ error: 'Data de registro inválida.' });
-            }
             else if (!checkUserName(name)) {
                 res.status(400).json({ error: 'Nome inválido.' });
             }
@@ -99,7 +98,7 @@ function handleRegister(req, res) {
                 const userData = { email, name, cpf, created_at, password };
                 const registeredUser = yield registerUser(userData);
                 // Send confirmation email
-                sendConfirmationEmail(email, registeredUser[0].id, 'register');
+                sendConfirmationEmail(req, res, email, registeredUser[0].id, 'register');
                 res.status(201).json(registeredUser);
             }
         }
@@ -109,7 +108,7 @@ function handleRegister(req, res) {
     });
 }
 // Function to send confirmation email when a new user sign on
-const sendConfirmationEmail = (email, userId, goal) => __awaiter(this, void 0, void 0, function* () {
+const sendConfirmationEmail = (req, res, email, userId, goal) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let expiresAt = 0;
         let resetExpiration = 0;
@@ -275,9 +274,10 @@ function handleForgotPasswordConfirmation(req, res) {
 }
 function handleEmailConfirmation(req, res, goal) {
     return __awaiter(this, void 0, void 0, function* () {
+        let messageQueryString = "";
         try {
-            let { id, uniqueString } = req.params;
-            let messageQueryString = "";
+            const uniqueString = req.params.uniqueString;
+            const id = parseInt(req.params.id);
             if (isNaN(id)) {
                 messageQueryString = `?error=true&message=Problemas na id. 
             <br>Por favor, verifique novamente o link enviado.`;
@@ -452,7 +452,7 @@ function httpUpdateUserEmail(req, res) {
                         const updatedUser = yield updateEmail(userId, checkIfEmailChanged[0].email, userData);
                         if (updatedUser.length) {
                             // Send confirmation email
-                            yield sendConfirmationEmail(email, updatedUser[0].id, 'update_user_email');
+                            yield sendConfirmationEmail(req, res, email, updatedUser[0].id, 'update_user_email');
                             res.status(200).json(updatedUser[0]);
                         }
                         else {
@@ -544,6 +544,7 @@ function TestaCPF(strCPF) {
     let Soma;
     let Resto;
     let validaKey = ((process.env.CPF_VALIDATION || "1") == "1") ? true : false;
+    let i = 0;
     if (!validaKey) {
         return true; // validation has been turned off.
     }
@@ -569,12 +570,12 @@ function TestaCPF(strCPF) {
         return true;
     }
 }
-function httpRenderForgotPassword(req, res, next) {
+function httpRenderForgotPassword(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         res.render(path.join(__dirname, "../../views/forgot_password"));
     });
 }
-function httpPostForgotPassword(req, res, next) {
+function httpPostForgotPassword(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { email } = req.body;
@@ -601,11 +602,11 @@ function httpPostForgotPassword(req, res, next) {
                         email: email,
                         action: 'reset_password'
                     };
-                    const login = (yield signinUser(loginData, bcrypt, saltRounds)) || [];
+                    const login = (yield SignInUser(loginData, bcrypt)) || [];
                     if (login.length) {
                         // Create a one time link valid for 30 minutes (inside sendConfirmationEmail() )
                         // Send confirmation email
-                        sendConfirmationEmail(email, recoveredUser[0].id, 'reset_password');
+                        sendConfirmationEmail(req, res, email, recoveredUser[0].id, 'reset_password');
                         messageQueryString = `?error=false&message=
                     O link para redefinir a senha foi enviado para o seu email.`;
                         handleEmailConfirmationError(req, res, messageQueryString);
@@ -623,7 +624,7 @@ function httpPostForgotPassword(req, res, next) {
         }
     });
 }
-function httpPostResetPassword(req, res, next) {
+function httpPostResetPassword(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let { id, uniqueString } = req.params;
@@ -661,7 +662,7 @@ function httpPostResetPassword(req, res, next) {
                         email: recoveredUser[0].email,
                         action: 'reset_password'
                     };
-                    const login = (yield signinUser(loginData, bcrypt, saltRounds)) || [];
+                    const login = (yield SignInUser(loginData, bcrypt)) || [];
                     if (login.length) {
                         // // Create a one time link valid for 30 minutes
                         // This link is one time valid
@@ -670,7 +671,7 @@ function httpPostResetPassword(req, res, next) {
                             email: recoveredUser[0].email,
                             password: newPassword
                         };
-                        const resetedPassword = yield resetLoginPassword(loginData, bcrypt, saltRounds);
+                        const resetedPassword = yield resetLoginPassword(loginData);
                         if (!resetedPassword.email) {
                             messageQueryString = `?error=true&message=
                         Não foi possível atualizar o email. <br>
@@ -700,7 +701,7 @@ function httpPostResetPassword(req, res, next) {
     });
 }
 module.exports = {
-    handleSignin,
+    handleSignIn,
     handleRegister,
     httpGetAllUsers,
     httpGetUser,

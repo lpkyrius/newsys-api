@@ -1,3 +1,4 @@
+"use strict";
 const express = require('express');
 const { httpGetAllGrupos } = require('./grupos.controller');
 const gruposRouter = express.Router();

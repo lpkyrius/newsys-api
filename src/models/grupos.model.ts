@@ -1,6 +1,14 @@
 //const { promiseHooks } = require("v8");
 
-const grupos = [
+interface Grupo {
+    id: number;
+    name: string;
+    inicio: Date;
+    dia: string;
+    hora: string;
+}
+
+const grupos: Array<Grupo> = [
     {
         id: 1,
         name: 'Shekinah',

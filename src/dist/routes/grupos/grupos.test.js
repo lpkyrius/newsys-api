@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,7 +12,7 @@ const request = require('supertest');
 const app = require('../../app');
 describe('Grupos API', () => {
     describe('Test GET /grupos', () => {
-        test('It should respond with 200 success + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+        test('It should respond with 200 success + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
             const response = yield request(app)
                 .get('/grupos')
                 .expect('Content-Type', /json/)

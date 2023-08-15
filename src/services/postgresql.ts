@@ -1,3 +1,5 @@
+import Knex from 'knex';
+
 require('dotenv').config();
 
 const db = require('knex')({

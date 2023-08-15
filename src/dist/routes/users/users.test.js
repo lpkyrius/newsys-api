@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -31,14 +32,14 @@ describe('Users API', () => {
     // beforeAll( async () => {
     //     await db;
     // });
-    afterAll(() => __awaiter(this, void 0, void 0, function* () {
+    afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
         console.log(message);
     }));
-    // usersRouter.post('/signin',     handleSignin); 
+    // usersRouter.post('/SignIn',     handleSignIn); 
     describe('Test POST /userSignIn', () => {
-        test('It should respond with 200 success', () => __awaiter(this, void 0, void 0, function* () {
+        test('It should respond with 200 success', () => __awaiter(void 0, void 0, void 0, function* () {
             const response = yield request(app)
-                .post('/signin')
+                .post('/SignIn')
                 .send({
                 "email": "lpkyrius@gmail.com",
                 "password": "lpkyrius123"
@@ -46,9 +47,9 @@ describe('Users API', () => {
                 .expect('Content-Type', /json/)
                 .expect(200);
         }));
-        test('It should respond with 400 bad request', () => __awaiter(this, void 0, void 0, function* () {
+        test('It should respond with 400 bad request', () => __awaiter(void 0, void 0, void 0, function* () {
             const response = yield request(app)
-                .post('/signin')
+                .post('/SignIn')
                 .send({
                 "email": "lpkyrius@hotmail.com",
                 "password": ""
@@ -74,7 +75,7 @@ describe('Users API', () => {
             cpf: cpf
         };
         describe('Test POST /register email already exists', () => {
-            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userDataWithoutDate.email = "test.com";
                 const response = yield request(app)
                     .post('/register')
@@ -85,7 +86,7 @@ describe('Users API', () => {
             userDataWithoutDate.email = "lpkyrius@gmail.com";
         });
         describe('Test POST /register bad format email', () => {
-            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userDataWithoutDate.email = "test.com";
                 const response = yield request(app)
                     .post('/register')
@@ -96,7 +97,7 @@ describe('Users API', () => {
             userDataWithoutDate.email = email;
         });
         describe('Test POST /register blank email', () => {
-            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userDataWithoutDate.email = "";
                 const response = yield request(app)
                     .post('/register')
@@ -107,7 +108,7 @@ describe('Users API', () => {
             userDataWithoutDate.email = email;
         });
         describe('Test POST /register blank password', () => {
-            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userDataWithoutDate.password = "";
                 const response = yield request(app)
                     .post('/register')
@@ -118,7 +119,7 @@ describe('Users API', () => {
             userDataWithoutDate.password = password;
         });
         describe('Test POST /register blank name', () => {
-            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userDataWithoutDate.name = "";
                 const response = yield request(app)
                     .post('/register')
@@ -129,7 +130,7 @@ describe('Users API', () => {
             userDataWithoutDate.password = password;
         });
         describe('Test POST /register cpf already exists', () => {
-            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 const response = yield request(app)
                     .post('/register')
                     .send(userDataWithoutDate)
@@ -138,7 +139,7 @@ describe('Users API', () => {
             }));
         });
         describe('Test POST /register blank cpf', () => {
-            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userDataWithoutDate.cpf = "";
                 const response = yield request(app)
                     .post('/register')
@@ -175,7 +176,7 @@ describe('Users API', () => {
     });
     // usersRouter.get('/listUsers', httpGetAllUsers); 
     describe('Test GET /listUsers', () => {
-        test('It should respond with 200 success + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+        test('It should respond with 200 success + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
             const response = yield request(app)
                 .get('/listUsers')
                 .expect('Content-Type', /json/)
@@ -184,7 +185,7 @@ describe('Users API', () => {
     });
     // usersRouter.get('/profile/:id', httpGetUser); 
     describe('Test GET /profile/1', () => {
-        test('It should respond with 200 success + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+        test('It should respond with 200 success + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
             const response = yield request(app)
                 .get('/profile/1')
                 .expect('Content-Type', /json/)
@@ -200,7 +201,7 @@ describe('Users API', () => {
             cpf: cpf
         };
         describe('Test PUT /update_user/:id bad format name', () => {
-            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.name = "test#$";
                 userData.cpf = cpf;
                 const response = yield request(app)
@@ -211,7 +212,7 @@ describe('Users API', () => {
             }));
         });
         describe('Test PUT /update_user/:id blank name', () => {
-            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.name = "";
                 userData.cpf = cpf;
                 const response = yield request(app)
@@ -222,7 +223,7 @@ describe('Users API', () => {
             }));
         });
         describe('Test PUT /update_user/:id blank cpf', () => {
-            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.name = name;
                 userData.cpf = "";
                 const response = yield request(app)
@@ -233,7 +234,7 @@ describe('Users API', () => {
             }));
         });
         describe('Test PUT /update_user/:id', () => {
-            test('It should respond with 200 success + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 200 success + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.name = name;
                 userData.cpf = cpf;
                 const response = yield request(app)
@@ -248,7 +249,7 @@ describe('Users API', () => {
     // usersRouter.put('/confirm_email/:id/:uniqueString', handleEmailConfirmation);
     describe('Test GET /confirm_email/:id/:uniqueString', () => {
         describe('Test GET /confirm_email/:id/:uniqueString general test', () => {
-            test('It should respond with 200 + Content-Type = html', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 200 + Content-Type = html', () => __awaiter(void 0, void 0, void 0, function* () {
                 const response = yield request(app)
                     .get('/confirm_email/1/9a405464-bc99-4dc5-bf8d-1c5a596bf3b383')
                     .expect('Content-Type', "text/plain; charset=utf-8")
@@ -289,7 +290,7 @@ describe('Users API', () => {
             email: "lpkyrius@gmail.com"
         };
         describe('Test PUT /confirm_email/:id with an email already used', () => {
-            test('It should respond with 400 fail + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 400 fail + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 const response = yield request(app)
                     .put('/update_user_email/2')
                     .send(userData)
@@ -298,7 +299,7 @@ describe('Users API', () => {
             }));
         });
         describe('Test PUT /update_user_email/:id with bad format email', () => {
-            test('It should respond with 400 fail + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 400 fail + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.email = "lpkyriusgmail.com";
                 const response = yield request(app)
                     .put('/update_user_email/1')
@@ -308,7 +309,7 @@ describe('Users API', () => {
             }));
         });
         describe('Test PUT /update_user_email/:id with an id that does not exist', () => {
-            test('It should respond with 400 fail + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 400 fail + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.email = "lpkyrius@hotmail.com";
                 const response = yield request(app)
                     .put('/update_user_email/0')
@@ -318,7 +319,7 @@ describe('Users API', () => {
             }));
         });
         describe('Test PUT /update_user_email/:id with a valid email', () => {
-            test('It should respond with 200 success + Content-Type = json', () => __awaiter(this, void 0, void 0, function* () {
+            test('It should respond with 200 success + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.email = "lpkyrius@gmail.com";
                 const response = yield request(app)
                     .put('/update_user_email/1')

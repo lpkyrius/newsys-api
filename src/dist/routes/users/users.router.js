@@ -1,3 +1,4 @@
+"use strict";
 const express = require('express');
 const { handleSignin, handleRegister, httpGetAllUsers, httpGetUser, httpUpdateUser, handleRegisterOrUpdateEmailConfirmation, httpUpdateUserEmail, handleEmailConfirmationVerified, httpRenderForgotPassword, httpPostForgotPassword, httpPostResetPassword, handleForgotPasswordConfirmation } = require('./users.controller');
 const usersRouter = express.Router();

@@ -28,11 +28,11 @@ describe('Users API', () => {
         console.log(message);
     });
 
-    // usersRouter.post('/signin',     handleSignin); 
+    // usersRouter.post('/SignIn',     handleSignIn); 
     describe('Test POST /userSignIn', () => {
         test('It should respond with 200 success', async () => {
             const response = await request(app)
-                .post('/signin')
+                .post('/SignIn')
                 .send({
                     "email": "lpkyrius@gmail.com",
                     "password": "lpkyrius123"
@@ -43,7 +43,7 @@ describe('Users API', () => {
 
         test('It should respond with 400 bad request', async () => {
             const response = await request(app)
-                .post('/signin')
+                .post('/SignIn')
                 .send({
                     "email": "lpkyrius@hotmail.com",
                     "password": ""

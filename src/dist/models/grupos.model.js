@@ -1,3 +1,4 @@
+"use strict";
 //const { promiseHooks } = require("v8");
 const grupos = [
     {

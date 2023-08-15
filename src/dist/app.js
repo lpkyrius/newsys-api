@@ -5,7 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 // const cors = require('cors'); 
-const usersRouter = require('./routes/users/users.router');
+const users_router_1 = __importDefault(require("./routes/users/users.router"));
+// import gruposRouter from './routes/grupos/grupos.router';
+// const usersRouter = require('./routes/users/users.router');
 const gruposRouter = require('./routes/grupos/grupos.router');
 const app = (0, express_1.default)();
 // app.use(cors({
@@ -15,7 +17,7 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.set('view engine', 'ejs');
 app.get('/', (req, res) => { res.status(200).send('New SAVIC - RCC Brasil'); });
-app.use(usersRouter);
+app.use(users_router_1.users_router_1);
 app.use(gruposRouter);
 module.exports = app;
 // CORS list

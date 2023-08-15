@@ -31,6 +31,7 @@
 - Currently in FreeForm
 - [ ] **Create an user with limited privileges such as no access to create/drop/truncate tables/databases**.
 - User roles, token: [check this video]('https://youtu.be/Tw5LupcpKS4')
+- User isAuthenticated, isOwner: [check this video]('https://youtu.be/b8ZUb_Okxro?t=2762')
 
 - [ ] Captcha [check this video]('https://youtu.be/u_QXNT4o_64')
 - [ ] Validations: [check this]('https://www.tabnine.com/code/javascript/functions/express-validator/Validator/equals')

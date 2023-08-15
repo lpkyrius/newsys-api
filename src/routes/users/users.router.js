@@ -31,4 +31,3 @@ usersRouter.get('/reset_password/:id/:uniqueString', handleForgotPasswordConfirm
 usersRouter.post('/reset_password/:id/:uniqueString', httpPostResetPassword); // handleForgotPasswordConfirmation
 
 module.exports = usersRouter;
-
