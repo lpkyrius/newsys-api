@@ -17,7 +17,7 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.set('view engine', 'ejs');
 app.get('/', (req, res) => { res.status(200).send('New SAVIC - RCC Brasil'); });
-app.use(users_router_1.users_router_1);
+app.use(users_router_1.default);
 app.use(gruposRouter);
 module.exports = app;
 // CORS list

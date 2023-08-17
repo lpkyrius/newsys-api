@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const { registerUser, getUserByKey, getAllUsers, updateUser, SignInUser, confirmUser, getKeyAlreadyUsedByAnotherId, updateEmail, newUserVerification, getUserVerificationById, deleteUserVerification, resetLoginPassword } = require('../../models/users.model');
+const { registerUser, getUserByKey, getAllUsers, updateUser, signinUser, confirmUser, getKeyAlreadyUsedByAnotherId, updateEmail, newUserVerification, getUserVerificationById, deleteUserVerification, resetLoginPassword } = require('../../models/users.model');
 const passwordSize = Number(process.env.PASSWORD_MIN_SIZE || 8);
 // hash handler
 const bcrypt = require('bcrypt');
@@ -24,7 +24,7 @@ require('dotenv').config();
 const path = require("path");
 // web token
 const jwt = require('jsonwebtoken');
-function handleSignIn(req, res) {
+function handleSignin(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let { email, password } = req.body;
@@ -42,9 +42,9 @@ function handleSignIn(req, res) {
                 const loginData = {
                     email: email,
                     password: password,
-                    action: 'SignIn'
+                    action: 'signin'
                 };
-                const user = (yield SignInUser(loginData, bcrypt)) || [];
+                const user = (yield signinUser(loginData, bcrypt, saltRounds)) || [];
                 if (user.id) {
                     if (!user.verified) {
                         res.status(400).json({ error: 'Usuário ainda não confirmado via email de confirmação.' });
@@ -74,6 +74,8 @@ function handleRegister(req, res) {
             cpf = cpf.slice(0, 11);
             if (email == "" || name == "" || cpf == "" || password == "") {
                 res.status(400).json({ error: 'Dados inválidos.' });
+                // } else if (isNaN(created_at)) {
+                //     res.status(400).json({ error: 'Data de registro inválida.' });
             }
             else if (!checkUserName(name)) {
                 res.status(400).json({ error: 'Nome inválido.' });
@@ -541,10 +543,10 @@ function checkEmailAlreadyUsed(id, email) {
     });
 }
 function TestaCPF(strCPF) {
-    let Soma;
-    let Resto;
+    let Soma = 0;
+    let Resto = 0;
     let validaKey = ((process.env.CPF_VALIDATION || "1") == "1") ? true : false;
-    let i = 0;
+    let i = 1;
     if (!validaKey) {
         return true; // validation has been turned off.
     }
@@ -572,6 +574,7 @@ function TestaCPF(strCPF) {
 }
 function httpRenderForgotPassword(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log('debug httpRenderForgotPassword', __dirname);
         res.render(path.join(__dirname, "../../views/forgot_password"));
     });
 }
@@ -602,7 +605,7 @@ function httpPostForgotPassword(req, res) {
                         email: email,
                         action: 'reset_password'
                     };
-                    const login = (yield SignInUser(loginData, bcrypt)) || [];
+                    const login = (yield signinUser(loginData, bcrypt, saltRounds)) || [];
                     if (login.length) {
                         // Create a one time link valid for 30 minutes (inside sendConfirmationEmail() )
                         // Send confirmation email
@@ -662,7 +665,7 @@ function httpPostResetPassword(req, res) {
                         email: recoveredUser[0].email,
                         action: 'reset_password'
                     };
-                    const login = (yield SignInUser(loginData, bcrypt)) || [];
+                    const login = (yield signinUser(loginData, bcrypt, saltRounds)) || [];
                     if (login.length) {
                         // // Create a one time link valid for 30 minutes
                         // This link is one time valid
@@ -671,7 +674,7 @@ function httpPostResetPassword(req, res) {
                             email: recoveredUser[0].email,
                             password: newPassword
                         };
-                        const resetedPassword = yield resetLoginPassword(loginData);
+                        const resetedPassword = yield resetLoginPassword(loginData, bcrypt, saltRounds);
                         if (!resetedPassword.email) {
                             messageQueryString = `?error=true&message=
                         Não foi possível atualizar o email. <br>
@@ -701,7 +704,7 @@ function httpPostResetPassword(req, res) {
     });
 }
 module.exports = {
-    handleSignIn,
+    handleSignin,
     handleRegister,
     httpGetAllUsers,
     httpGetUser,
