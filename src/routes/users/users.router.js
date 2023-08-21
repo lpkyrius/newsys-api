@@ -14,6 +14,7 @@ const  {
     httpPostResetPassword,
     handleForgotPasswordConfirmation
 } =  require('./users.controller');
+const { response } = require('../../app');
 
 const usersRouter = express.Router();
 
