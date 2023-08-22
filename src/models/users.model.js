@@ -62,7 +62,7 @@ async function newUserVerification(data) {
 async function deleteUserVerification(user_id) {
     try {
         const registeredVerification = await db('user_verification')
-            .where({ user_id })
+            .where({ id: user_id })
             .del();
     } catch (error) {
     console.log(`Error in newUserVerification(): ${error}`);

@@ -97,7 +97,7 @@ async function handleRegister(req, res) {
             const registeredUser = await registerUser(userData);
             // Send confirmation email
             sendConfirmationEmail(email, registeredUser[0].id, 'register');
-            res.status(201).json(registeredUser);
+            res.status(201).json(registeredUser[0]);
         }
     } catch (error) {
         res.status(500).json({ error: 'Falha ao registrar novo usuário.' });
