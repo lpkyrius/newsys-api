@@ -88,9 +88,9 @@ async function handleRegister(req, res) {
         } else if (!TestaCPF(cpf)){
             res.status(400).json({ error: 'CPF inválido.' });
         } else if (await checkCpfExists(cpf)){
-            res.status(400).json({ error: 'CPF já cadastrado.' });
+            res.status(400).json({ error: 'CPF já cadastrado. Tente efetuar o login ou recuperar sua senha' });
         } else if (await checkEmailExists(email)){
-            res.status(400).json({ error: 'Email já cadastrado.' });
+            res.status(400).json({ error: 'Email já cadastrado. Tente efetuar o login ou recuperar sua senha' });
         } else {
             password = bcrypt.hashSync(password, saltRounds);
             const userData = { email, name, cpf, created_at, password };
