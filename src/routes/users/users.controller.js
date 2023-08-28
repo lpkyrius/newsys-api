@@ -66,6 +66,12 @@ async function handleSignin(req, res) {
     }
 }
 
+function formatCPF(cpf) {
+    // let's keep only the numbers
+    cpf = cpf.replace(/[^\d]/g, '');
+    return cpf.slice(0,11);
+}
+
 async function handleRegister(req, res) {
     try {
         let {email, name, cpf, password } = req.body;
@@ -74,7 +80,7 @@ async function handleRegister(req, res) {
         // data validation
         email = email.slice(0,100);
         name = name.slice(0,100);
-        cpf = cpf.slice(0,11); 
+        cpf = formatCPF(cpf); 
         if (email == "" || name == "" || cpf == "" || password == ""){
             res.status(400).json({ error: 'Dados inválidos.' });
         } else if (isNaN(created_at)) {
@@ -369,7 +375,7 @@ async function httpUpdateUser(req, res) {
         let { name, cpf } = req.body;      
         // Validation
         name = name.slice(0,100);
-        cpf = cpf.slice(0,11);  
+        cpf = formatCPF(cpf);  
         if (isNaN(Number(userId))){
             res.status(400).json({ error: 'Id de usuário deve ser em formato numérico.'});
         } else if (!checkUserName(name)){
