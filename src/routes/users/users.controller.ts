@@ -1,3 +1,5 @@
+import express, { Request, Response }  from 'express';
+
 const { 
     registerUser, 
     getUserByKey, 
@@ -34,7 +36,7 @@ const path = require("path");
 // web token
 const jwt = require('jsonwebtoken');
 
-async function handleSignin(req, res) {
+async function handleSignin(req: Request, res: Response) {
     try {
         let {email, password } = req.body;
         // data validation: right email/password format avoiding SQL Injection...
@@ -72,7 +74,7 @@ function formatCPF(cpf) {
     return cpf.slice(0,11);
 }
 
-async function handleRegister(req, res) {
+async function handleRegister(req: Request, res: Response) {
     try {
         let {email, name, cpf, password } = req.body;
         const created_at = new Date();
@@ -83,8 +85,8 @@ async function handleRegister(req, res) {
         cpf = formatCPF(cpf); 
         if (email == "" || name == "" || cpf == "" || password == ""){
             res.status(400).json({ error: 'Dados inválidos.' });
-        } else if (isNaN(created_at)) {
-            res.status(400).json({ error: 'Data de registro inválida.' });
+        // } else if (isNaN(created_at)) {
+        //     res.status(400).json({ error: 'Data de registro inválida.' });
         } else if (!checkUserName(name)){
             res.status(400).json({ error: 'Nome inválido.' });
         } else if (!checkEmail(email)){
@@ -102,7 +104,7 @@ async function handleRegister(req, res) {
             const userData = { email, name, cpf, created_at, password };
             const registeredUser = await registerUser(userData);
             // Send confirmation email
-            sendConfirmationEmail(email, registeredUser[0].id, 'register');
+            sendConfirmationEmail(req, res, email, registeredUser[0].id, 'register');
             res.status(201).json(registeredUser[0]);
         }
     } catch (error) {
@@ -111,7 +113,7 @@ async function handleRegister(req, res) {
 }
 
 // Function to send confirmation email when a new user sign on
-const sendConfirmationEmail = async (email, userId, goal) => {
+const sendConfirmationEmail = async (req: Request, res: Response, email: string, userId: number, goal: string) => {
     try {
         let expiresAt = 0;
         let resetExpiration = 0;
@@ -249,11 +251,11 @@ const sendConfirmationEmail = async (email, userId, goal) => {
     }
 };
 
-function handleEmailConfirmationVerified(req, res){
+function handleEmailConfirmationVerified(req: Request, res: Response){
     res.sendFile(path.join(__dirname, "../../views/user_message.html"));
 }
 
-function handleEmailConfirmationError(req, res, message){
+function handleEmailConfirmationError(req: Request, res: Response, message: string){
     const redirectUrl = '/user_message' + message;
     res.redirect(redirectUrl);
 }
@@ -261,20 +263,25 @@ function handleEmailConfirmationError(req, res, message){
 // Function to handle user confirmation, 
 // it returns the confirmation email from:
 // user register || update user email 
-async function handleRegisterOrUpdateEmailConfirmation(req, res) {
+async function handleRegisterOrUpdateEmailConfirmation(req: Request, res: Response) {
     await handleEmailConfirmation(req, res, 'register_or_update_email');
 }
 
 // Function to handle user confirmation, 
 // it returns the confirmation email from:
 // forgot password 
-async function handleForgotPasswordConfirmation(req, res) {
+async function handleForgotPasswordConfirmation(req: Request, res: Response) {
     await handleEmailConfirmation(req, res, 'forgot_password');
 }
-async function handleEmailConfirmation(req, res, goal) {
+async function handleEmailConfirmation(req: Request, res: Response, goal: string) {
+
+    let messageQueryString = "";
+
     try {
-        let {id, uniqueString} = req.params;
-        let messageQueryString = "";
+
+        const uniqueString = req.params.uniqueString;
+        const id: number = parseInt(req.params.id);
+
         if (isNaN(id)){
             messageQueryString = `?error=true&message=Problemas na id. 
             <br>Por favor, verifique novamente o link enviado.`;
@@ -337,7 +344,7 @@ async function handleEmailConfirmation(req, res, goal) {
     }
 }
 
-async function httpGetAllUsers(req, res) {
+async function httpGetAllUsers(req: Request, res: Response) {
     try {
         const recoveredUsers = await getAllUsers()
         if (recoveredUsers.length) {
@@ -350,7 +357,7 @@ async function httpGetAllUsers(req, res) {
     }
 }
 
-async function httpGetUser(req, res) {
+async function httpGetUser(req: Request, res: Response) {
     try {
         const key = req.params;
         // Validation
@@ -369,7 +376,7 @@ async function httpGetUser(req, res) {
     }
 }
 
-async function httpUpdateUser(req, res) {
+async function httpUpdateUser(req: Request, res: Response) {
     try {
         const userId = req.params.id;
         let { name, cpf } = req.body;      
@@ -398,7 +405,7 @@ async function httpUpdateUser(req, res) {
     }   
 }
 
-async function httpUpdateUserEmail(req, res) {
+async function httpUpdateUserEmail(req: Request, res: Response) {
     try {
         const userId = req.params.id;
         let { email } = req.body;
@@ -424,7 +431,7 @@ async function httpUpdateUserEmail(req, res) {
                     const updatedUser = await updateEmail(userId, checkIfEmailChanged[0].email, userData);
                     if (updatedUser.length) {
                         // Send confirmation email
-                        await sendConfirmationEmail(email, updatedUser[0].id,'update_user_email');
+                        await sendConfirmationEmail(req, res, email, updatedUser[0].id,'update_user_email');
                         res.status(200).json(updatedUser[0]);
                     } else {
                         res.status(400).json({ error: 'Não foi possível atualizar o email do usuário.' });
@@ -527,11 +534,11 @@ function TestaCPF(strCPF) {
     }
 }
 
-async function httpRenderForgotPassword(req, res, next){
+async function httpRenderForgotPassword(req: Request, res: Response){
     res.render(path.join(__dirname, "../../views/forgot_password"));
 }
 
-async function httpPostForgotPassword(req, res, next){
+async function httpPostForgotPassword(req: Request, res: Response){
     try {
         const { email } = req.body;
         let messageQueryString = "";
@@ -558,7 +565,7 @@ async function httpPostForgotPassword(req, res, next){
                 if (login.length){
                     // Create a one time link valid for 30 minutes (inside sendConfirmationEmail() )
                     // Send confirmation email
-                    sendConfirmationEmail(email, recoveredUser[0].id, 'reset_password');                    
+                    sendConfirmationEmail(req, res, email, recoveredUser[0].id, 'reset_password');                    
                     messageQueryString = `?error=false&message=
                     O link para redefinir a senha foi enviado para o seu email.`;
                     handleEmailConfirmationError(req, res, messageQueryString);
@@ -574,7 +581,7 @@ async function httpPostForgotPassword(req, res, next){
     }
 }
 
-async function httpPostResetPassword(req, res, next){
+async function httpPostResetPassword(req: Request, res: Response){
     try {
         let {id, uniqueString} = req.params;
         const { password, password2 } = req.body;
