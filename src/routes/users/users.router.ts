@@ -1,6 +1,6 @@
-const express = require('express'); 
+import express from 'express'; 
 
-const  {
+import  {
     handleSignin,
     handleRegister,
     httpGetAllUsers,
@@ -13,7 +13,7 @@ const  {
     httpPostForgotPassword,
     httpPostResetPassword,
     handleForgotPasswordConfirmation
-} =  require('./users.controller');
+} from './users.controller';
 // const { response } = require('../../app');
 
 const usersRouter = express.Router();
@@ -31,5 +31,5 @@ usersRouter.post('/forgot_password', httpPostForgotPassword);
 usersRouter.get('/reset_password/:id/:uniqueString', handleForgotPasswordConfirmation); // httpResetPassword 
 usersRouter.post('/reset_password/:id/:uniqueString', httpPostResetPassword); // handleForgotPasswordConfirmation
 
-module.exports = usersRouter;
+export default usersRouter;
 

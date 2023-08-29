@@ -504,6 +504,7 @@ function TestaCPF(strCPF) {
     let Soma;
     let Resto;
     let validaKey = ((process.env.CPF_VALIDATION || "1") == "1") ? true : false;
+    let i = 1;
     if (!validaKey) {
         return true; // validation has been turned off.
     } else {
@@ -641,7 +642,7 @@ async function httpPostResetPassword(req, res, next){
     }
 }
 
-module.exports = {
+export {
     handleSignin,
     handleRegister,
     httpGetAllUsers,

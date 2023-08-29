@@ -152,7 +152,7 @@ async function updateUser(userId, userData) {
             .returning('*');
         return updatedUser;
     } catch (error) {
-        console.log(`Error in updateUser(): ${ error }`)
+        console.log(`Error in updateUser(): ${ error }`);
         throw error;
     }
 }

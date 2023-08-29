@@ -1,6 +1,6 @@
 // server functions
-const http = require('http');
-const app = require('./app');
+import http from 'http';
+import app from './app';
 require('dotenv').config();
 const PORT = process.env.PORT;
 const serverAddress = `${process.env.SERVER_ADDRESS || 'http://localhost'}:${PORT}`;

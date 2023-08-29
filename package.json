@@ -2,12 +2,15 @@
   "name": "newsavic-api",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server.js",
+  "main": "./dist/server.js",
+  "type": "commonjs",
   "scripts": {
     "test": "jest --verbose --detectOpenHandles",
     "test-watch": "jest --watch",
-    "watch": "nodemon src/server.js",
-    "start": "node src/server.js"
+    "watch": "nodemon ./dist/server.js",
+    "start": "node ./dist/server.js",
+    "postinstall": "tsc",
+    "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -29,7 +32,6 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.5.7",
     "jest": "^29.6.1",
     "nodemon": "^3.0.1",
     "supertest": "^6.3.3"
