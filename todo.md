@@ -16,12 +16,13 @@
 - [x] Frontend for Users Registration: try [317. Connecting To Our Front-End]('hhttps://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/8820894#questions')
 - I've started with /Users/leandropassoslpkyrius/Projects/WebDev/NewSAVIC/newsavic_temp_example/newsrccexample
 - [x] FE: State of Management - Redux (component state should not be globally available). Better keep it simple, no Redux.
-- [ ] Typescript conversion:
+- [x] Typescript conversion:
 - Review tests after Typescript by checking this video https://youtu.be/Ml51d87uoPo
 - stopped here: https://youtu.be/IvLzSAjkO1c?t=273 
 - https://youtu.be/IvLzSAjkO1c 
 - https://youtu.be/S2L4fatK0Ek
 - https://youtu.be/kZGzyJWIyBM 
+- [ ] ⭐️ Final tests Typescript, Jest & SuperJest
 - [ ] Feature Flags
 - [ ] Unit testing, integration testing and end-to-end testing. Not necessary may be: mutation tests, load tests, stress testing, performance tests, visual tests, snapshot tests.
 - [ ] CI/CD
