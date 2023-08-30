@@ -62,7 +62,7 @@ async function newUserVerification(data) {
 async function deleteUserVerification(user_id) {
     try {
         const registeredVerification = await db('user_verification')
-            .where({ id: user_id })
+            .where({ user_id: user_id })
             .del();
     } catch (error) {
     console.log(`Error in newUserVerification(): ${error}`);
@@ -226,7 +226,7 @@ async function resetLoginPassword(loginData, bcrypt, saltRounds) {
     }
 }   
 
-module.exports = {
+export {
     getAllUsers,
     registerUser,
     getUserById,

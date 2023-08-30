@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,6 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.resetLoginPassword = exports.deleteUserVerification = exports.getUserVerificationById = exports.newUserVerification = exports.updateEmail = exports.getKeyAlreadyUsedByAnotherId = exports.getUserByKey = exports.confirmUser = exports.signinUser = exports.updateUser = exports.getUserById = exports.registerUser = exports.getAllUsers = void 0;
 const { db } = require('../services/postgresql');
 function getAllUsers() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -21,6 +24,7 @@ function getAllUsers() {
         }
     });
 }
+exports.getAllUsers = getAllUsers;
 function registerUser(user) {
     return __awaiter(this, void 0, void 0, function* () {
         /*
@@ -49,6 +53,7 @@ function registerUser(user) {
         }
     });
 }
+exports.registerUser = registerUser;
 function newUserVerification(data) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -69,11 +74,12 @@ function newUserVerification(data) {
         }
     });
 }
+exports.newUserVerification = newUserVerification;
 function deleteUserVerification(user_id) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const registeredVerification = yield db('user_verification')
-                .where({ id: user_id })
+                .where({ user_id: user_id })
                 .del();
         }
         catch (error) {
@@ -82,6 +88,7 @@ function deleteUserVerification(user_id) {
         }
     });
 }
+exports.deleteUserVerification = deleteUserVerification;
 // Function to confirm user and update verified field
 function getUserVerificationById(user_id) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -99,6 +106,7 @@ function getUserVerificationById(user_id) {
         }
     });
 }
+exports.getUserVerificationById = getUserVerificationById;
 function confirmUser(userId) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -117,6 +125,7 @@ function confirmUser(userId) {
         }
     });
 }
+exports.confirmUser = confirmUser;
 function getUserById(id) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -130,6 +139,7 @@ function getUserById(id) {
         }
     });
 }
+exports.getUserById = getUserById;
 function getUserByKey(key) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -145,6 +155,7 @@ function getUserByKey(key) {
         }
     });
 }
+exports.getUserByKey = getUserByKey;
 function getKeyAlreadyUsedByAnotherId(id, key) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -160,6 +171,7 @@ function getKeyAlreadyUsedByAnotherId(id, key) {
         }
     });
 }
+exports.getKeyAlreadyUsedByAnotherId = getKeyAlreadyUsedByAnotherId;
 function updateUser(userId, userData) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -180,6 +192,7 @@ function updateUser(userId, userData) {
         }
     });
 }
+exports.updateUser = updateUser;
 function updateEmail(userId, oldEmail, userData) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -208,6 +221,7 @@ function updateEmail(userId, oldEmail, userData) {
         }
     });
 }
+exports.updateEmail = updateEmail;
 function signinUser(loginData, bcrypt, saltRounds) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -239,6 +253,7 @@ function signinUser(loginData, bcrypt, saltRounds) {
         }
     });
 }
+exports.signinUser = signinUser;
 function resetLoginPassword(loginData, bcrypt, saltRounds) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -254,18 +269,4 @@ function resetLoginPassword(loginData, bcrypt, saltRounds) {
         }
     });
 }
-module.exports = {
-    getAllUsers,
-    registerUser,
-    getUserById,
-    updateUser,
-    signinUser,
-    confirmUser,
-    getUserByKey,
-    getKeyAlreadyUsedByAnotherId,
-    updateEmail,
-    newUserVerification,
-    getUserVerificationById,
-    deleteUserVerification,
-    resetLoginPassword,
-};
+exports.resetLoginPassword = resetLoginPassword;

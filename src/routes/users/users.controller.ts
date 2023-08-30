@@ -1,6 +1,6 @@
 import express, { Request, Response }  from 'express';
 
-const { 
+import { 
     registerUser, 
     getUserByKey, 
     getAllUsers, 
@@ -13,7 +13,7 @@ const {
     getUserVerificationById,
     deleteUserVerification,
     resetLoginPassword
-} = require('../../models/users.model');
+} from '../../models/users.model';
 
 const passwordSize = Number(process.env.PASSWORD_MIN_SIZE || 8);
 
@@ -294,7 +294,7 @@ async function handleEmailConfirmation(req: Request, res: Response, goal: string
                 if (expires_at < Date.now()){
                     // The verification record is not necessary any more, 
                     // also should be deleted to avoid using the same link again
-                    deleteUserVerification(verificationData[0].id);
+                    deleteUserVerification(verificationData[0].user_id);
                     messageQueryString = `?error=true&message=
                     O prazo para confirmação do email expirou. 
                     <br>Para receber um novo email, <br>utilize a opção [esqueci minha senha]`;
@@ -307,7 +307,7 @@ async function handleEmailConfirmation(req: Request, res: Response, goal: string
                             if (updatedUser.length){
                                 // The verification record is not necessary any more, 
                                 // also should be deleted to avoid using the same link again
-                                deleteUserVerification(verificationData[0].id);
+                                deleteUserVerification(verificationData[0].user_id);
                                 messageQueryString = `?error=false&message=
                                 Seu email foi verificado com sucesso.
                                 <br><br>Você já pode acessar o New SAVIC!`;
@@ -602,7 +602,7 @@ async function httpPostResetPassword(req: Request, res: Response){
             messageQueryString = `?error=true&message=
             Senha definida e senha confirmada são diferentes.`;
             handleEmailConfirmationError(req, res, messageQueryString);
-        }else {    
+        } else {    
             const recoveredUser = await getUserByKey({ id });
             if (!recoveredUser.length) {
                 messageQueryString = `?error=true&message=

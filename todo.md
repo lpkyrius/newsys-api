@@ -13,13 +13,15 @@
 - [x] Forgot password
 - [x] Knex.js Migration 
 - [x] Create process for field users.updated_at
-- [ ] Typescript conversion: 
+- [x] Frontend for Users Registration: try [317. Connecting To Our Front-End]('hhttps://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/8820894#questions')
+- I've started with /Users/leandropassoslpkyrius/Projects/WebDev/NewSAVIC/newsavic_temp_example/newsrccexample
+- [x] FE: State of Management - Redux (component state should not be globally available). Better keep it simple, no Redux.
+- [ ] Typescript conversion:
+- Review tests after Typescript 
+- stoped here: https://youtu.be/IvLzSAjkO1c?t=273 
 - https://youtu.be/IvLzSAjkO1c 
 - https://youtu.be/S2L4fatK0Ek
 - https://youtu.be/kZGzyJWIyBM 
-- [ ] Frontend for Users Registration: try [317. Connecting To Our Front-End]('hhttps://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/8820894#questions')
-- I've started with /Users/leandropassoslpkyrius/Projects/WebDev/NewSAVIC/newsavic_temp_example/newsrccexample
-- [ ] FE: State of Management - Redux (component state should not be globally available).
 - [ ] Feature Flags
 - [ ] Unit testing, integration testing and end-to-end testing. Not necessary may be: mutation tests, load tests, stress testing, performance tests, visual tests, snapshot tests.
 - [ ] CI/CD

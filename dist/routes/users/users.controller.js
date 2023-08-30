@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleForgotPasswordConfirmation = exports.httpPostResetPassword = exports.httpPostForgotPassword = exports.httpRenderForgotPassword = exports.handleEmailConfirmationError = exports.handleEmailConfirmationVerified = exports.httpUpdateUserEmail = exports.handleRegisterOrUpdateEmailConfirmation = exports.httpUpdateUser = exports.httpGetUser = exports.httpGetAllUsers = exports.handleRegister = exports.handleSignin = void 0;
-const { registerUser, getUserByKey, getAllUsers, updateUser, signinUser, confirmUser, getKeyAlreadyUsedByAnotherId, updateEmail, newUserVerification, getUserVerificationById, deleteUserVerification, resetLoginPassword } = require('../../models/users.model');
+const users_model_1 = require("../../models/users.model");
 const passwordSize = Number(process.env.PASSWORD_MIN_SIZE || 8);
 // hash handler
 const bcrypt = require('bcrypt');
@@ -45,7 +45,7 @@ function handleSignin(req, res) {
                     password: password,
                     action: 'signin'
                 };
-                const user = (yield signinUser(loginData, bcrypt, saltRounds)) || [];
+                const user = (yield (0, users_model_1.signinUser)(loginData, bcrypt, saltRounds)) || [];
                 if (user.id) {
                     if (!user.verified) {
                         res.status(400).json({ error: 'Usuário ainda não confirmado via email de confirmação.' });
@@ -105,7 +105,7 @@ function handleRegister(req, res) {
             else {
                 password = bcrypt.hashSync(password, saltRounds);
                 const userData = { email, name, cpf, created_at, password };
-                const registeredUser = yield registerUser(userData);
+                const registeredUser = yield (0, users_model_1.registerUser)(userData);
                 // Send confirmation email
                 sendConfirmationEmail(req, res, email, registeredUser[0].id, 'register');
                 res.status(201).json(registeredUser[0]);
@@ -227,7 +227,7 @@ const sendConfirmationEmail = (req, res, email, userId, goal) => __awaiter(void 
             expires_at: new Date(expiresAt),
             email: email
         };
-        const registeredVerification = yield newUserVerification(newVerification);
+        const registeredVerification = yield (0, users_model_1.newUserVerification)(newVerification);
         if (registeredVerification.length) {
             transporter.verify((error, success) => {
                 if (error) {
@@ -298,14 +298,14 @@ function handleEmailConfirmation(req, res, goal) {
                 handleEmailConfirmationError(req, res, messageQueryString);
             }
             else {
-                const verificationData = yield getUserVerificationById(id);
+                const verificationData = yield (0, users_model_1.getUserVerificationById)(id);
                 if (verificationData.length) {
                     const { expires_at } = verificationData[0];
                     const hashedUniqueString = verificationData[0].unique_string;
                     if (expires_at < Date.now()) {
                         // The verification record is not necessary any more, 
                         // also should be deleted to avoid using the same link again
-                        deleteUserVerification(verificationData[0].id);
+                        (0, users_model_1.deleteUserVerification)(verificationData[0].user_id);
                         messageQueryString = `?error=true&message=
                     O prazo para confirmação do email expirou. 
                     <br>Para receber um novo email, <br>utilize a opção [esqueci minha senha]`;
@@ -315,11 +315,11 @@ function handleEmailConfirmation(req, res, goal) {
                         const match = yield bcrypt.compare(uniqueString, hashedUniqueString);
                         if (match) {
                             if (goal === 'register_or_update_email') {
-                                const updatedUser = yield confirmUser(id);
+                                const updatedUser = yield (0, users_model_1.confirmUser)(id);
                                 if (updatedUser.length) {
                                     // The verification record is not necessary any more, 
                                     // also should be deleted to avoid using the same link again
-                                    deleteUserVerification(verificationData[0].id);
+                                    (0, users_model_1.deleteUserVerification)(verificationData[0].user_id);
                                     messageQueryString = `?error=false&message=
                                 Seu email foi verificado com sucesso.
                                 <br><br>Você já pode acessar o New SAVIC!`;
@@ -364,7 +364,7 @@ function handleEmailConfirmation(req, res, goal) {
 function httpGetAllUsers(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const recoveredUsers = yield getAllUsers();
+            const recoveredUsers = yield (0, users_model_1.getAllUsers)();
             if (recoveredUsers.length) {
                 res.status(200).json(recoveredUsers);
             }
@@ -386,7 +386,7 @@ function httpGetUser(req, res) {
             if (isNaN(Number(key.id))) {
                 return res.status(400).json({ error: 'Id de usuário deve ser em formato numérico.' });
             }
-            const recoveredUser = yield getUserByKey(key);
+            const recoveredUser = yield (0, users_model_1.getUserByKey)(key);
             if (recoveredUser.length) {
                 res.status(200).json(recoveredUser[0]);
             }
@@ -422,7 +422,7 @@ function httpUpdateUser(req, res) {
             }
             else {
                 const userData = { name, cpf };
-                const updatedUser = yield updateUser(userId, userData);
+                const updatedUser = yield (0, users_model_1.updateUser)(userId, userData);
                 if (updatedUser.length) {
                     res.status(200).json(updatedUser[0]);
                 }
@@ -453,12 +453,12 @@ function httpUpdateUserEmail(req, res) {
                 res.status(400).json({ error: 'Email já cadastrado.' });
             }
             else {
-                const recoveredUser = yield getUserByKey({ id: userId });
+                const recoveredUser = yield (0, users_model_1.getUserByKey)({ id: userId });
                 if (!recoveredUser.length) {
                     res.status(400).json({ error: 'Não foi possível localizar o usuário.' });
                 }
                 else {
-                    const checkIfEmailChanged = yield getUserByKey({ id: userId });
+                    const checkIfEmailChanged = yield (0, users_model_1.getUserByKey)({ id: userId });
                     // To verify if we are actually changing the email or if it's still the same
                     if (checkIfEmailChanged.length && checkIfEmailChanged[0].email == email) {
                         res.status(200).json(checkIfEmailChanged[0]);
@@ -466,7 +466,7 @@ function httpUpdateUserEmail(req, res) {
                     else {
                         // update email and update verified=false in order to force validate the email again
                         const userData = { email: email, verified: false };
-                        const updatedUser = yield updateEmail(userId, checkIfEmailChanged[0].email, userData);
+                        const updatedUser = yield (0, users_model_1.updateEmail)(userId, checkIfEmailChanged[0].email, userData);
                         if (updatedUser.length) {
                             // Send confirmation email
                             yield sendConfirmationEmail(req, res, email, updatedUser[0].id, 'update_user_email');
@@ -511,7 +511,7 @@ function checkEmail(email) {
 function checkEmailExists(email) {
     return __awaiter(this, void 0, void 0, function* () {
         const key = { email: email };
-        const exists = yield getUserByKey(key);
+        const exists = yield (0, users_model_1.getUserByKey)(key);
         if (exists.length) {
             return true;
         }
@@ -523,7 +523,7 @@ function checkEmailExists(email) {
 function checkCpfExists(cpf) {
     return __awaiter(this, void 0, void 0, function* () {
         const key = { cpf: cpf };
-        const exists = yield getUserByKey(key);
+        const exists = yield (0, users_model_1.getUserByKey)(key);
         if (exists.length) {
             return true;
         }
@@ -536,7 +536,7 @@ function checkCpfAlreadyUsed(id, cpf) {
     return __awaiter(this, void 0, void 0, function* () {
         const idSearch = { id: id };
         const keySearch = { cpf: cpf };
-        const exists = yield getKeyAlreadyUsedByAnotherId(idSearch, keySearch);
+        const exists = yield (0, users_model_1.getKeyAlreadyUsedByAnotherId)(idSearch, keySearch);
         if (exists.length) {
             return true;
         }
@@ -549,7 +549,7 @@ function checkEmailAlreadyUsed(id, email) {
     return __awaiter(this, void 0, void 0, function* () {
         const idSearch = { id: id };
         const keySearch = { email: email };
-        const exists = yield getKeyAlreadyUsedByAnotherId(idSearch, keySearch);
+        const exists = yield (0, users_model_1.getKeyAlreadyUsedByAnotherId)(idSearch, keySearch);
         if (exists.length) {
             return true;
         }
@@ -610,7 +610,7 @@ function httpPostForgotPassword(req, res) {
                 handleEmailConfirmationError(req, res, messageQueryString);
             }
             else {
-                const recoveredUser = yield getUserByKey({ email: email });
+                const recoveredUser = yield (0, users_model_1.getUserByKey)({ email: email });
                 if (!recoveredUser.length) {
                     messageQueryString = `?error=true&message=
                 Email inválido.`;
@@ -621,7 +621,7 @@ function httpPostForgotPassword(req, res) {
                         email: email,
                         action: 'reset_password'
                     };
-                    const login = (yield signinUser(loginData, bcrypt, saltRounds)) || [];
+                    const login = (yield (0, users_model_1.signinUser)(loginData, bcrypt, saltRounds)) || [];
                     if (login.length) {
                         // Create a one time link valid for 30 minutes (inside sendConfirmationEmail() )
                         // Send confirmation email
@@ -671,7 +671,7 @@ function httpPostResetPassword(req, res) {
                 handleEmailConfirmationError(req, res, messageQueryString);
             }
             else {
-                const recoveredUser = yield getUserByKey({ id });
+                const recoveredUser = yield (0, users_model_1.getUserByKey)({ id });
                 if (!recoveredUser.length) {
                     messageQueryString = `?error=true&message=
                 Id inválida.`;
@@ -682,7 +682,7 @@ function httpPostResetPassword(req, res) {
                         email: recoveredUser[0].email,
                         action: 'reset_password'
                     };
-                    const login = (yield signinUser(loginData, bcrypt, saltRounds)) || [];
+                    const login = (yield (0, users_model_1.signinUser)(loginData, bcrypt, saltRounds)) || [];
                     if (login.length) {
                         // // Create a one time link valid for 30 minutes
                         // This link is one time valid
@@ -691,7 +691,7 @@ function httpPostResetPassword(req, res) {
                             email: recoveredUser[0].email,
                             password: newPassword
                         };
-                        const resetedPassword = yield resetLoginPassword(loginData, bcrypt, saltRounds);
+                        const resetedPassword = yield (0, users_model_1.resetLoginPassword)(loginData, bcrypt, saltRounds);
                         if (!resetedPassword.email) {
                             messageQueryString = `?error=true&message=
                         Não foi possível atualizar o email. <br>
@@ -702,10 +702,10 @@ function httpPostResetPassword(req, res) {
                             // Just in case the user had registered 
                             // but before confirm his email has requested
                             // reset password - it also update users.updated_at field
-                            const updatedUser = yield confirmUser(id);
+                            const updatedUser = yield (0, users_model_1.confirmUser)(id);
                             // The verification record is not necessary any more, 
                             // also should be deleted to avoid using the same link again
-                            deleteUserVerification(recoveredUser[0].id);
+                            (0, users_model_1.deleteUserVerification)(recoveredUser[0].id);
                             messageQueryString = `?error=false&message=
                         Senha redefinida com sucesso para ${resetedPassword.email}. <br>
                         Você já pode se conectar com a nova senha.`;
