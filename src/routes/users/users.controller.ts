@@ -37,8 +37,11 @@ const path = require("path");
 const jwt = require('jsonwebtoken');
 
 async function handleSignin(req: Request, res: Response) {
+
     try {
+
         let {email, password } = req.body;
+        
         // data validation: right email/password format avoiding SQL Injection...
         if (email == "" || password == ""){
             res.status(400).json({ error: 'Dados inválidos.' });
@@ -63,19 +66,24 @@ async function handleSignin(req: Request, res: Response) {
                 res.status(400).json({ error: 'usuário ou senha inválidos'});
             }
         }
+
     } catch (error) {
         res.status(500).json({ error: 'Erro na tentativa de login.' });
     }
 }
 
-function formatCPF(cpf) {
+function formatCPF(cpf: string) {
+
     // let's keep only the numbers
     cpf = cpf.replace(/[^\d]/g, '');
     return cpf.slice(0,11);
 }
 
+
 async function handleRegister(req: Request, res: Response) {
+
     try {
+
         let {email, name, cpf, password } = req.body;
         const created_at = new Date();
         
@@ -85,8 +93,6 @@ async function handleRegister(req: Request, res: Response) {
         cpf = formatCPF(cpf); 
         if (email == "" || name == "" || cpf == "" || password == ""){
             res.status(400).json({ error: 'Dados inválidos.' });
-        // } else if (isNaN(created_at)) {
-        //     res.status(400).json({ error: 'Data de registro inválida.' });
         } else if (!checkUserName(name)){
             res.status(400).json({ error: 'Nome inválido.' });
         } else if (!checkEmail(email)){
@@ -107,6 +113,7 @@ async function handleRegister(req: Request, res: Response) {
             sendConfirmationEmail(req, res, email, registeredUser[0].id, 'register');
             res.status(201).json(registeredUser[0]);
         }
+        
     } catch (error) {
         res.status(500).json({ error: 'Falha ao registrar novo usuário.' });
     }
@@ -114,13 +121,16 @@ async function handleRegister(req: Request, res: Response) {
 
 // Function to send confirmation email when a new user sign on
 const sendConfirmationEmail = async (req: Request, res: Response, email: string, userId: number, goal: string) => {
+    
     try {
+
         let expiresAt = 0;
         let resetExpiration = 0;
         let routeLink = '';
         let subject = '';
         let titulo = '';
         let body_message ='';
+
         if (goal==='register' || goal === 'update_user_email'){
             resetExpiration = Number(process.env.EMAIL_EXPIRATION || 21600000);
             expiresAt = Date.now() + resetExpiration; // 6 hours
@@ -141,6 +151,7 @@ const sendConfirmationEmail = async (req: Request, res: Response, email: string,
             <br>por favor, utilize o link abaixo:</p>
             <p><b>Este link vai expirar em ${Math.round(resetExpiration/3600000*60)} minutos.</b></p>`
         }
+        
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -222,6 +233,7 @@ const sendConfirmationEmail = async (req: Request, res: Response, email: string,
                     email: email 
                 }
         const registeredVerification = await newUserVerification(newVerification);
+
         if (registeredVerification.length){
             transporter.verify((error, success) => {
                 if (error) {
@@ -273,6 +285,7 @@ async function handleRegisterOrUpdateEmailConfirmation(req: Request, res: Respon
 async function handleForgotPasswordConfirmation(req: Request, res: Response) {
     await handleEmailConfirmation(req, res, 'forgot_password');
 }
+
 async function handleEmailConfirmation(req: Request, res: Response, goal: string) {
 
     let messageQueryString = "";
@@ -336,6 +349,7 @@ async function handleEmailConfirmation(req: Request, res: Response, goal: string
                 handleEmailConfirmationError(req, res, messageQueryString);
             }
         }
+        
     } catch (error) {
         messageQueryString = `?error=true&message=
         Falha ao confirmar usuário.
@@ -378,8 +392,10 @@ async function httpGetUser(req: Request, res: Response) {
 
 async function httpUpdateUser(req: Request, res: Response) {
     try {
+
         const userId = req.params.id;
-        let { name, cpf } = req.body;      
+        let { name, cpf } = req.body; 
+
         // Validation
         name = name.slice(0,100);
         cpf = formatCPF(cpf);  
@@ -407,8 +423,10 @@ async function httpUpdateUser(req: Request, res: Response) {
 
 async function httpUpdateUserEmail(req: Request, res: Response) {
     try {
+
         const userId = req.params.id;
         let { email } = req.body;
+        
         // Validation
         if (isNaN(Number(userId))){
             res.status(400).json({ error: 'Id de usuário deve ser em formato numérico.'});
@@ -445,7 +463,7 @@ async function httpUpdateUserEmail(req: Request, res: Response) {
 }
 
 // Block of validation functions
-function checkUserName(name) {
+function checkUserName(name: string) {
     // The number of characters must be between 3 and 100. 
     // The string should only contain alphanumeric characters and/or underscores (_).
     // The first character of the string should be alphabetic
@@ -455,7 +473,8 @@ function checkUserName(name) {
         return false; // invalid
     }
 }
-function checkEmail(email) {
+
+function checkEmail(email: string) {
     if(!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
         return false; // invalid
     } else if (email.length < 3 || email.length > 100){
@@ -465,7 +484,7 @@ function checkEmail(email) {
     }
 }
 
-async function checkEmailExists(email){
+async function checkEmailExists(email: string){
     const key = { email: email }
     const exists = await getUserByKey(key);
     if (exists.length){
@@ -475,7 +494,7 @@ async function checkEmailExists(email){
     }
 }
 
-async function checkCpfExists(cpf){
+async function checkCpfExists(cpf: string){
     const key = { cpf: cpf }
     const exists = await getUserByKey(key);
     if (exists.length){
@@ -485,10 +504,12 @@ async function checkCpfExists(cpf){
     }
 }
 
-async function checkCpfAlreadyUsed(id, cpf){
+async function checkCpfAlreadyUsed(id: string | number, cpf: string){
+
     const idSearch = { id: id };
     const keySearch = { cpf: cpf };
     const exists = await getKeyAlreadyUsedByAnotherId(idSearch, keySearch);
+
     if (exists.length){
         return true;
     } else {
@@ -496,10 +517,12 @@ async function checkCpfAlreadyUsed(id, cpf){
     }
 }
 
-async function checkEmailAlreadyUsed(id, email){
+async function checkEmailAlreadyUsed(id: string | number, email: string){
+
     const idSearch = { id: id };
     const keySearch = { email: email };
     const exists = await getKeyAlreadyUsedByAnotherId(idSearch, keySearch);
+
     if (exists.length){
         return true;
     } else {
@@ -507,11 +530,13 @@ async function checkEmailAlreadyUsed(id, email){
     }
 }
 
-function TestaCPF(strCPF) {
-    let Soma;
-    let Resto;
-    let validaKey = ((process.env.CPF_VALIDATION || "1") == "1") ? true : false;
-    let i = 1;
+function TestaCPF(strCPF: string) {
+
+    let Soma: number;
+    let Resto: number;
+    let validaKey: boolean = ((process.env.CPF_VALIDATION || "1") == "1") ? true : false;
+    let i: number = 1;
+
     if (!validaKey) {
         return true; // validation has been turned off.
     } else {
@@ -540,8 +565,10 @@ async function httpRenderForgotPassword(req: Request, res: Response){
 
 async function httpPostForgotPassword(req: Request, res: Response){
     try {
+        
         const { email } = req.body;
-        let messageQueryString = "";
+        let messageQueryString: string = "";
+
         if (email == ""){
             messageQueryString = `?error=true&message=
             Email inválido.`;
@@ -583,9 +610,11 @@ async function httpPostForgotPassword(req: Request, res: Response){
 
 async function httpPostResetPassword(req: Request, res: Response){
     try {
+
         let {id, uniqueString} = req.params;
         const { password, password2 } = req.body;
-        let messageQueryString = "";
+        let messageQueryString: string = "";
+
         if (id == "" || uniqueString == ""){
             messageQueryString = `?error=true&message=
             Parametros inválidos.`;

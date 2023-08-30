@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const grupos = [
     {
         id: 1,
@@ -23,7 +21,9 @@ const grupos = [
         hora: '19:30',
     },
 ];
+
 function getAllGrupos() {
     return grupos;
 }
-exports.default = getAllGrupos;
+
+export default getAllGrupos;

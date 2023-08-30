@@ -11,13 +11,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-//import { getAllGrupos } from '../../models/grupos.model';
-const grupos_model_1 = __importDefault(require("../../models/grupos.model"));
-function httpGetAllGrupos(req, res) {
+Object.defineProperty(exports, "__esModule", { value: true });
+// server functions
+const http_1 = __importDefault(require("http"));
+const app_1 = __importDefault(require("./app"));
+require('dotenv').config();
+const PORT = process.env.PORT;
+const serverAddress = `${process.env.SERVER_ADDRESS || 'http://localhost'}:${PORT}`;
+const server = http_1.default.createServer(app_1.default);
+function startServer() {
     return __awaiter(this, void 0, void 0, function* () {
-        return res.status(200).json(yield (0, grupos_model_1.default)());
+        server.listen(PORT, () => {
+            // await function_name();
+            console.log(`Listening on PORT ${PORT}... @ ${serverAddress}`);
+        });
     });
 }
-module.exports = {
-    httpGetAllGrupos
-};
+startServer();

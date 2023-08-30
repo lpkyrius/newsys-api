@@ -1,12 +1,14 @@
-const request = require('supertest');
-const app = require('../../app');
+import app from '../../app';
+import request from 'supertest';
+
 let email = "";
 let password = "";
 let name = "";
 let cpf = "";
 let userData = {
     name: name,
-    cpf: cpf
+    cpf: cpf, 
+    email: email
 };
 let message = `⚠️ Warning:
 
@@ -34,8 +36,8 @@ describe('Users API', () => {
             const response = await request(app)
                 .post('/signin')
                 .send({
-                    "email": "lpkyrius@gmail.com",
-                    "password": "lpkyrius123"
+                "email": "leandropassoscoach@gmail.com",
+                "password": "leandropassoscoach123"
                 })
                 .expect('Content-Type', /json/)
                 .expect(200);
@@ -209,7 +211,7 @@ describe('Users API', () => {
 
         name = "Lpkyrius GMail";
         cpf = "00671067737";
-        userData = {
+        let userData = {
             name: name,
             cpf: cpf
         }
@@ -309,9 +311,8 @@ describe('Users API', () => {
     // usersRouter.put('/update_user_email/:id',httpUpdateUserEmail);
     describe('Test PUT /update_user_email/:id', () => {
 
-        userData = {
-            email: "lpkyrius@gmail.com"
-        }
+        userData.email = "lpkyrius@gmail.com";
+        
         describe('Test PUT /confirm_email/:id with an email already used', () => {
             test('It should respond with 400 fail + Content-Type = json', async () => {
                 const response = await request(app)
@@ -324,7 +325,7 @@ describe('Users API', () => {
 
         describe('Test PUT /update_user_email/:id with bad format email', () => {
             test('It should respond with 400 fail + Content-Type = json', async () => {
-                userData.email = "lpkyriusgmail.com"
+                userData.email = "lpkyriusgmail.com";
                 const response = await request(app)
                     .put('/update_user_email/1')
                     .send(userData)

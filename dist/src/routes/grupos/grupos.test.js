@@ -11,13 +11,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-//import { getAllGrupos } from '../../models/grupos.model';
-const grupos_model_1 = __importDefault(require("../../models/grupos.model"));
-function httpGetAllGrupos(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return res.status(200).json(yield (0, grupos_model_1.default)());
+Object.defineProperty(exports, "__esModule", { value: true });
+const app_1 = __importDefault(require("../../app"));
+const supertest_1 = __importDefault(require("supertest"));
+describe('Grupos API', () => {
+    describe('Test GET /grupos', () => {
+        test('It should respond with 200 success + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
+            const response = yield (0, supertest_1.default)(app_1.default)
+                .get('/grupos')
+                .expect('Content-Type', /json/)
+                .expect(200);
+        }));
     });
-}
-module.exports = {
-    httpGetAllGrupos
-};
+    describe('Test POST /grupo', () => {
+        test('It should respond with 200 success', () => {
+        });
+        test('It should catch missing required properties', () => { });
+        test('It should catch invalid dates', () => { });
+    });
+});

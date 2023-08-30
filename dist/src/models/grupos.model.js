@@ -1,5 +1,5 @@
-//const { promiseHooks } = require("v8");
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const grupos = [
     {
         id: 1,
@@ -23,11 +23,7 @@ const grupos = [
         hora: '19:30',
     },
 ];
-
 function getAllGrupos() {
     return grupos;
 }
-
-module.exports = {
-    getAllGrupos,
-};
+exports.default = getAllGrupos;
