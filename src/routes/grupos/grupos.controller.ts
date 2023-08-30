@@ -5,6 +5,6 @@ async function httpGetAllGrupos(req, res) {
     return res.status(200).json(await getAllGrupos());
 }
 
-export = {
+export {
     httpGetAllGrupos
 };

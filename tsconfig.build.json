@@ -1,0 +1,6 @@
+// to exclude test files from typescript build
+// check package.json: "build": "tsc -p tsconfig.build.json" 
+{
+    "extends": "./tsconfig",
+    "exclude": ["**/*.test.*", "**/__mocks__/*", "**/__tests__/*"]
+  }

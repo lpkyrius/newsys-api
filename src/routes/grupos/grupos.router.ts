@@ -1,14 +1,14 @@
-const express = require('express'); 
+import express from 'express'; 
 
-const  { 
+import  { 
     httpGetAllGrupos 
-} =  require('./grupos.controller');
+} from './grupos.controller';
  
 const gruposRouter = express.Router();
 
 gruposRouter.get('/grupos', httpGetAllGrupos);
 
-module.exports = gruposRouter;
+export default gruposRouter;
 
 // // Frontend call:
 // const API_URL = http://localhost:8000/grupos

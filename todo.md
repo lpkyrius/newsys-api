@@ -17,7 +17,7 @@
 - I've started with /Users/leandropassoslpkyrius/Projects/WebDev/NewSAVIC/newsavic_temp_example/newsrccexample
 - [x] FE: State of Management - Redux (component state should not be globally available). Better keep it simple, no Redux.
 - [ ] Typescript conversion:
-- Review tests after Typescript 
+- Review tests after Typescript by checking this video https://youtu.be/Ml51d87uoPo
 - stopped here: https://youtu.be/IvLzSAjkO1c?t=273 
 - https://youtu.be/IvLzSAjkO1c 
 - https://youtu.be/S2L4fatK0Ek

@@ -10,8 +10,9 @@
     // "disableSolutionSearching": true,                 /* Opt a project out of multi-project reference checking when editing. */
     // "disableReferencedProjectLoad": true,             /* Reduce the number of projects loaded automatically by TypeScript. */
 
-    /* Language and Environment */
-    "target": "es2016",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+    /* Language and Environment */   
+    "target": "es2016",                               /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+    // "types": ["node", "jest"],       /* https://swizec.com/blog/how-to-configure-jest-with-typescript/ */
     // "lib": [],                                        /* Specify a set of bundled library declaration files that describe the target runtime environment. */
     // "jsx": "preserve",                                /* Specify what JSX code is generated. */
     // "experimentalDecorators": true,                   /* Enable experimental support for legacy experimental decorators. */
@@ -106,5 +107,10 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "compileOnSave": true,
   "include": ["src/**/*.js", "src/**/*.ts", "jest.config.js"]
 }

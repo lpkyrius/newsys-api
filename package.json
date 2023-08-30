@@ -2,19 +2,23 @@
   "name": "newsavic-api",
   "version": "1.0.0",
   "description": "",
-  "main": "./dist/server.js",
+  "main": "./dist/src/server.js",
   "type": "commonjs",
   "scripts": {
     "test": "jest --verbose --detectOpenHandles",
     "test-watch": "jest --watch",
-    "watch": "nodemon ./dist/server.js",
-    "start": "node ./dist/server.js",
+    "watch": "nodemon ./dist/src/server.js",
+    "start": "node ./dist/src/server.js",
     "postinstall": "tsc",
-    "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts"
+    "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
+    "build": "tsc -p tsconfig.build.json"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "jestCOMMENTED": {
+    "testEnvironment": "node"
+  },
   "dependencies": {
     "bcrypt": "^5.1.0",
     "bcrypt-nodejs": "^0.0.3",

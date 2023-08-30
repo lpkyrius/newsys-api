@@ -1,5 +1,5 @@
 // server functions
-import http from 'http';
+import * as http from 'http';
 import app from './app';
 require('dotenv').config();
 const PORT = process.env.PORT;

@@ -11,6 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.httpGetAllGrupos = void 0;
 //import { getAllGrupos } from '../../models/grupos.model';
 const grupos_model_1 = __importDefault(require("../../models/grupos.model"));
 function httpGetAllGrupos(req, res) {
@@ -18,6 +20,4 @@ function httpGetAllGrupos(req, res) {
         return res.status(200).json(yield (0, grupos_model_1.default)());
     });
 }
-module.exports = {
-    httpGetAllGrupos
-};
+exports.httpGetAllGrupos = httpGetAllGrupos;
