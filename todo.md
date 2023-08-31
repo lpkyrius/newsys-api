@@ -1,36 +1,17 @@
 # ToDo
-<!-- ![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNgS4NjTHOlP7WmZ3pIngUGbEa8IQ3yOVvfg&usqp=CAU) -->
+![](https://btholt.github.io/intro-to-web-dev-v2/static/ef4a30c374ea4cf7fb52b7f8748cf4a5/0b533/node.png)
  
-
-- [x] User register
-- Expiration date
-- Email confirmation 
-- Hash unique string
-- [x] User login
-- [x] TestaCPF
-- [x] User data update
-- [x] Automated tests Users
-- [x] Forgot password
-- [x] Knex.js Migration 
-- [x] Create process for field users.updated_at
-- [x] Frontend for Users Registration: try [317. Connecting To Our Front-End]('hhttps://www.udemy.com/course/the-complete-web-developer-zero-to-mastery/learn/lecture/8820894#questions')
-- I've started with /Users/leandropassoslpkyrius/Projects/WebDev/NewSAVIC/newsavic_temp_example/newsrccexample
 - [x] FE: State of Management - Redux (component state should not be globally available). Better keep it simple, no Redux.
 - [x] Typescript conversion:
-- Review tests after Typescript by checking this video https://youtu.be/Ml51d87uoPo
-- stopped here: https://youtu.be/IvLzSAjkO1c?t=273 
-- https://youtu.be/IvLzSAjkO1c 
-- https://youtu.be/S2L4fatK0Ek
-- https://youtu.be/kZGzyJWIyBM 
-- [ ] ⭐️ Final tests Typescript, Jest & SuperJest
-- [ ] Feature Flags
+- Review tests after Typescript by checking these videos: https://youtu.be/Ml51d87uoPo | https://youtu.be/IvLzSAjkO1c | https://youtu.be/S2L4fatK0Ek | https://youtu.be/kZGzyJWIyBM | https://youtu.be/AIVWz9tDIxM 
+- [ ] ⭐️ Documentation for current processes (Users email confirmation flow) & Automated tests
+- [ ] ⭐️ Feature Flags
 - [ ] Unit testing, integration testing and end-to-end testing. Not necessary may be: mutation tests, load tests, stress testing, performance tests, visual tests, snapshot tests.
 - [ ] CI/CD
 - [ ] CDN
 - [ ] Linting
 - [ ] Observability (logging, metrics collection, and distributed tracing)
 - [ ] Accessibility https://github.com/brunopulis/awesome-a11y#readme 
-- [ ] Update documentation -> flows 
 - Currently in FreeForm
 - [ ] **Create an user with limited privileges such as no access to create/drop/truncate tables/databases**.
 - User roles, token: [check this video]('https://youtu.be/Tw5LupcpKS4')
@@ -39,7 +20,6 @@
 - [ ] Validations: [check this]('https://www.tabnine.com/code/javascript/functions/express-validator/Validator/equals')
 - [ ] Disable User Account (to-do not urgent - just avoid the user to log in)
 - [ ] ⭐️ Use one Docker to deploy it at Docker Playground
-- [ ] TypeScript NodeJS 394. TypeScript Installation implementation which still keeps flexibility [check this video]('https://youtu.be/AIVWz9tDIxM?t=428') => Let's do it before continue.
 - [ ] Performance (PM2 Cluster) & Deploy scripts. [149. Improving Performance Of Our NASA Project]('https://www.udemy.com/course/complete-nodejs-developer-zero-to-mastery/learn/lecture/26009832#overview')
 
 ## Documents
