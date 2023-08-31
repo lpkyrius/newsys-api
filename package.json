@@ -20,7 +20,7 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "bcrypt": "^5.1.0",
+    "bcrypt": "^5.1.1",
     "bcrypt-nodejs": "^0.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
