@@ -1,6 +1,5 @@
-# ToDo
 ![](https://btholt.github.io/intro-to-web-dev-v2/static/ef4a30c374ea4cf7fb52b7f8748cf4a5/0b533/node.png)
- 
+# ToDo 
 - [x] FE: State of Management - Redux (component state should not be globally available). Better keep it simple, no Redux.
 - [x] Typescript conversion:
 - Review tests after Typescript by checking these videos: https://youtu.be/Ml51d87uoPo | https://youtu.be/IvLzSAjkO1c | https://youtu.be/S2L4fatK0Ek | https://youtu.be/kZGzyJWIyBM | https://youtu.be/AIVWz9tDIxM 
