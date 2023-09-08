@@ -102,9 +102,9 @@ async function handleRegister(req: Request, res: Response) {
         } else if (!TestaCPF(cpf)){
             res.status(400).json({ error: 'CPF inválido.' });
         } else if (await checkCpfExists(cpf)){
-            res.status(400).json({ error: 'CPF já cadastrado. Tente efetuar o login ou recuperar sua senha' });
+            res.status(409).json({ error: 'CPF já cadastrado. Tente efetuar o login ou recuperar sua senha' });
         } else if (await checkEmailExists(email)){
-            res.status(400).json({ error: 'Email já cadastrado. Tente efetuar o login ou recuperar sua senha' });
+            res.status(409).json({ error: 'Email já cadastrado. Tente efetuar o login ou recuperar sua senha' });
         } else {
             password = bcrypt.hashSync(password, saltRounds);
             const userData = { email, name, cpf, created_at, password };
@@ -406,7 +406,7 @@ async function httpUpdateUser(req: Request, res: Response) {
         } else if (!TestaCPF(cpf)){
             res.status(400).json({ error: 'CPF inválido.' });
         } else if (await checkCpfAlreadyUsed(userId,cpf)){
-            res.status(400).json({ error: 'CPF já cadastrado.' });
+            res.status(409).json({ error: 'CPF já cadastrado.' });
         } else {
             const userData = { name, cpf };
             const updatedUser = await updateUser(userId, userData);
@@ -433,7 +433,7 @@ async function httpUpdateUserEmail(req: Request, res: Response) {
         } else if (!checkEmail(email)){
             res.status(400).json({ error: 'Email inválido.' });
         } else if (await checkEmailAlreadyUsed(userId,email)){
-            res.status(400).json({ error: 'Email já cadastrado.' });
+            res.status(409).json({ error: 'Email já cadastrado.' });
         } else {
             const recoveredUser = await getUserByKey({ id: userId});
             if (!recoveredUser.length) {

@@ -95,10 +95,10 @@ function handleRegister(req, res) {
                 res.status(400).json({ error: 'CPF inválido.' });
             }
             else if (yield checkCpfExists(cpf)) {
-                res.status(400).json({ error: 'CPF já cadastrado. Tente efetuar o login ou recuperar sua senha' });
+                res.status(409).json({ error: 'CPF já cadastrado. Tente efetuar o login ou recuperar sua senha' });
             }
             else if (yield checkEmailExists(email)) {
-                res.status(400).json({ error: 'Email já cadastrado. Tente efetuar o login ou recuperar sua senha' });
+                res.status(409).json({ error: 'Email já cadastrado. Tente efetuar o login ou recuperar sua senha' });
             }
             else {
                 password = bcrypt.hashSync(password, saltRounds);
@@ -416,7 +416,7 @@ function httpUpdateUser(req, res) {
                 res.status(400).json({ error: 'CPF inválido.' });
             }
             else if (yield checkCpfAlreadyUsed(userId, cpf)) {
-                res.status(400).json({ error: 'CPF já cadastrado.' });
+                res.status(409).json({ error: 'CPF já cadastrado.' });
             }
             else {
                 const userData = { name, cpf };
@@ -448,7 +448,7 @@ function httpUpdateUserEmail(req, res) {
                 res.status(400).json({ error: 'Email inválido.' });
             }
             else if (yield checkEmailAlreadyUsed(userId, email)) {
-                res.status(400).json({ error: 'Email já cadastrado.' });
+                res.status(409).json({ error: 'Email já cadastrado.' });
             }
             else {
                 const recoveredUser = yield (0, users_model_1.getUserByKey)({ id: userId });
