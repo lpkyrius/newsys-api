@@ -4,6 +4,8 @@
 - [x] Typescript conversion:
 - Review tests after Typescript by checking these videos: https://youtu.be/Ml51d87uoPo | https://youtu.be/IvLzSAjkO1c | https://youtu.be/S2L4fatK0Ek | https://youtu.be/kZGzyJWIyBM | https://youtu.be/AIVWz9tDIxM 
 - [x] Documentation for Users email confirmation flow
+- [ ] ⭐️ Review [routes best practices]('https://youtu.be/JxeTegu4dD8')
+- [ ] ⭐️ Review tests by creating a new user and following the right sequence to test
 - [ ] ⭐️ Documentation for API Rest [check this video]('https://youtu.be/5aryMKiBEKY?t=103')
 - [ ] ⭐️ Documentation for Automated tests
 - [ ] ⭐️ Feature Flags

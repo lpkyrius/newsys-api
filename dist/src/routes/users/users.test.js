@@ -292,13 +292,14 @@ describe('Users API', () => {
     // usersRouter.put('/update_user_email/:id',httpUpdateUserEmail);
     describe('Test PUT /update_user_email/:id', () => {
         userData.email = "lpkyrius@gmail.com";
+        userData.cpf = "06763865040";
         describe('Test PUT /confirm_email/:id with an email already used', () => {
-            test('It should respond with 400 fail + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
+            test('It should respond with 409 conflict + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 const response = yield (0, supertest_1.default)(app_1.default)
                     .put('/update_user_email/2')
                     .send(userData)
                     .expect('Content-Type', /json/)
-                    .expect(400);
+                    .expect(409);
             }));
         });
         describe('Test PUT /update_user_email/:id with bad format email', () => {
@@ -312,18 +313,20 @@ describe('Users API', () => {
             }));
         });
         describe('Test PUT /update_user_email/:id with an id that does not exist', () => {
-            test('It should respond with 400 fail + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
-                userData.email = "lpkyrius@hotmail.com";
+            test('It should respond with 404 not found + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
+                userData.email = "lpkyrius@zmail.com";
+                userData.cpf = "573.761.058-67";
                 const response = yield (0, supertest_1.default)(app_1.default)
                     .put('/update_user_email/0')
                     .send(userData)
                     .expect('Content-Type', /json/)
-                    .expect(400);
+                    .expect(404);
             }));
         });
         describe('Test PUT /update_user_email/:id with a valid email', () => {
             test('It should respond with 200 success + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.email = "lpkyrius@gmail.com";
+                userData.cpf = "00671067737";
                 const response = yield (0, supertest_1.default)(app_1.default)
                     .put('/update_user_email/1')
                     .send(userData)

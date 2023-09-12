@@ -425,7 +425,7 @@ function httpUpdateUser(req, res) {
                     res.status(200).json(updatedUser[0]);
                 }
                 else {
-                    res.status(400).json({ error: 'Não foi possível atualizar os dados do usuário.' });
+                    res.status(404).json({ error: 'Não foi possível atualizar os dados do usuário.' });
                 }
             }
         }
