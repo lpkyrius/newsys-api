@@ -25,11 +25,11 @@ let userData = {
 };
 let message = `⚠️ Warning:
 
--> [POST /register] To a successful test we need a valid cpf 
+-> [POST /users/register] To a successful test we need a valid cpf 
 (correct format + still not used yet).
 So, it demands a manual test.
 
--> [PUT /update_user_email/:id] Even with a successful test,    
+-> [PUT /update-user-email/:id] Even with a successful test,    
 we do it by saving the same email, which means there was no
 real update in database. 
 So, it demands a manual test.`;
@@ -40,11 +40,11 @@ describe('Users API', () => {
     afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
         console.log(message);
     }));
-    // usersRouter.post('/signin',     handleSignin); 
-    describe('Test POST /userSignIn', () => {
+    // usersRouter.post('/users/signin',     handleSignin); 
+    describe('Test POST /users/signIn', () => {
         test('It should respond with 200 success', () => __awaiter(void 0, void 0, void 0, function* () {
             const response = yield (0, supertest_1.default)(app_1.default)
-                .post('/signin')
+                .post('/users/signin')
                 .send({
                 "email": "leandropassoscoach@gmail.com",
                 "password": "leandropassoscoach123"
@@ -54,7 +54,7 @@ describe('Users API', () => {
         }));
         test('It should respond with 400 bad request', () => __awaiter(void 0, void 0, void 0, function* () {
             const response = yield (0, supertest_1.default)(app_1.default)
-                .post('/signin')
+                .post('/users/signin')
                 .send({
                 "email": "lpkyrius@hotmail.com",
                 "password": ""
@@ -66,8 +66,8 @@ describe('Users API', () => {
             });
         }));
     });
-    // usersRouter.post('/register', handleRegister); 
-    describe('Test POST /register', () => {
+    // usersRouter.post('/users/register', handleRegister); 
+    describe('Test POST /users/register', () => {
         const randomComplement = (Math.floor((Math.random() * 100) + 1)).toString();
         email = "test" + randomComplement + "@abc" + randomComplement + ".com";
         password = randomComplement + "test123";
@@ -79,82 +79,82 @@ describe('Users API', () => {
             name: name,
             cpf: cpf
         };
-        describe('Test POST /register email already exists', () => {
+        describe('Test POST /users/register email already exists', () => {
             test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userDataWithoutDate.email = "test.com";
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .post('/register')
+                    .post('/users/register')
                     .send(userDataWithoutDate)
                     .expect('Content-Type', /json/)
                     .expect(400);
             }));
             userDataWithoutDate.email = "lpkyrius@gmail.com";
         });
-        describe('Test POST /register bad format email', () => {
+        describe('Test POST /users/register bad format email', () => {
             test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userDataWithoutDate.email = "test.com";
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .post('/register')
+                    .post('/users/register')
                     .send(userDataWithoutDate)
                     .expect('Content-Type', /json/)
                     .expect(400);
             }));
             userDataWithoutDate.email = email;
         });
-        describe('Test POST /register blank email', () => {
+        describe('Test POST /users/register blank email', () => {
             test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userDataWithoutDate.email = "";
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .post('/register')
+                    .post('/users/register')
                     .send(userDataWithoutDate)
                     .expect('Content-Type', /json/)
                     .expect(400);
             }));
             userDataWithoutDate.email = email;
         });
-        describe('Test POST /register blank password', () => {
+        describe('Test POST /users/register blank password', () => {
             test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userDataWithoutDate.password = "";
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .post('/register')
+                    .post('/users/register')
                     .send(userDataWithoutDate)
                     .expect('Content-Type', /json/)
                     .expect(400);
             }));
             userDataWithoutDate.password = password;
         });
-        describe('Test POST /register blank name', () => {
+        describe('Test POST /users/register blank name', () => {
             test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userDataWithoutDate.name = "";
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .post('/register')
+                    .post('/users/register')
                     .send(userDataWithoutDate)
                     .expect('Content-Type', /json/)
                     .expect(400);
             }));
             userDataWithoutDate.password = password;
         });
-        describe('Test POST /register cpf already exists', () => {
+        describe('Test POST /users/register cpf already exists', () => {
             test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .post('/register')
+                    .post('/users/register')
                     .send(userDataWithoutDate)
                     .expect('Content-Type', /json/)
                     .expect(400);
             }));
         });
-        describe('Test POST /register blank cpf', () => {
+        describe('Test POST /users/register blank cpf', () => {
             test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userDataWithoutDate.cpf = "";
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .post('/register')
+                    .post('/users/register')
                     .send(userDataWithoutDate)
                     .expect('Content-Type', /json/)
                     .expect(400);
             }));
             userDataWithoutDate.cpf = cpf;
         });
-        describe('Test POST /register', () => {
+        describe('Test POST /users/register', () => {
             // test('It should respond with 201 success + Content-Type = json', async () => {
             //     email = "test" + randomComplement + "@abc"+randomComplement+".com";
             //     password = randomComplement+"test123";
@@ -167,7 +167,7 @@ describe('Users API', () => {
             //         cpf: cpf
             //     }
             //     const response = await request(app)
-            //         .post('/register')
+            //         .post('/users/register')
             //         .send(userDataWithoutDate)
             //         .expect('Content-Type', /json/)
             //         .expect(201);
@@ -179,71 +179,71 @@ describe('Users API', () => {
             // });
         });
     });
-    // usersRouter.get('/listUsers', httpGetAllUsers); 
-    describe('Test GET /listUsers', () => {
+    // usersRouter.get('/users/users', httpGetAllUsers); 
+    describe('Test GET /users/users', () => {
         test('It should respond with 200 success + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
             const response = yield (0, supertest_1.default)(app_1.default)
-                .get('/listUsers')
+                .get('/users')
                 .expect('Content-Type', /json/)
                 .expect(200);
         }));
     });
     // usersRouter.get('/profile/:id', httpGetUser); 
-    describe('Test GET /profile/1', () => {
+    describe('Test GET /users/profile/1', () => {
         test('It should respond with 200 success + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
             const response = yield (0, supertest_1.default)(app_1.default)
-                .get('/profile/1')
+                .get('/users/profile/1')
                 .expect('Content-Type', /json/)
                 .expect(200);
         }));
     });
-    // usersRouter.put('/update_user/:id',httpUpdateUser);
-    describe('Test PUT /update_user/:id', () => {
+    // usersRouter.put('/update-user/:id',httpUpdateUser);
+    describe('Test PUT /users/update-user/:id', () => {
         name = "Lpkyrius GMail";
         cpf = "00671067737";
         let userData = {
             name: name,
             cpf: cpf
         };
-        describe('Test PUT /update_user/:id bad format name', () => {
+        describe('Test PUT /users/update-user/:id bad format name', () => {
             test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.name = "test#$";
                 userData.cpf = cpf;
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .put('/update_user/1')
+                    .put('/users/update-user/1')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(400);
             }));
         });
-        describe('Test PUT /update_user/:id blank name', () => {
+        describe('Test PUT /users/update-user/:id blank name', () => {
             test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.name = "";
                 userData.cpf = cpf;
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .put('/update_user/1')
+                    .put('/users/update-user/1')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(400);
             }));
         });
-        describe('Test PUT /update_user/:id blank cpf', () => {
+        describe('Test PUT /users/update-user/:id blank cpf', () => {
             test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.name = name;
                 userData.cpf = "";
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .put('/update_user/1')
+                    .put('/users/update-user/1')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(400);
             }));
         });
-        describe('Test PUT /update_user/:id', () => {
+        describe('Test PUT /users/update-user/:id', () => {
             test('It should respond with 200 success + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.name = name;
                 userData.cpf = cpf;
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .put('/update_user/1')
+                    .put('/users/update-user/1')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(200);
@@ -251,12 +251,12 @@ describe('Users API', () => {
             }));
         });
     });
-    // usersRouter.put('/confirm_email/:id/:uniqueString', handleEmailConfirmation);
-    describe('Test GET /confirm_email/:id/:uniqueString', () => {
-        describe('Test GET /confirm_email/:id/:uniqueString general test', () => {
+    // usersRouter.put('/users/confirm-email/:id/:uniqueString', handleEmailConfirmation);
+    describe('Test GET /users/confirm-email/:id/:uniqueString', () => {
+        describe('Test GET /users/confirm-email/:id/:uniqueString general test', () => {
             test('It should respond with 200 + Content-Type = html', () => __awaiter(void 0, void 0, void 0, function* () {
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .get('/confirm_email/1/9a405464-bc99-4dc5-bf8d-1c5a596bf3b383')
+                    .get('/users/confirm-email/1/9a405464-bc99-4dc5-bf8d-1c5a596bf3b383')
                     .expect('Content-Type', "text/plain; charset=utf-8")
                     .expect(302);
                 // .end((err, res) => {
@@ -272,63 +272,63 @@ describe('Users API', () => {
             }));
         });
         // Since it sends a HTML file with success or error message, there is way to test it.
-        // describe('Test GET /confirm_email/:id/:uniqueString with id that does not exist', () => {
+        // describe('Test GET /users/users/confirm-email/:id/:uniqueString with id that does not exist', () => {
         //     test('It should respond with 400 fail + Content-Type = json', async () => {
         //         const response = await request(app)
-        //             .get('/confirm_email/0/:uniqueString')
+        //             .get('/users/confirm-email/0/:uniqueString')
         //             .expect('Content-Type', /json/)
         //             .expect(400);
         //     });
         // });
-        // describe('Test GET //confirm_email/:id/:uniqueString with a valid id', () => {
+        // describe('Test GET /users/confirm-email/:id/:uniqueString with a valid id', () => {
         //     test('It should respond with 200 success + Content-Type = json', async () => {
         //         const response = await request(app)
-        //             .get('/confirm/83/3de13c32-8aeb-4774-b040-0270d783d5e883')
+        //             .get('/users/confirm/83/3de13c32-8aeb-4774-b040-0270d783d5e883')
         //             .expect('Content-Type', /json/)
         //             .expect(200);
         //     });
         // });
     });
-    // usersRouter.put('/update_user_email/:id',httpUpdateUserEmail);
-    describe('Test PUT /update_user_email/:id', () => {
+    // usersRouter.put('/users/update-user-email/:id',httpUpdateUserEmail);
+    describe('Test PUT /users/update-user-email/:id', () => {
         userData.email = "lpkyrius@gmail.com";
         userData.cpf = "06763865040";
-        describe('Test PUT /confirm_email/:id with an email already used', () => {
+        describe('Test PUT /users/confirm-email/:id with an email already used', () => {
             test('It should respond with 409 conflict + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .put('/update_user_email/2')
+                    .put('/users/update-user-email/2')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(409);
             }));
         });
-        describe('Test PUT /update_user_email/:id with bad format email', () => {
+        describe('Test PUT /users/update-user-email/:id with bad format email', () => {
             test('It should respond with 400 fail + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.email = "lpkyriusgmail.com";
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .put('/update_user_email/1')
+                    .put('/users/update-user-email/1')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(400);
             }));
         });
-        describe('Test PUT /update_user_email/:id with an id that does not exist', () => {
+        describe('Test PUT /users/update-user-email/:id with an id that does not exist', () => {
             test('It should respond with 404 not found + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.email = "lpkyrius@zmail.com";
                 userData.cpf = "573.761.058-67";
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .put('/update_user_email/0')
+                    .put('/users/update-user-email/0')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(404);
             }));
         });
-        describe('Test PUT /update_user_email/:id with a valid email', () => {
+        describe('Test PUT /users/update-user-email/:id with a valid email', () => {
             test('It should respond with 200 success + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 userData.email = "lpkyrius@gmail.com";
                 userData.cpf = "00671067737";
                 const response = yield (0, supertest_1.default)(app_1.default)
-                    .put('/update_user_email/1')
+                    .put('/users/update-user-email/1')
                     .send(userData)
                     .expect('Content-Type', /json/)
                     .expect(200);

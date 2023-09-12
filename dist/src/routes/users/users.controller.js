@@ -124,10 +124,10 @@ const sendConfirmationEmail = (req, res, email, userId, goal) => __awaiter(void 
         let subject = '';
         let titulo = '';
         let body_message = '';
-        if (goal === 'register' || goal === 'update_user_email') {
+        if (goal === 'register' || goal === 'update-user-email') {
             resetExpiration = Number(process.env.EMAIL_EXPIRATION || 21600000);
             expiresAt = Date.now() + resetExpiration; // 6 hours
-            routeLink = 'confirm_email';
+            routeLink = 'users/confirm-email';
             subject = 'Confirme seu registro no New SAVIC';
             titulo = 'Confirme seu registro no New SAVIC';
             body_message = `<p>Para ter acesso liberado ao <b>New SAVIC da RCC Brasil</b>,
@@ -135,10 +135,10 @@ const sendConfirmationEmail = (req, res, email, userId, goal) => __awaiter(void 
             <p><b>Este link vai expirar em ${Math.round(resetExpiration / 3600000)} horas.</b></p>`;
         }
         else {
-            // reset_password
+            // reset-password
             resetExpiration = Number(process.env.RESET_EXPIRATION || 1800000);
             expiresAt = Date.now() + resetExpiration; // 30 min
-            routeLink = 'reset_password';
+            routeLink = 'users/reset-password';
             subject = 'Redefina sua senha no New SAVIC';
             titulo = 'Redefinir senha - New SAVIC';
             body_message = `<p>Para redefinir sua senha no <b>New SAVIC da RCC Brasil</b>,
@@ -250,7 +250,7 @@ const sendConfirmationEmail = (req, res, email, userId, goal) => __awaiter(void 
         else {
             console.log('sendConfirmationEmail can not save userVerification data');
             let message = "Ocorreu um problema ao acessar sua verificação de email.";
-            res.redirect(`/user_message/?error=true&message=${message}`);
+            res.redirect(`/users/user_message/?error=true&message=${message}`);
         }
     }
     catch (error) {
@@ -262,7 +262,7 @@ function handleEmailConfirmationVerified(req, res) {
 }
 exports.handleEmailConfirmationVerified = handleEmailConfirmationVerified;
 function handleEmailConfirmationError(req, res, message) {
-    const redirectUrl = '/user_message' + message;
+    const redirectUrl = '/users/user_message' + message;
     res.redirect(redirectUrl);
 }
 exports.handleEmailConfirmationError = handleEmailConfirmationError;
@@ -280,7 +280,7 @@ exports.handleRegisterOrUpdateEmailConfirmation = handleRegisterOrUpdateEmailCon
 // forgot password 
 function handleForgotPasswordConfirmation(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield handleEmailConfirmation(req, res, 'forgot_password');
+        yield handleEmailConfirmation(req, res, 'forgot-password');
     });
 }
 exports.handleForgotPasswordConfirmation = handleForgotPasswordConfirmation;
@@ -331,8 +331,8 @@ function handleEmailConfirmation(req, res, goal) {
                                 }
                             }
                             else {
-                                // forgot_password
-                                res.render(path.join(__dirname, "../../views/reset_password"), { email: verificationData[0].email });
+                                // forgot-password
+                                res.render(path.join(__dirname, "../../views/reset-password"), { email: verificationData[0].email });
                             }
                         }
                         else {
@@ -425,7 +425,7 @@ function httpUpdateUser(req, res) {
                     res.status(200).json(updatedUser[0]);
                 }
                 else {
-                    res.status(404).json({ error: 'Não foi possível atualizar os dados do usuário.' });
+                    res.status(404).json({ error: 'Não foi possível localizar o usuário.' });
                 }
             }
         }
@@ -467,7 +467,7 @@ function httpUpdateUserEmail(req, res) {
                         const updatedUser = yield (0, users_model_1.updateEmail)(userId, checkIfEmailChanged[0].email, userData);
                         if (updatedUser.length) {
                             // Send confirmation email
-                            yield sendConfirmationEmail(req, res, email, updatedUser[0].id, 'update_user_email');
+                            yield sendConfirmationEmail(req, res, email, updatedUser[0].id, 'update-user-email');
                             res.status(200).json(updatedUser[0]);
                         }
                         else {
@@ -588,7 +588,7 @@ function TestaCPF(strCPF) {
 }
 function httpRenderForgotPassword(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        res.render(path.join(__dirname, "../../views/forgot_password"));
+        res.render(path.join(__dirname, "../../views/forgot-password"));
     });
 }
 exports.httpRenderForgotPassword = httpRenderForgotPassword;
@@ -617,13 +617,13 @@ function httpPostForgotPassword(req, res) {
                 else {
                     const loginData = {
                         email: email,
-                        action: 'reset_password'
+                        action: 'reset-password'
                     };
                     const login = (yield (0, users_model_1.signinUser)(loginData, bcrypt, saltRounds)) || [];
                     if (login.length) {
                         // Create a one time link valid for 30 minutes (inside sendConfirmationEmail() )
                         // Send confirmation email
-                        sendConfirmationEmail(req, res, email, recoveredUser[0].id, 'reset_password');
+                        sendConfirmationEmail(req, res, email, recoveredUser[0].id, 'reset-password');
                         messageQueryString = `?error=false&message=
                     O link para redefinir a senha foi enviado para o seu email.`;
                         handleEmailConfirmationError(req, res, messageQueryString);
@@ -678,7 +678,7 @@ function httpPostResetPassword(req, res) {
                 else {
                     const loginData = {
                         email: recoveredUser[0].email,
-                        action: 'reset_password'
+                        action: 'reset-password'
                     };
                     const login = (yield (0, users_model_1.signinUser)(loginData, bcrypt, saltRounds)) || [];
                     if (login.length) {
