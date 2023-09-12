@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleForgotPasswordConfirmation = exports.httpPostResetPassword = exports.httpPostForgotPassword = exports.httpRenderForgotPassword = exports.handleEmailConfirmationError = exports.handleEmailConfirmationVerified = exports.httpUpdateUserEmail = exports.handleRegisterOrUpdateEmailConfirmation = exports.httpUpdateUser = exports.httpGetUser = exports.httpGetAllUsers = exports.handleRegister = exports.handleSignin = void 0;
+exports.handleUserDelete = exports.handleForgotPasswordConfirmation = exports.httpPostResetPassword = exports.httpPostForgotPassword = exports.httpRenderForgotPassword = exports.handleEmailConfirmationError = exports.handleEmailConfirmationVerified = exports.httpUpdateUserEmail = exports.handleRegisterOrUpdateEmailConfirmation = exports.httpUpdateUser = exports.httpGetUser = exports.httpGetAllUsers = exports.handleRegister = exports.handleSignin = void 0;
 const users_model_1 = require("../../models/users.model");
 const passwordSize = Number(process.env.PASSWORD_MIN_SIZE || 8);
 // hash handler
@@ -435,6 +435,32 @@ function httpUpdateUser(req, res) {
     });
 }
 exports.httpUpdateUser = httpUpdateUser;
+function handleUserDelete(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const userId = req.params.id;
+            // Validation 
+            if (isNaN(Number(userId))) {
+                res.status(400).json({ error: 'Id de usuário deve ser em formato numérico.' });
+            }
+            else {
+                const deletedUserInfo = yield (0, users_model_1.deleteUser)(userId);
+                // if (deletedUserInfo.length) {
+                console.log('debug handleUserDelete - review this undefined');
+                if (deletedUserInfo === undefined) {
+                    res.status(200).json(deletedUserInfo[0]);
+                }
+                else {
+                    res.status(404).json({ error: 'Não foi possível localizar o usuário.' });
+                }
+            }
+        }
+        catch (error) {
+            res.status(500).json(error);
+        }
+    });
+}
+exports.handleUserDelete = handleUserDelete;
 function httpUpdateUserEmail(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -453,7 +479,7 @@ function httpUpdateUserEmail(req, res) {
             else {
                 const recoveredUser = yield (0, users_model_1.getUserByKey)({ id: userId });
                 if (!recoveredUser.length) {
-                    res.status(400).json({ error: 'Não foi possível localizar o usuário.' });
+                    res.status(404).json({ error: 'Não foi possível localizar o usuário.' });
                 }
                 else {
                     const checkIfEmailChanged = yield (0, users_model_1.getUserByKey)({ id: userId });

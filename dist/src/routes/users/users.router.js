@@ -19,5 +19,5 @@ usersRouter.get('/users/forgot-password', users_controller_1.httpRenderForgotPas
 usersRouter.post('/users/forgot-password', users_controller_1.httpPostForgotPassword);
 usersRouter.get('/users/reset-password/:id/:uniqueString', users_controller_1.handleForgotPasswordConfirmation); // httpResetPassword 
 usersRouter.post('/users/reset-password/:id/:uniqueString', users_controller_1.httpPostResetPassword); // handleForgotPasswordConfirmation
-// usersRouter.post('/users/delete', handleDelete); 
+usersRouter.post('/users/delete/:id', users_controller_1.handleUserDelete);
 exports.default = usersRouter;

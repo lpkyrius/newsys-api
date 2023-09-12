@@ -226,6 +226,32 @@ async function resetLoginPassword(loginData, bcrypt, saltRounds) {
     }
 }   
 
+async function deleteUser(id) {
+    try {
+
+        // Delete any records from UserVerification
+        deleteUserVerification(id)
+
+        // Delete User Login info
+        const deletedUserInfo = await db.transaction(async (trx) => {
+            const deletedUserLogin = await trx('login')
+                .where({ id: id })
+                .del();
+
+            // Delete User Login info
+            const deletedUser = await trx('user')
+                    .where({ id: id })
+                    .del();
+
+        return deletedUserInfo;
+
+        });
+    } catch (error) {
+    console.log(`Error in newUserVerification(): ${error}`);
+    throw error;
+    }
+}
+
 export {
     getAllUsers,
     registerUser,
@@ -240,4 +266,5 @@ export {
     getUserVerificationById,
     deleteUserVerification,
     resetLoginPassword,
+    deleteUser
 };

@@ -12,7 +12,8 @@ import  {
     httpRenderForgotPassword,
     httpPostForgotPassword,
     httpPostResetPassword,
-    handleForgotPasswordConfirmation
+    handleForgotPasswordConfirmation,
+    handleUserDelete
 } from './users.controller';
 // const { response } = require('../../app');
 
@@ -30,7 +31,7 @@ usersRouter.get ('/users/forgot-password', httpRenderForgotPassword);
 usersRouter.post('/users/forgot-password', httpPostForgotPassword);
 usersRouter.get ('/users/reset-password/:id/:uniqueString', handleForgotPasswordConfirmation); // httpResetPassword 
 usersRouter.post('/users/reset-password/:id/:uniqueString', httpPostResetPassword); // handleForgotPasswordConfirmation
-// usersRouter.post('/users/delete', handleDelete); 
+usersRouter.post('/users/delete/:id', handleUserDelete); 
 
 export default usersRouter;
 

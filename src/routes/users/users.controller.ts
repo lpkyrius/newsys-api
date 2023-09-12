@@ -12,7 +12,8 @@ import {
     newUserVerification,
     getUserVerificationById,
     deleteUserVerification,
-    resetLoginPassword
+    resetLoginPassword,
+    deleteUser
 } from '../../models/users.model';
 
 const passwordSize = Number(process.env.PASSWORD_MIN_SIZE || 8);
@@ -421,6 +422,29 @@ async function httpUpdateUser(req: Request, res: Response) {
     }   
 }
 
+async function handleUserDelete(req: Request, res: Response) {
+    try {
+
+        const userId = req.params.id;
+
+        // Validation 
+        if (isNaN(Number(userId))){
+            res.status(400).json({ error: 'Id de usuário deve ser em formato numérico.'});
+        } else {
+            const deletedUserInfo = await deleteUser(userId);
+            // if (deletedUserInfo.length) {
+            console.log('debug handleUserDelete - review this undefined');
+            if (deletedUserInfo === undefined) {
+                res.status(200).json(deletedUserInfo[0]);
+            } else {
+                res.status(404).json({ error: 'Não foi possível localizar o usuário.' });
+            }
+        }
+    } catch (error) {
+        res.status(500).json(error);
+    }   
+}
+
 async function httpUpdateUserEmail(req: Request, res: Response) {
     try {
 
@@ -437,7 +461,7 @@ async function httpUpdateUserEmail(req: Request, res: Response) {
         } else {
             const recoveredUser = await getUserByKey({ id: userId});
             if (!recoveredUser.length) {
-                res.status(400).json({ error: 'Não foi possível localizar o usuário.' });
+                res.status(404).json({ error: 'Não foi possível localizar o usuário.' });
             } else {
                 const checkIfEmailChanged = await getUserByKey({id: userId});
                 // To verify if we are actually changing the email or if it's still the same
@@ -691,5 +715,6 @@ export {
     httpRenderForgotPassword, 
     httpPostForgotPassword,
     httpPostResetPassword,
-    handleForgotPasswordConfirmation
+    handleForgotPasswordConfirmation,
+    handleUserDelete
 };

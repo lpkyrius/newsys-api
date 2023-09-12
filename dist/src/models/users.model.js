@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetLoginPassword = exports.deleteUserVerification = exports.getUserVerificationById = exports.newUserVerification = exports.updateEmail = exports.getKeyAlreadyUsedByAnotherId = exports.getUserByKey = exports.confirmUser = exports.signinUser = exports.updateUser = exports.getUserById = exports.registerUser = exports.getAllUsers = void 0;
+exports.deleteUser = exports.resetLoginPassword = exports.deleteUserVerification = exports.getUserVerificationById = exports.newUserVerification = exports.updateEmail = exports.getKeyAlreadyUsedByAnotherId = exports.getUserByKey = exports.confirmUser = exports.signinUser = exports.updateUser = exports.getUserById = exports.registerUser = exports.getAllUsers = void 0;
 const { db } = require('../services/postgresql');
 function getAllUsers() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -270,3 +270,27 @@ function resetLoginPassword(loginData, bcrypt, saltRounds) {
     });
 }
 exports.resetLoginPassword = resetLoginPassword;
+function deleteUser(id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            // Delete any records from UserVerification
+            deleteUserVerification(id);
+            // Delete User Login info
+            const deletedUserInfo = yield db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const deletedUserLogin = yield trx('login')
+                    .where({ id: id })
+                    .del();
+                // Delete User Login info
+                const deletedUser = yield trx('user')
+                    .where({ id: id })
+                    .del();
+                return deletedUserInfo;
+            }));
+        }
+        catch (error) {
+            console.log(`Error in newUserVerification(): ${error}`);
+            throw error;
+        }
+    });
+}
+exports.deleteUser = deleteUser;

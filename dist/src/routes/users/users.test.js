@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("../../app"));
 const supertest_1 = __importDefault(require("supertest"));
+let id = "";
 let email = "";
 let password = "";
 let name = "";
@@ -155,28 +156,31 @@ describe('Users API', () => {
             userDataWithoutDate.cpf = cpf;
         });
         describe('Test POST /users/register', () => {
-            // test('It should respond with 201 success + Content-Type = json', async () => {
-            //     email = "test" + randomComplement + "@abc"+randomComplement+".com";
-            //     password = randomComplement+"test123";
-            //     name = "Test "+ randomComplement;
-            //     cpf = "19640375730";
-            //     userDataWithoutDate = {
-            //         email: email,
-            //         password: password,
-            //         name: name,
-            //         cpf: cpf
-            //     }
-            //     const response = await request(app)
-            //         .post('/users/register')
-            //         .send(userDataWithoutDate)
-            //         .expect('Content-Type', /json/)
-            //         .expect(201);
-            //     // For any date data
-            //     const requestDate = new Date().valueOf(); // user.created_at 
-            //     const responseDate = new Date(response.body.created_at).valueOf();
-            //     expect(responseDate).toBe(requestDate);
-            //     expect(response.body).toMatchObject(userDataWithoutDate);
-            // });
+            test('It should respond with 201 success + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
+                email = "test" + randomComplement + "@abc" + randomComplement + ".com";
+                password = randomComplement + "test123";
+                name = "Test " + randomComplement;
+                cpf = "573.761.058-67";
+                userDataWithoutDate = {
+                    email: email,
+                    password: password,
+                    name: name,
+                    cpf: cpf
+                };
+                const response = yield (0, supertest_1.default)(app_1.default)
+                    .post('/users/register')
+                    .send(userDataWithoutDate)
+                    .expect('Content-Type', /json/)
+                    .expect(201);
+                // save new id generated for next tests and final delete
+                id = response.body.id;
+                console.log(`Id generated: ${id}`);
+                // For any date data
+                const requestDate = new Date().valueOf(); // user.created_at 
+                const responseDate = new Date(response.body.created_at).valueOf();
+                expect(responseDate).toBe(requestDate);
+                expect(response.body).toMatchObject(userDataWithoutDate);
+            }));
         });
     });
     // usersRouter.get('/users/users', httpGetAllUsers); 
