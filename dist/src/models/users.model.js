@@ -83,7 +83,7 @@ function deleteUserVerification(user_id) {
                 .del();
         }
         catch (error) {
-            console.log(`Error in newUserVerification(): ${error}`);
+            console.log(`Error in deleteUserVerification(): ${error}`);
             throw error;
         }
     });
@@ -273,22 +273,32 @@ exports.resetLoginPassword = resetLoginPassword;
 function deleteUser(id) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // Delete any records from UserVerification
+            // Fetch the user information before deleting
+            const foundUser = yield db('users')
+                .where('id', id)
+                .first(); // Assuming there is only one matching record
+            if (!foundUser) {
+                return null;
+            }
+            // Delete the user info from all 3 tables
+            // 1 - Delete any records from UserVerification
             deleteUserVerification(id);
-            // Delete User Login info
+            // 2 - Delete User & Login info
             const deletedUserInfo = yield db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
-                const deletedUserLogin = yield trx('login')
+                const deletedLogin = yield trx('login')
                     .where({ id: id })
-                    .del();
-                // Delete User Login info
-                const deletedUser = yield trx('user')
+                    .del()
+                    .returning("id");
+                // 3 - Delete User Login info
+                const deletedUser = yield trx('users')
                     .where({ id: id })
-                    .del();
-                return deletedUserInfo;
+                    .del()
+                    .returning("id");
             }));
+            return foundUser;
         }
         catch (error) {
-            console.log(`Error in newUserVerification(): ${error}`);
+            console.log(`Error in deleteUser(): ${error}`);
             throw error;
         }
     });

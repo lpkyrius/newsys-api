@@ -13,11 +13,11 @@ usersRouter.get('/users', users_controller_1.httpGetAllUsers);
 usersRouter.get('/users/profile/:id', users_controller_1.httpGetUser);
 usersRouter.put('/users/update-user/:id', users_controller_1.httpUpdateUser);
 usersRouter.get('/users/confirm-email/:id/:uniqueString', users_controller_1.handleRegisterOrUpdateEmailConfirmation);
-usersRouter.get('/users/user_message', users_controller_1.handleEmailConfirmationVerified);
+usersRouter.get('/users/user-message', users_controller_1.handleEmailConfirmationVerified);
 usersRouter.put('/users/update-user-email/:id', users_controller_1.httpUpdateUserEmail);
 usersRouter.get('/users/forgot-password', users_controller_1.httpRenderForgotPassword);
 usersRouter.post('/users/forgot-password', users_controller_1.httpPostForgotPassword);
 usersRouter.get('/users/reset-password/:id/:uniqueString', users_controller_1.handleForgotPasswordConfirmation); // httpResetPassword 
 usersRouter.post('/users/reset-password/:id/:uniqueString', users_controller_1.httpPostResetPassword); // handleForgotPasswordConfirmation
-usersRouter.post('/users/delete/:id', users_controller_1.handleUserDelete);
+usersRouter.delete('/users/delete/:id', users_controller_1.handleUserDelete);
 exports.default = usersRouter;

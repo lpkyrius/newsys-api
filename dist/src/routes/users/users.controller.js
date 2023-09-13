@@ -250,7 +250,7 @@ const sendConfirmationEmail = (req, res, email, userId, goal) => __awaiter(void 
         else {
             console.log('sendConfirmationEmail can not save userVerification data');
             let message = "Ocorreu um problema ao acessar sua verificação de email.";
-            res.redirect(`/users/user_message/?error=true&message=${message}`);
+            res.redirect(`/users/user-message/?error=true&message=${message}`);
         }
     }
     catch (error) {
@@ -258,11 +258,11 @@ const sendConfirmationEmail = (req, res, email, userId, goal) => __awaiter(void 
     }
 });
 function handleEmailConfirmationVerified(req, res) {
-    res.sendFile(path.join(__dirname, "../../views/user_message.html"));
+    res.sendFile(path.join(__dirname, "../../views/user-message.html"));
 }
 exports.handleEmailConfirmationVerified = handleEmailConfirmationVerified;
 function handleEmailConfirmationError(req, res, message) {
-    const redirectUrl = '/users/user_message' + message;
+    const redirectUrl = '/users/user-message' + message;
     res.redirect(redirectUrl);
 }
 exports.handleEmailConfirmationError = handleEmailConfirmationError;
@@ -445,10 +445,8 @@ function handleUserDelete(req, res) {
             }
             else {
                 const deletedUserInfo = yield (0, users_model_1.deleteUser)(userId);
-                // if (deletedUserInfo.length) {
-                console.log('debug handleUserDelete - review this undefined');
-                if (deletedUserInfo === undefined) {
-                    res.status(200).json(deletedUserInfo[0]);
+                if (deletedUserInfo) {
+                    res.status(200).json({ message: `Usuário id ${deletedUserInfo.id} excluído com sucesso!` });
                 }
                 else {
                     res.status(404).json({ error: 'Não foi possível localizar o usuário.' });

@@ -256,7 +256,7 @@ const sendConfirmationEmail = async (req: Request, res: Response, email: string,
         } else {
             console.log('sendConfirmationEmail can not save userVerification data');
             let message = "Ocorreu um problema ao acessar sua verificação de email.";
-            res.redirect(`/users/user_message/?error=true&message=${message}`);
+            res.redirect(`/users/user-message/?error=true&message=${message}`);
         }
           
     } catch (error) {
@@ -265,11 +265,11 @@ const sendConfirmationEmail = async (req: Request, res: Response, email: string,
 };
 
 function handleEmailConfirmationVerified(req: Request, res: Response){
-    res.sendFile(path.join(__dirname, "../../views/user_message.html"));
+    res.sendFile(path.join(__dirname, "../../views/user-message.html"));
 }
 
 function handleEmailConfirmationError(req: Request, res: Response, message: string){
-    const redirectUrl = '/users/user_message' + message;
+    const redirectUrl = '/users/user-message' + message;
     res.redirect(redirectUrl);
 }
 
@@ -432,10 +432,8 @@ async function handleUserDelete(req: Request, res: Response) {
             res.status(400).json({ error: 'Id de usuário deve ser em formato numérico.'});
         } else {
             const deletedUserInfo = await deleteUser(userId);
-            // if (deletedUserInfo.length) {
-            console.log('debug handleUserDelete - review this undefined');
-            if (deletedUserInfo === undefined) {
-                res.status(200).json(deletedUserInfo[0]);
+            if (deletedUserInfo) {
+                res.status(200).json({ message: `Usuário id ${ deletedUserInfo.id } excluído com sucesso!`});
             } else {
                 res.status(404).json({ error: 'Não foi possível localizar o usuário.' });
             }
