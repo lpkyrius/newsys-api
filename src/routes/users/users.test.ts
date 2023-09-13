@@ -1,15 +1,22 @@
 import app from '../../app';
 import request from 'supertest';
+import { confirmUser } from "../../models/users.model";
 
-let id = "";
-let email = "";
-let password = "";
-let name = "";
-let cpf = "";
+let testId = "";
+const randomComplement = (Math.floor((Math.random() * 100) + 1)).toString();
+let email = "test" + randomComplement + "@abc"+randomComplement+".com";
+let password = randomComplement+"test123";
+let name = "Test "+ randomComplement;
+let cpf = "573.761.058-67";
+let userDataWithoutDate = {
+    email: email,
+    password: password,
+    name: name,
+    cpf: cpf
+}
 let userData = {
     name: name,
-    cpf: cpf, 
-    email: email
+    cpf: cpf
 };
 let message = `⚠️ Warning:
 
@@ -31,64 +38,8 @@ describe('Users API', () => {
         console.log(message);
     });
 
-    // usersRouter.post('/users/signin',     handleSignin); 
-    describe('Test POST /users/signIn', () => {
-        test('It should respond with 200 success', async () => {
-            const response = await request(app)
-                .post('/users/signin')
-                .send({
-                "email": "leandropassoscoach@gmail.com",
-                "password": "leandropassoscoach123"
-                })
-                .expect('Content-Type', /json/)
-                .expect(200);
-        });
-
-        test('It should respond with 400 bad request', async () => {
-            const response = await request(app)
-                .post('/users/signin')
-                .send({
-                    "email": "lpkyrius@hotmail.com",
-                    "password": ""
-                })
-                .expect('Content-Type', /json/)
-                .expect(400);
-
-            expect(response.body).toStrictEqual(
-                {
-                    "error": "Dados inválidos."
-                }
-            );
-        });
-    });
-
     // usersRouter.post('/users/register', handleRegister); 
     describe('Test POST /users/register', () => {
-
-        const randomComplement = (Math.floor((Math.random() * 100) + 1)).toString();
-        email = "test" + randomComplement + "@abc"+randomComplement+".com";
-        password = randomComplement+"test123";
-        name = "Test "+ randomComplement;
-        cpf = "00930475763";
-        let userDataWithoutDate = {
-            email: email,
-            password: password,
-            name: name,
-            cpf: cpf
-        }
-
-        describe('Test POST /users/register email already exists', () => {
-            test('It should respond with 400 bad request + Content-Type = json', async () => {
-                userDataWithoutDate.email = "test.com";
-                const response = await request(app)
-                    .post('/users/register')
-                    .send(userDataWithoutDate)
-                    .expect('Content-Type', /json/)
-                    .expect(400);
-            });
-            userDataWithoutDate.email = "lpkyrius@gmail.com";
-        });
-
         describe('Test POST /users/register bad format email', () => {
             test('It should respond with 400 bad request + Content-Type = json', async () => {
                 userDataWithoutDate.email = "test.com";
@@ -136,16 +87,6 @@ describe('Users API', () => {
             });
             userDataWithoutDate.password = password;
         });   
- 
-        describe('Test POST /users/register cpf already exists', () => {
-            test('It should respond with 400 bad request + Content-Type = json', async () => {
-                const response = await request(app)
-                    .post('/users/register')
-                    .send(userDataWithoutDate)
-                    .expect('Content-Type', /json/)
-                    .expect(400);
-            });
-        });  
 
         describe('Test POST /users/register blank cpf', () => {
             test('It should respond with 400 bad request + Content-Type = json', async () => {
@@ -161,16 +102,7 @@ describe('Users API', () => {
 
         describe('Test POST /users/register', () => {
             test('It should respond with 201 success + Content-Type = json', async () => {
-                email = "test" + randomComplement + "@abc"+randomComplement+".com";
-                password = randomComplement+"test123";
-                name = "Test "+ randomComplement;
-                cpf = "573.761.058-67";
-                userDataWithoutDate = {
-                    email: email,
-                    password: password,
-                    name: name,
-                    cpf: cpf
-                }
+
                 const response = await request(app)
                     .post('/users/register')
                     .send(userDataWithoutDate)
@@ -178,8 +110,8 @@ describe('Users API', () => {
                     .expect(201);
                 
                 // save new id generated for next tests and final delete
-                id = response.body.id;
-                console.log(`Id generated: ${ id }`);
+                testId = response.body.id;
+                console.log(`Test User created! testId generated as ${ testId }`);
                 // For any date data
                 const requestDate = new Date().valueOf(); // user.created_at 
                 const responseDate = new Date(response.body.created_at).valueOf();
@@ -187,6 +119,129 @@ describe('Users API', () => {
 
                 expect(response.body).toMatchObject(userDataWithoutDate);
             });
+        });
+
+        describe('Test POST /users/register email already exists', () => {
+            
+            let tempCpf = userDataWithoutDate.cpf;
+            userDataWithoutDate.cpf = "148.127.180-66";
+
+            test('It should respond with 400 bad request + Content-Type = json', async () => {
+                const response = await request(app)
+                    .post('/users/register')
+                    .send(userDataWithoutDate)
+                    .expect('Content-Type', /json/)
+                    .expect(400);
+            });
+
+            userDataWithoutDate.cpf = tempCpf;
+
+        });
+
+        describe('Test POST /users/register cpf already exists', () => {
+
+            let tempEmail = userDataWithoutDate.email;
+            userDataWithoutDate.email = "new"+tempEmail;
+
+            test('It should respond with 400 bad request + Content-Type = json', async () => {
+                const response = await request(app)
+                    .post('/users/register')
+                    .send(userDataWithoutDate)
+                    .expect('Content-Type', /json/)
+                    .expect(400);
+            });
+
+            userDataWithoutDate.email = tempEmail;
+        });        
+
+    });
+
+    // usersRouter.put('/users/confirm-email/:id/:uniqueString', handleEmailConfirmation);
+    describe('Test GET /users/confirm-email/:id/:uniqueString', () => {
+
+        describe('Test GET /users/confirm-email/:id/:uniqueString general test', () => {
+            test('It should respond with 200 + Content-Type = html', async () => {
+                const response = await request(app)
+                    .get('/users/confirm-email/1/9a405464-bc99-4dc5-bf8d-1c5a596bf3b383')
+                    .expect('Content-Type', "text/plain; charset=utf-8")
+                    .expect(302)
+                    // .end((err, res) => {
+                    //     if (err) return done(err);
+                    //     // Make another request to the redirected URL
+                    //     request(app)
+                    //       .get(res.headers.location)
+                    //       .expect('Content-Type', /html/)
+                    //       .expect(200)
+                    //       .expect(/<p class="error">/) // This checks if the body contains the error message
+                    //       .end(done);
+                    //   });
+            });
+        });
+        // Since it sends a HTML file with success or error message, there is way to test it.
+        // describe('Test GET /users/users/confirm-email/:id/:uniqueString with id that does not exist', () => {
+        //     test('It should respond with 400 fail + Content-Type = json', async () => {
+        //         const response = await request(app)
+        //             .get('/users/confirm-email/0/:uniqueString')
+        //             .expect('Content-Type', /json/)
+        //             .expect(400);
+        //     });
+        // });
+
+        // describe('Test GET /users/confirm-email/:id/:uniqueString with a valid id', () => {
+        //     test('It should respond with 200 success + Content-Type = json', async () => {
+        //         const response = await request(app)
+        //             .get('/users/confirm/83/3de13c32-8aeb-4774-b040-0270d783d5e883')
+        //             .expect('Content-Type', /json/)
+        //             .expect(200);
+        //     });
+        // });
+    });
+
+    // usersRouter.post('/users/signin',     handleSignin); 
+    describe('Test POST /users/signIn', () => {
+        test('It should respond with 400 Bad Request due to user not validated yet', async () => {
+            const response = await request(app)
+                .post('/users/signin')
+                .send({
+                "email": userDataWithoutDate.email,
+                "password": userDataWithoutDate.password
+                })
+                .expect('Content-Type', /json/)
+                .expect(400);
+        });
+
+        // Forces email verification for the user
+        const updatedUser = async () => {
+            await confirmUser(testId);
+            console.log(`Test User ${ testId } confirmed!`);
+        };
+
+        test('It should respond with 200 success', async () => {
+            const response = await request(app)
+                .post('/users/signin')
+                .send({
+                "email": "leandropassoscoach@gmail.com",
+                "password": "leandropassoscoach123"
+                })
+                .expect('Content-Type', /json/)
+                .expect(200);
+        });
+
+        test('It should respond with 400 bad request', async () => {
+            const response = await request(app)
+                .post('/users/signin')
+                .send({
+                    "email": "lpkyrius@hotmail.com",
+                    "password": ""
+                })
+                .expect('Content-Type', /json/)
+                .expect(400);
+
+            expect(response.body).toStrictEqual(
+                {
+                    "error": "Dados inválidos."
+                }
+            );
         });
     });
 
@@ -212,13 +267,6 @@ describe('Users API', () => {
 
     // usersRouter.put('/update-user/:id',httpUpdateUser);
     describe('Test PUT /users/update-user/:id', () => {
-
-        name = "Lpkyrius GMail";
-        cpf = "00671067737";
-        let userData = {
-            name: name,
-            cpf: cpf
-        }
         describe('Test PUT /users/update-user/:id bad format name', () => {
             test('It should respond with 400 bad request + Content-Type = json', async () => {
                 userData.name = "test#$";
@@ -270,46 +318,7 @@ describe('Users API', () => {
 
     });
 
-    // usersRouter.put('/users/confirm-email/:id/:uniqueString', handleEmailConfirmation);
-    describe('Test GET /users/confirm-email/:id/:uniqueString', () => {
 
-        describe('Test GET /users/confirm-email/:id/:uniqueString general test', () => {
-            test('It should respond with 200 + Content-Type = html', async () => {
-                const response = await request(app)
-                    .get('/users/confirm-email/1/9a405464-bc99-4dc5-bf8d-1c5a596bf3b383')
-                    .expect('Content-Type', "text/plain; charset=utf-8")
-                    .expect(302)
-                    // .end((err, res) => {
-                    //     if (err) return done(err);
-                    //     // Make another request to the redirected URL
-                    //     request(app)
-                    //       .get(res.headers.location)
-                    //       .expect('Content-Type', /html/)
-                    //       .expect(200)
-                    //       .expect(/<p class="error">/) // This checks if the body contains the error message
-                    //       .end(done);
-                    //   });
-            });
-        });
-        // Since it sends a HTML file with success or error message, there is way to test it.
-        // describe('Test GET /users/users/confirm-email/:id/:uniqueString with id that does not exist', () => {
-        //     test('It should respond with 400 fail + Content-Type = json', async () => {
-        //         const response = await request(app)
-        //             .get('/users/confirm-email/0/:uniqueString')
-        //             .expect('Content-Type', /json/)
-        //             .expect(400);
-        //     });
-        // });
-
-        // describe('Test GET /users/confirm-email/:id/:uniqueString with a valid id', () => {
-        //     test('It should respond with 200 success + Content-Type = json', async () => {
-        //         const response = await request(app)
-        //             .get('/users/confirm/83/3de13c32-8aeb-4774-b040-0270d783d5e883')
-        //             .expect('Content-Type', /json/)
-        //             .expect(200);
-        //     });
-        // });
-    });
 
     
     // usersRouter.put('/users/update-user-email/:id',httpUpdateUserEmail);

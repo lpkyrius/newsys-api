@@ -8,7 +8,8 @@
 - [ ] ⭐️ Review tests by **creating user/delete route**, then create a new user and following the right sequence to test util user/delete
 - [ ] ⭐️ Documentation for API Rest [check this video]('https://youtu.be/5aryMKiBEKY?t=103')
 - [ ] ⭐️ Documentation for Automated tests
-- [ ] ⭐️ Feature Flags
+- [ ] Temporary token to automatically logout users
+- [ ] Feature Flags
 - [ ] Unit testing, integration testing and end-to-end testing. Not necessary may be: mutation tests, load tests, stress testing, performance tests, visual tests, snapshot tests.
 - [ ] CI/CD
 - [ ] CDN
