@@ -42,7 +42,7 @@ async function handleSignin(req: Request, res: Response) {
     try {
 
         let {email, password } = req.body;
-        
+
         // data validation: right email/password format avoiding SQL Injection...
         if (email == "" || password == ""){
             res.status(400).json({ error: 'Dados inválidos.' });
