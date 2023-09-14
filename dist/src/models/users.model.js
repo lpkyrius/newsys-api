@@ -282,7 +282,7 @@ function deleteUser(id) {
             }
             // Delete the user info from all 3 tables
             // 1 - Delete any records from UserVerification
-            deleteUserVerification(id);
+            yield deleteUserVerification(id);
             // 2 - Delete User & Login info
             const deletedUserInfo = yield db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
                 const deletedLogin = yield trx('login')

@@ -240,7 +240,7 @@ async function deleteUser(id) {
 
         // Delete the user info from all 3 tables
         // 1 - Delete any records from UserVerification
-        deleteUserVerification(id)
+        await deleteUserVerification(id)
 
         // 2 - Delete User & Login info
         const deletedUserInfo = await db.transaction(async (trx) => {

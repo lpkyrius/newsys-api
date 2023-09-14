@@ -4,8 +4,8 @@
 - [x] Typescript conversion:
 - Review tests after Typescript by checking these videos: https://youtu.be/Ml51d87uoPo | https://youtu.be/IvLzSAjkO1c | https://youtu.be/S2L4fatK0Ek | https://youtu.be/kZGzyJWIyBM | https://youtu.be/AIVWz9tDIxM 
 - [x] Documentation for Users email confirmation flow
-- [ ] ⭐️ Review [routes best practices]('https://youtu.be/JxeTegu4dD8') >>> Missing only the final complete test
-- [ ] ⭐️ Review tests by **creating user/delete route**, then create a new user and following the right sequence to test util user/delete
+- [x] ⭐️ Review [routes best practices]('https://youtu.be/JxeTegu4dD8') >>> Missing only the final complete test
+- [x] ⭐️ Review tests by **creating user/delete route**, then create a new user and following the right sequence to test util user/delete
 - [ ] ⭐️ Documentation for API Rest [check this video]('https://youtu.be/5aryMKiBEKY?t=103')
 - [ ] ⭐️ Documentation for Automated tests
 - [ ] Temporary token to automatically logout users
