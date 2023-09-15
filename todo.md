@@ -6,6 +6,9 @@
 - [x] Documentation for Users email confirmation flow
 - [x] ⭐️ Review [routes best practices]('https://youtu.be/JxeTegu4dD8') >>> Missing only the final complete test
 - [x] ⭐️ Review tests by **creating user/delete route**, then create a new user and following the right sequence to test util user/delete
+- [ ] ⭐️ Save images SAVIC and make the current project public in GitHub until it has any sensitive data
+- [ ] ⭐️ Turn off CPF validation .env
+- [ ] ⭐️ Check the GitHub Udemy course for how to manage project (tasks) in GitHub
 - [ ] ⭐️ Documentation for API Rest [check this video]('https://youtu.be/5aryMKiBEKY?t=103')
 - [ ] ⭐️ Documentation for Automated tests
 - [ ] Temporary token to automatically logout users

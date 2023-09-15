@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("../../app"));
 const supertest_1 = __importDefault(require("supertest"));
 const users_model_1 = require("../../models/users.model");
+require('dotenv').config();
 describe('Users API', () => {
     // Data to be used on our tests
     const randomComplement = (Math.floor((Math.random() * 100) + 1)).toString();
@@ -193,7 +194,7 @@ describe('Users API', () => {
                 .expect('Content-Type', /json/)
                 .expect(400);
             expect(response.body).toStrictEqual({
-                "error": "Dados inválidos."
+                "error": "Invalid data."
             });
         }));
     });
@@ -239,17 +240,20 @@ describe('Users API', () => {
                 editableUser.name = name;
             }));
         });
-        describe('Test PUT /users/update-user/:id blank cpf', () => {
-            test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
-                editableUser.cpf = "";
-                const response = yield (0, supertest_1.default)(app_1.default)
-                    .put('/users/update-user/' + mainCreatedUser.id)
-                    .send(editableUser)
-                    .expect('Content-Type', /json/)
-                    .expect(400);
-                editableUser.cpf = cpf;
-            }));
-        });
+        // Test only if the CPF_VALIDATION is ON
+        if ((process.env.CPF_VALIDATION || "1") == "1") {
+            describe('Test PUT /users/update-user/:id blank cpf', () => {
+                test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
+                    editableUser.cpf = "";
+                    const response = yield (0, supertest_1.default)(app_1.default)
+                        .put('/users/update-user/' + mainCreatedUser.id)
+                        .send(editableUser)
+                        .expect('Content-Type', /json/)
+                        .expect(400);
+                    editableUser.cpf = cpf;
+                }));
+            });
+        }
         describe('Test PUT /users/update-user/:id', () => {
             editableUser = {
                 name: mainCreatedUser.name,

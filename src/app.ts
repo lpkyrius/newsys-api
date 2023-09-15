@@ -1,7 +1,7 @@
 import express from 'express'; 
 import cors from 'cors';
 import usersRouter from './routes/users/users.router';
-import gruposRouter from './routes/grupos/grupos.router';
+import groupRouter from './routes/groups/groups.router';
 
 const app = express();
 
@@ -13,9 +13,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.set('view engine', 'ejs');
 
-app.get('/', (req, res) => {res.status(200).send('New SAVIC - RCC Brasil')}); 
+app.get('/', (req, res) => {res.status(200).send('New SYS - Your Company')}); 
 app.use(usersRouter);
-app.use(gruposRouter);
+app.use(groupRouter);
 
 export default app;
 

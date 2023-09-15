@@ -1,6 +1,7 @@
 import app from '../../app';
 import request from 'supertest';
 import { confirmUser } from "../../models/users.model";
+require('dotenv').config();
 
 describe('Users API', () => {
 
@@ -225,7 +226,7 @@ describe('Users API', () => {
 
             expect(response.body).toStrictEqual(
                 {
-                    "error": "Dados inválidos."
+                    "error": "Invalid data."
                 }
             );
         });
@@ -278,17 +279,20 @@ describe('Users API', () => {
             });
         });   
         
-        describe('Test PUT /users/update-user/:id blank cpf', () => {
-            test('It should respond with 400 bad request + Content-Type = json', async () => {
-                editableUser.cpf = "";
-                const response = await request(app)
-                    .put('/users/update-user/' + mainCreatedUser.id)
-                    .send(editableUser)
-                    .expect('Content-Type', /json/)
-                    .expect(400);
-                editableUser.cpf = cpf;
+        // Test only if the CPF_VALIDATION is ON
+        if ((process.env.CPF_VALIDATION || "1") == "1") {
+            describe('Test PUT /users/update-user/:id blank cpf', () => {
+                test('It should respond with 400 bad request + Content-Type = json', async () => {
+                    editableUser.cpf = "";
+                    const response = await request(app)
+                        .put('/users/update-user/' + mainCreatedUser.id)
+                        .send(editableUser)
+                        .expect('Content-Type', /json/)
+                        .expect(400);
+                    editableUser.cpf = cpf;
+                });
             });
-        });   
+        }   
 
        describe('Test PUT /users/update-user/:id', () => {
 
