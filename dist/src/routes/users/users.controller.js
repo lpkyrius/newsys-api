@@ -13,7 +13,7 @@ exports.handleUserDelete = exports.handleForgotPasswordConfirmation = exports.ht
 const users_model_1 = require("../../models/users.model");
 const passwordSize = Number(process.env.PASSWORD_MIN_SIZE || 8);
 // hash handler
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 // email handler
 const nodemailer = require('nodemailer');
@@ -122,14 +122,14 @@ const sendConfirmationEmail = (req, res, email, userId, goal) => __awaiter(void 
         let resetExpiration = 0;
         let routeLink = '';
         let subject = '';
-        let titulo = '';
+        let title = '';
         let body_message = '';
         if (goal === 'register' || goal === 'update-user-email') {
             resetExpiration = Number(process.env.EMAIL_EXPIRATION || 21600000);
             expiresAt = Date.now() + resetExpiration; // 6 hours
             routeLink = 'users/confirm-email';
             subject = 'Confirm your registration';
-            titulo = 'Confirm your registration';
+            title = 'Confirm your registration';
             body_message = `<p>You are almost there!<b>NewSYS access.</b>,
             <br>To confirm your registration please clink on the link below:</p>
             <p><b>This link will expire within ${Math.round(resetExpiration / 3600000)} hours.</b></p>`;
@@ -140,7 +140,7 @@ const sendConfirmationEmail = (req, res, email, userId, goal) => __awaiter(void 
             expiresAt = Date.now() + resetExpiration; // 30 min
             routeLink = 'users/reset-password';
             subject = 'Reset your password';
-            titulo = 'Reset your password';
+            title = 'Reset your password';
             body_message = `<p>To reset your password on <b>NewSYS access</b>,
             <br>please clink on the link below:</p>
             <p><b>This link will expire within ${Math.round(resetExpiration / 3600000 * 60)} minutes.</b></p>`;
@@ -206,9 +206,9 @@ const sendConfirmationEmail = (req, res, email, userId, goal) => __awaiter(void 
             </head>
             <body>
             <div class="container" align="center">
-                <h1>${titulo}</h1>
+                <h1>${title}</h1>
                 ${body_message}
-                <p><a href="${confirmationLink}">Confirme aqui</a></p><br>
+                <p><a href="${confirmationLink}">Confirm Here</a></p><br>
                 <p><b>If you can't use the button above, 
                 <br>copy and paste the link below into your browser:</b></p>
                 ${confirmationLink}
@@ -367,11 +367,11 @@ function httpGetAllUsers(req, res) {
                 res.status(200).json(recoveredUsers);
             }
             else {
-                res.status(400).json({ error: 'Não foi possível localizar usuários.' });
+                res.status(400).json({ error: 'Can not find users.' });
             }
         }
         catch (error) {
-            res.status(500).json({ error: 'Falha ao localizar usuários.' });
+            res.status(500).json({ error: 'Failed recovering users.' });
         }
     });
 }
