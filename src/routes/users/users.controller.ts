@@ -138,8 +138,8 @@ const sendConfirmationEmail = async (req: Request, res: Response, email: string,
             routeLink = 'users/confirm-email';
             subject = 'Confirm your registration';
             title = 'Confirm your registration';
-            body_message = `<p>You are almost there!<b>NewSYS access.</b>,
-            <br>To confirm your registration please clink on the link below:</p>
+            body_message = `<b>NewSYS access: </b><p>You are almost there!
+            <br>To confirm your registration please click on the link below</p>
             <p><b>This link will expire within ${Math.round(resetExpiration/3600000)} hours.</b></p>`
         } else {
             // reset-password
@@ -149,7 +149,7 @@ const sendConfirmationEmail = async (req: Request, res: Response, email: string,
             subject = 'Reset your password';
             title = 'Reset your password'
             body_message = `<p>To reset your password on <b>NewSYS access</b>,
-            <br>please clink on the link below:</p>
+            <br>please click on the link below:</p>
             <p><b>This link will expire within ${Math.round(resetExpiration/3600000*60)} minutes.</b></p>`
         }
         
@@ -200,15 +200,15 @@ const sendConfirmationEmail = async (req: Request, res: Response, email: string,
                 b {
                 font-weight: bold;
                 }
-                a {
-                color: #ffffff;
-                background-color: #e9b722;
+                a.button {
+                color: #ffffff; /* Set the font color to white */
+                background-color: #004d84;
                 text-decoration: none;
                 padding: 10px 20px;
                 border-radius: 4px;
                 }
-                a:hover {
-                background-color: #45a049;
+                a.button:hover {
+                background-color: #1867e7;
                 }
             </style>
             </head>
@@ -216,7 +216,7 @@ const sendConfirmationEmail = async (req: Request, res: Response, email: string,
             <div class="container" align="center">
                 <h1>${title}</h1>
                 ${body_message}
-                <p><a href="${confirmationLink}">Confirm Here</a></p><br>
+                <p><a class="button" href="${confirmationLink}">Confirm Here</a></p><br>
                 <p><b>If you can't use the button above, 
                 <br>copy and paste the link below into your browser:</b></p>
                 ${confirmationLink}
