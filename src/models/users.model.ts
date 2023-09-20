@@ -65,7 +65,7 @@ async function deleteUserVerification(user_id) {
             .where({ user_id: user_id })
             .del();
     } catch (error) {
-    console.log(`Error in newUserVerification(): ${error}`);
+    console.log(`Error in deleteUserVerification(): ${error}`);
     throw error;
     }
 }
@@ -190,9 +190,9 @@ async function signinUser(loginData, bcrypt, saltRounds) {
         let recoveredUser = [];
         let match = false;
         const recoveredLogin = await db('login')
-        .select('*')
-        .from('login')
-        .where('email', '=', loginData.email);
+            .select('*')
+            .from('login')
+            .where('email', '=', loginData.email);
         if (recoveredLogin.length){
             if (loginData.action === 'signin'){ // login
                 match = await bcrypt.compare(loginData.password, recoveredLogin[0].hash);
@@ -226,6 +226,45 @@ async function resetLoginPassword(loginData, bcrypt, saltRounds) {
     }
 }   
 
+async function deleteUser(id) {
+    try {
+
+        // Fetch the user information before deleting
+        const foundUser = await db('users')
+        .where('id', id)
+        .first(); // Assuming there is only one matching record
+
+        if (!foundUser) {
+            return null;
+        }
+
+        // Delete the user info from all 3 tables
+        // 1 - Delete any records from UserVerification
+        await deleteUserVerification(id)
+
+        // 2 - Delete User & Login info
+        const deletedUserInfo = await db.transaction(async (trx) => {
+            const deletedLogin = await trx('login')
+                .where({ id: id })
+                .del()
+                .returning("id");
+
+            // 3 - Delete User Login info
+            const deletedUser = await trx('users')
+                    .where({ id: id })
+                    .del()
+                    .returning("id");
+
+        });
+        
+        return foundUser;
+
+    } catch (error) {
+    console.log(`Error in deleteUser(): ${error}`);
+    throw error;
+    }
+}
+
 export {
     getAllUsers,
     registerUser,
@@ -240,4 +279,5 @@ export {
     getUserVerificationById,
     deleteUserVerification,
     resetLoginPassword,
+    deleteUser
 };

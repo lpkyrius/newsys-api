@@ -12,24 +12,26 @@ import  {
     httpRenderForgotPassword,
     httpPostForgotPassword,
     httpPostResetPassword,
-    handleForgotPasswordConfirmation
+    handleForgotPasswordConfirmation,
+    handleUserDelete
 } from './users.controller';
 // const { response } = require('../../app');
 
 const usersRouter = express.Router();
 
-usersRouter.post('/signin', handleSignin); 
-usersRouter.post('/register', handleRegister); 
-usersRouter.get('/listUsers', httpGetAllUsers); 
-usersRouter.get('/profile/:id', httpGetUser); 
-usersRouter.put('/update_user/:id',httpUpdateUser);
-usersRouter.get('/confirm_email/:id/:uniqueString', handleRegisterOrUpdateEmailConfirmation); 
-usersRouter.get('/user_message', handleEmailConfirmationVerified); 
-usersRouter.put('/update_user_email/:id',httpUpdateUserEmail);
-usersRouter.get('/forgot_password', httpRenderForgotPassword);
-usersRouter.post('/forgot_password', httpPostForgotPassword);
-usersRouter.get('/reset_password/:id/:uniqueString', handleForgotPasswordConfirmation); // httpResetPassword 
-usersRouter.post('/reset_password/:id/:uniqueString', httpPostResetPassword); // handleForgotPasswordConfirmation
+usersRouter.post  ('/users/signin', handleSignin); 
+usersRouter.post  ('/users/register', handleRegister); 
+usersRouter.get   ('/users', httpGetAllUsers); 
+usersRouter.get   ('/users/profile/:id', httpGetUser); 
+usersRouter.put   ('/users/update-user/:id',httpUpdateUser);
+usersRouter.get   ('/users/confirm-email/:id/:uniqueString', handleRegisterOrUpdateEmailConfirmation); 
+usersRouter.get   ('/users/user-message', handleEmailConfirmationVerified); 
+usersRouter.put   ('/users/update-user-email/:id',httpUpdateUserEmail);
+usersRouter.get   ('/users/forgot-password', httpRenderForgotPassword);
+usersRouter.post  ('/users/forgot-password', httpPostForgotPassword);
+usersRouter.get   ('/users/reset-password/:id/:uniqueString', handleForgotPasswordConfirmation); // httpResetPassword 
+usersRouter.post  ('/users/reset-password/:id/:uniqueString', httpPostResetPassword); // handleForgotPasswordConfirmation
+usersRouter.delete('/users/delete/:id', handleUserDelete); 
 
 export default usersRouter;
 

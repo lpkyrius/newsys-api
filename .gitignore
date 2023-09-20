@@ -3,3 +3,7 @@
 node_modules
 # todo.txt
 # todo.md
+docker-compose.yml
+
+.env
+.env.*

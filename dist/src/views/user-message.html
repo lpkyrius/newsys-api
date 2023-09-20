@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>New SAVIC</title>
+    <title>NewSYS</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,7 +34,7 @@
 </head>
 <body>
     <div class="content">
-        <h1>New SAVIC</h1>
+        <h1>NewSYS</h1>
         <script>
             var error = false;
             var message = "";
@@ -46,7 +46,7 @@
                 // Extract the values of error and message parameters
                 error = params.get("error") === "true";
                 // default
-                message = "Infelizmente ocorreu um problema durante o processo." 
+                message = "Error during the process." 
             }
             if (params.has("message")) {
                 message = params.get("message");

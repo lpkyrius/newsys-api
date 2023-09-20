@@ -12,13 +12,14 @@ import {
     newUserVerification,
     getUserVerificationById,
     deleteUserVerification,
-    resetLoginPassword
+    resetLoginPassword,
+    deleteUser
 } from '../../models/users.model';
 
 const passwordSize = Number(process.env.PASSWORD_MIN_SIZE || 8);
 
 // hash handler
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 
 // email handler
@@ -41,14 +42,14 @@ async function handleSignin(req: Request, res: Response) {
     try {
 
         let {email, password } = req.body;
-        
+
         // data validation: right email/password format avoiding SQL Injection...
         if (email == "" || password == ""){
-            res.status(400).json({ error: 'Dados inválidos.' });
+            res.status(400).json({ error: 'Invalid data.' });
         } else if (password.length < passwordSize){
-            res.status(400).json({ error: `Senha deve ter ao menos ${ passwordSize } caracteres.` });
+            res.status(400).json({ error: `Password should contain at least ${ passwordSize } characters.` });
         } else if (!checkEmail(email)){
-            res.status(400).json({ error: 'Email inválido.' });
+            res.status(400).json({ error: 'Invalid email.' });
         } else {
             const loginData = {
                 email: email, 
@@ -58,17 +59,17 @@ async function handleSignin(req: Request, res: Response) {
             const user = await signinUser(loginData, bcrypt, saltRounds) || [];
             if (user.id){
                 if (!user.verified){
-                    res.status(400).json({ error: 'Usuário ainda não confirmado via email de confirmação.' });
+                    res.status(400).json({ error: 'this email has not been verified yet, verify your inbox' });
                 } else {
                     res.status(200).json(user);
                 }
             } else {
-                res.status(400).json({ error: 'usuário ou senha inválidos'});
+                res.status(400).json({ error: 'invalid user or password'});
             }
         }
 
     } catch (error) {
-        res.status(500).json({ error: 'Erro na tentativa de login.' });
+        res.status(500).json({ error: 'error during login attempt' });
     }
 }
 
@@ -92,19 +93,19 @@ async function handleRegister(req: Request, res: Response) {
         name = name.slice(0,100);
         cpf = formatCPF(cpf); 
         if (email == "" || name == "" || cpf == "" || password == ""){
-            res.status(400).json({ error: 'Dados inválidos.' });
+            res.status(400).json({ error: 'Invalid data' });
         } else if (!checkUserName(name)){
-            res.status(400).json({ error: 'Nome inválido.' });
+            res.status(400).json({ error: 'invalid name' });
         } else if (!checkEmail(email)){
-            res.status(400).json({ error: 'Email inválido.' });
+            res.status(400).json({ error: 'Invalid email' });
         } else if (password.length < passwordSize){
-            res.status(400).json({ error: `Senha deve ter ao menos ${ passwordSize } caracteres.` });
-        } else if (!TestaCPF(cpf)){
-            res.status(400).json({ error: 'CPF inválido.' });
+            res.status(400).json({ error: `Password should contain at least ${ passwordSize } characters.` });
+        } else if (!CheckCPF(cpf)){
+            res.status(400).json({ error: 'invalid cpf' });
         } else if (await checkCpfExists(cpf)){
-            res.status(409).json({ error: 'CPF já cadastrado. Tente efetuar o login ou recuperar sua senha' });
+            res.status(409).json({ error: 'cpf already in use, try to log in ou reset your password' });
         } else if (await checkEmailExists(email)){
-            res.status(409).json({ error: 'Email já cadastrado. Tente efetuar o login ou recuperar sua senha' });
+            res.status(409).json({ error: 'email already in use, try to log in ou reset your password' });
         } else {
             password = bcrypt.hashSync(password, saltRounds);
             const userData = { email, name, cpf, created_at, password };
@@ -115,7 +116,7 @@ async function handleRegister(req: Request, res: Response) {
         }
         
     } catch (error) {
-        res.status(500).json({ error: 'Falha ao registrar novo usuário.' });
+        res.status(500).json({ error: 'error during user registration.' });
     }
 }
 
@@ -128,28 +129,28 @@ const sendConfirmationEmail = async (req: Request, res: Response, email: string,
         let resetExpiration = 0;
         let routeLink = '';
         let subject = '';
-        let titulo = '';
+        let title = '';
         let body_message ='';
 
-        if (goal==='register' || goal === 'update_user_email'){
+        if (goal==='register' || goal === 'update-user-email'){
             resetExpiration = Number(process.env.EMAIL_EXPIRATION || 21600000);
             expiresAt = Date.now() + resetExpiration; // 6 hours
-            routeLink = 'confirm_email';
-            subject = 'Confirme seu registro no New SAVIC';
-            titulo = 'Confirme seu registro no New SAVIC';
-            body_message = `<p>Para ter acesso liberado ao <b>New SAVIC da RCC Brasil</b>,
-            <br>por favor, confirme seu e-mail através do link abaixo:</p>
-            <p><b>Este link vai expirar em ${Math.round(resetExpiration/3600000)} horas.</b></p>`
+            routeLink = 'users/confirm-email';
+            subject = 'Confirm your registration';
+            title = 'Confirm your registration';
+            body_message = `<b>NewSYS access: </b><p>You are almost there!
+            <br>To confirm your registration please click on the link below</p>
+            <p><b>This link will expire within ${Math.round(resetExpiration/3600000)} hours.</b></p>`
         } else {
-            // reset_password
+            // reset-password
             resetExpiration = Number(process.env.RESET_EXPIRATION || 1800000);
             expiresAt = Date.now() + resetExpiration; // 30 min
-            routeLink = 'reset_password';
-            subject = 'Redefina sua senha no New SAVIC';
-            titulo = 'Redefinir senha - New SAVIC'
-            body_message = `<p>Para redefinir sua senha no <b>New SAVIC da RCC Brasil</b>,
-            <br>por favor, utilize o link abaixo:</p>
-            <p><b>Este link vai expirar em ${Math.round(resetExpiration/3600000*60)} minutos.</b></p>`
+            routeLink = 'users/reset-password';
+            subject = 'Reset your password';
+            title = 'Reset your password'
+            body_message = `<p>To reset your password on <b>NewSYS access</b>,
+            <br>please click on the link below:</p>
+            <p><b>This link will expire within ${Math.round(resetExpiration/3600000*60)} minutes.</b></p>`
         }
         
         const transporter = nodemailer.createTransport({
@@ -199,25 +200,25 @@ const sendConfirmationEmail = async (req: Request, res: Response, email: string,
                 b {
                 font-weight: bold;
                 }
-                a {
-                color: #ffffff;
-                background-color: #e9b722;
+                a.button {
+                color: #ffffff; /* Set the font color to white */
+                background-color: #004d84;
                 text-decoration: none;
                 padding: 10px 20px;
                 border-radius: 4px;
                 }
-                a:hover {
-                background-color: #45a049;
+                a.button:hover {
+                background-color: #1867e7;
                 }
             </style>
             </head>
             <body>
             <div class="container" align="center">
-                <h1>${titulo}</h1>
+                <h1>${title}</h1>
                 ${body_message}
-                <p><a href="${confirmationLink}">Confirme aqui</a></p><br>
-                <p><b>Se tiver problemas com o botão acima, 
-                <br>copie e cole o link abaixo no seu navegador:</b></p>
+                <p><a class="button" href="${confirmationLink}">Confirm Here</a></p><br>
+                <p><b>If you can't use the button above, 
+                <br>copy and paste the link below into your browser:</b></p>
                 ${confirmationLink}
             </div>
             </body>
@@ -245,7 +246,7 @@ const sendConfirmationEmail = async (req: Request, res: Response, email: string,
                         } else {
                             // turning off this console to avoid warnings messages in SuperJest automated tests
                             if (process.env.SHOW_CONSOLE_EMAIL==='1') {
-                                console.log('Email enviado: ' + info.response);
+                                console.log('email sent: ' + info.response);
                                 console.log(confirmationLink);
                             }
                         }
@@ -254,8 +255,8 @@ const sendConfirmationEmail = async (req: Request, res: Response, email: string,
             });
         } else {
             console.log('sendConfirmationEmail can not save userVerification data');
-            let message = "Ocorreu um problema ao acessar sua verificação de email.";
-            res.redirect(`/user_message/?error=true&message=${message}`);
+            let message = "error accessing user verification";
+            res.redirect(`/users/user-message/?error=true&message=${message}`);
         }
           
     } catch (error) {
@@ -264,11 +265,11 @@ const sendConfirmationEmail = async (req: Request, res: Response, email: string,
 };
 
 function handleEmailConfirmationVerified(req: Request, res: Response){
-    res.sendFile(path.join(__dirname, "../../views/user_message.html"));
+    res.sendFile(path.join(__dirname, "../../views/user-message.html"));
 }
 
 function handleEmailConfirmationError(req: Request, res: Response, message: string){
-    const redirectUrl = '/user_message' + message;
+    const redirectUrl = '/users/user-message' + message;
     res.redirect(redirectUrl);
 }
 
@@ -283,7 +284,7 @@ async function handleRegisterOrUpdateEmailConfirmation(req: Request, res: Respon
 // it returns the confirmation email from:
 // forgot password 
 async function handleForgotPasswordConfirmation(req: Request, res: Response) {
-    await handleEmailConfirmation(req, res, 'forgot_password');
+    await handleEmailConfirmation(req, res, 'forgot-password');
 }
 
 async function handleEmailConfirmation(req: Request, res: Response, goal: string) {
@@ -296,8 +297,8 @@ async function handleEmailConfirmation(req: Request, res: Response, goal: string
         const id: number = parseInt(req.params.id);
 
         if (isNaN(id)){
-            messageQueryString = `?error=true&message=Problemas na id. 
-            <br>Por favor, verifique novamente o link enviado.`;
+            messageQueryString = `?error=true&message=Invalid id. 
+            <br>Please verify the link sent.`;
             handleEmailConfirmationError(req, res, messageQueryString);
         } else {
             const verificationData = await getUserVerificationById(id);
@@ -309,8 +310,8 @@ async function handleEmailConfirmation(req: Request, res: Response, goal: string
                     // also should be deleted to avoid using the same link again
                     deleteUserVerification(verificationData[0].user_id);
                     messageQueryString = `?error=true&message=
-                    O prazo para confirmação do email expirou. 
-                    <br>Para receber um novo email, <br>utilize a opção [esqueci minha senha]`;
+                    Your confirmation email message has expired. 
+                    <br>To receive a new message, <br>use [forgot password?]`;
                     handleEmailConfirmationError(req, res, messageQueryString);
                 } else {
                     const match = await bcrypt.compare(uniqueString, hashedUniqueString);
@@ -322,38 +323,38 @@ async function handleEmailConfirmation(req: Request, res: Response, goal: string
                                 // also should be deleted to avoid using the same link again
                                 deleteUserVerification(verificationData[0].user_id);
                                 messageQueryString = `?error=false&message=
-                                Seu email foi verificado com sucesso.
-                                <br><br>Você já pode acessar o New SAVIC!`;
+                                Your email has been successfully verified.
+                                <br><br>You can log in to the application now!`;
                                 handleEmailConfirmationError(req, res, messageQueryString);
                             } else {
                                 messageQueryString = `?error=true&message=
-                                <p>Não foi possível alterar o registro de confirmação do email do usuário.
-                                <br>Por favor, tente iniciar a sessão no New SAVIC ou registrar-se novamente.`;
+                                <p>Error while attempting to update the user confirmation.
+                                <br>Please, try to log in or register again.`;
                                 handleEmailConfirmationError(req, res, messageQueryString);                                
                             }                        
                         } else {
-                            // forgot_password
-                            res.render(path.join(__dirname, "../../views/reset_password"), {email: verificationData[0].email});
+                            // forgot-password
+                            res.render(path.join(__dirname, "../../views/reset-password"), {email: verificationData[0].email});
                         }
                     } else {                    
                         messageQueryString = `?error=true&message=
-                        Problema nas chaves de segurança. 
-                        <br>Por favor, confira o link de verificação novamente.`;
+                        Error on security keys. 
+                        <br>Please, verify the link.`;
                         handleEmailConfirmationError(req, res, messageQueryString);
                     }
                 }
             } else {
                 messageQueryString = `?error=true&message=
-                A conta vinculada a essa verificação não existe ou o processo já foi realizado anteriormente.
-                <br>Por favor, tente iniciar a sessão no New SAVIC ou reinicie o processo.`;
+                The account related to this confirmation doesn't exist or this process has already been done.
+                <br>Please, try to log in or start the process again.`;
                 handleEmailConfirmationError(req, res, messageQueryString);
             }
         }
         
     } catch (error) {
         messageQueryString = `?error=true&message=
-        Falha ao confirmar usuário.
-        <br>Por favor, confira o link de verificação ou reinicie o processo`;
+        Error attempting to confirm your email.
+        <br>Please, verify the link or start the process again`;
         handleEmailConfirmationError(req, res, messageQueryString);
     }
 }
@@ -364,10 +365,10 @@ async function httpGetAllUsers(req: Request, res: Response) {
         if (recoveredUsers.length) {
             res.status(200).json(recoveredUsers);
         } else {
-            res.status(400).json({ error: 'Não foi possível localizar usuários.' });
+            res.status(400).json({ error: 'Can not find users.' });
         }
     } catch (error) {
-        res.status(500).json({ error: 'Falha ao localizar usuários.' });
+        res.status(500).json({ error: 'Failed recovering users.' });
     }
 }
 
@@ -376,17 +377,17 @@ async function httpGetUser(req: Request, res: Response) {
         const key = req.params;
         // Validation
         if (isNaN(Number(key.id))){
-            return res.status(400).json({ error: 'Id de usuário deve ser em formato numérico.'});
+            return res.status(400).json({ error: 'the ID must be a number'});
         }
         const recoveredUser = await getUserByKey(key);
         if (recoveredUser.length) {
             res.status(200).json(recoveredUser[0]);
         } else {
-            res.status(400).json({ error: 'Não foi possível localizar o usuário.' });
+            res.status(400).json({ error: 'user not found' });
         }
         
     } catch (error) {
-        res.status(500).json({ error: 'Falha ao localizar usuário.' });
+        res.status(500).json({ error: 'error attempting to access the user' });
     }
 }
 
@@ -400,24 +401,47 @@ async function httpUpdateUser(req: Request, res: Response) {
         name = name.slice(0,100);
         cpf = formatCPF(cpf);  
         if (isNaN(Number(userId))){
-            res.status(400).json({ error: 'Id de usuário deve ser em formato numérico.'});
+            res.status(400).json({ error: 'the ID must be a number'});
         } else if (!checkUserName(name)){
-            res.status(400).json({ error: 'Nome inválido.' });
-        } else if (!TestaCPF(cpf)){
-            res.status(400).json({ error: 'CPF inválido.' });
+            res.status(400).json({ error: 'invalid name' });
+        } else if (!CheckCPF(cpf)){
+            res.status(400).json({ error: 'invalid cpf' });
         } else if (await checkCpfAlreadyUsed(userId,cpf)){
-            res.status(409).json({ error: 'CPF já cadastrado.' });
+            res.status(409).json({ error: 'cpf already in use' });
         } else {
             const userData = { name, cpf };
             const updatedUser = await updateUser(userId, userData);
             if (updatedUser.length) {
                 res.status(200).json(updatedUser[0]);
             } else {
-                res.status(400).json({ error: 'Não foi possível atualizar os dados do usuário.' });
+                res.status(404).json({ error: 'user not found' });
             }
         }
     } catch (error) {
-        res.status(500).json(error);
+        console.log('httpUpdateUser', error);
+        res.status(500).json({error: 'error attempting to update the user'});
+    }   
+}
+
+async function handleUserDelete(req: Request, res: Response) {
+    try {
+
+        const userId = req.params.id;
+
+        // Validation 
+        if (isNaN(Number(userId))){
+            res.status(400).json({ error: 'the ID must be a number'});
+        } else {
+            const deletedUserInfo = await deleteUser(userId);
+            if (deletedUserInfo) {
+                res.status(200).json({ message: `User id ${ deletedUserInfo.id } successfully deleted!`});
+            } else {
+                res.status(404).json({ error: 'user not found' });
+            }
+        }
+    } catch (error) {
+        console.log('handleUserDelete', error);
+        res.status(500).json({error: 'error attempting to delete the user'});
     }   
 }
 
@@ -429,15 +453,15 @@ async function httpUpdateUserEmail(req: Request, res: Response) {
         
         // Validation
         if (isNaN(Number(userId))){
-            res.status(400).json({ error: 'Id de usuário deve ser em formato numérico.'});
+            res.status(400).json({ error: 'the ID must be a number'});
         } else if (!checkEmail(email)){
-            res.status(400).json({ error: 'Email inválido.' });
+            res.status(400).json({ error: 'invalid email.' });
         } else if (await checkEmailAlreadyUsed(userId,email)){
-            res.status(409).json({ error: 'Email já cadastrado.' });
+            res.status(409).json({ error: 'email already in use' });
         } else {
             const recoveredUser = await getUserByKey({ id: userId});
             if (!recoveredUser.length) {
-                res.status(400).json({ error: 'Não foi possível localizar o usuário.' });
+                res.status(404).json({ error: 'user not found' });
             } else {
                 const checkIfEmailChanged = await getUserByKey({id: userId});
                 // To verify if we are actually changing the email or if it's still the same
@@ -449,16 +473,17 @@ async function httpUpdateUserEmail(req: Request, res: Response) {
                     const updatedUser = await updateEmail(userId, checkIfEmailChanged[0].email, userData);
                     if (updatedUser.length) {
                         // Send confirmation email
-                        await sendConfirmationEmail(req, res, email, updatedUser[0].id,'update_user_email');
+                        await sendConfirmationEmail(req, res, email, updatedUser[0].id,'update-user-email');
                         res.status(200).json(updatedUser[0]);
                     } else {
-                        res.status(400).json({ error: 'Não foi possível atualizar o email do usuário.' });
+                        res.status(400).json({ error: 'error attempting to update the email' });
                     }
                 }
             }
         }
     } catch (error) {
-        res.status(500).json(error);
+        console.log('httpUpdateUserEmail', error);
+        res.status(500).json({error: 'error attempting to update the email'});
     }   
 }
 
@@ -530,7 +555,7 @@ async function checkEmailAlreadyUsed(id: string | number, email: string){
     }
 }
 
-function TestaCPF(strCPF: string) {
+function CheckCPF(strCPF: string) {
 
     let Soma: number;
     let Resto: number;
@@ -560,7 +585,7 @@ function TestaCPF(strCPF: string) {
 }
 
 async function httpRenderForgotPassword(req: Request, res: Response){
-    res.render(path.join(__dirname, "../../views/forgot_password"));
+    res.render(path.join(__dirname, "../../views/forgot-password"));
 }
 
 async function httpPostForgotPassword(req: Request, res: Response){
@@ -571,40 +596,41 @@ async function httpPostForgotPassword(req: Request, res: Response){
 
         if (email == ""){
             messageQueryString = `?error=true&message=
-            Email inválido.`;
+            Invalid email.`;
             handleEmailConfirmationError(req, res, messageQueryString);
         } else if (!checkEmail(email)){
             messageQueryString = `?error=true&message=
-            Email inválido.`;
+            Invalid email.`;
             handleEmailConfirmationError(req, res, messageQueryString);
         } else {
             const recoveredUser = await getUserByKey({ email: email });
             if (!recoveredUser.length) {
                 messageQueryString = `?error=true&message=
-                Email inválido.`;
+                Invalid email.`;
                 handleEmailConfirmationError(req, res, messageQueryString);
             } else {
                 const loginData = {
                     email: email,
-                    action: 'reset_password'
+                    action: 'reset-password'
                 };
                 const login = await signinUser(loginData, bcrypt, saltRounds) || [];
                 if (login.length){
                     // Create a one time link valid for 30 minutes (inside sendConfirmationEmail() )
                     // Send confirmation email
-                    sendConfirmationEmail(req, res, email, recoveredUser[0].id, 'reset_password');                    
+                    sendConfirmationEmail(req, res, email, recoveredUser[0].id, 'reset-password');                    
                     messageQueryString = `?error=false&message=
-                    O link para redefinir a senha foi enviado para o seu email.`;
+                    The link to reset your password has been sent to your email.`;
                     handleEmailConfirmationError(req, res, messageQueryString);
                 } else {
                     messageQueryString = `?error=true&message=
-                    Não foi possível localizar o usuário.`;
+                    User not found.`;
                     handleEmailConfirmationError(req, res, messageQueryString);
                 }
             }
         }
     } catch (error) {
-        res.status(500).json(error);
+        console.log('httpPostForgotPassword', error);
+        res.status(500).json({error: 'error attempting to reset password'});
     }
 }
 
@@ -617,30 +643,30 @@ async function httpPostResetPassword(req: Request, res: Response){
 
         if (id == "" || uniqueString == ""){
             messageQueryString = `?error=true&message=
-            Parametros inválidos.`;
+            Invalid parameters.`;
             handleEmailConfirmationError(req, res, messageQueryString);
         } else if (isNaN(Number(id))){
             messageQueryString = `?error=true&message=
-            Formato id inválido.`;
+            Invalid ID.`;
             handleEmailConfirmationError(req, res, messageQueryString);
         } else if (password.length < passwordSize){
             messageQueryString = `?error=true&message=
-            Senha deve ter ao menos ${ passwordSize } caracteres.`;
+            Password must contain at least ${ passwordSize } characters.`;
             handleEmailConfirmationError(req, res, messageQueryString);
         } else if (password !== password2){
             messageQueryString = `?error=true&message=
-            Senha definida e senha confirmada são diferentes.`;
+            Password and confirmation password do not match.`;
             handleEmailConfirmationError(req, res, messageQueryString);
         } else {    
             const recoveredUser = await getUserByKey({ id });
             if (!recoveredUser.length) {
                 messageQueryString = `?error=true&message=
-                Id inválida.`;
+                Invalid ID.`;
                 handleEmailConfirmationError(req, res, messageQueryString);
             } else {
                 const loginData = {
                     email: recoveredUser[0].email,
-                    action: 'reset_password'
+                    action: 'reset-password'
                 };
                 const login = await signinUser(loginData, bcrypt, saltRounds) || [];
                 if (login.length){
@@ -654,8 +680,8 @@ async function httpPostResetPassword(req: Request, res: Response){
                     const resetedPassword = await resetLoginPassword(loginData, bcrypt, saltRounds);
                     if (!resetedPassword.email){
                         messageQueryString = `?error=true&message=
-                        Não foi possível atualizar o email. <br>
-                        Verifique se informou a nova senha corretamente ou tente redefinir novamente.`;
+                        Error attempting to update your email. <br>
+                        Please, review your data and try again.`;
                         handleEmailConfirmationError(req, res, messageQueryString);
                     } else {
                         // Just in case the user had registered 
@@ -666,15 +692,16 @@ async function httpPostResetPassword(req: Request, res: Response){
                         // also should be deleted to avoid using the same link again
                         deleteUserVerification(recoveredUser[0].id);
                         messageQueryString = `?error=false&message=
-                        Senha redefinida com sucesso para ${ resetedPassword.email }. <br>
-                        Você já pode se conectar com a nova senha.`;
+                        New password defined successfully for ${ resetedPassword.email }. <br>
+                        You can log in now.`;
                         handleEmailConfirmationError(req, res, messageQueryString);
                     }                      
                 }
             }            
         }
     } catch (error) {
-        res.status(500).json(error);
+        console.log('httpPostResetPassword', error);
+        res.status(500).json({error: 'error attempting to reset password'});
     }
 }
 
@@ -691,5 +718,6 @@ export {
     httpRenderForgotPassword, 
     httpPostForgotPassword,
     httpPostResetPassword,
-    handleForgotPasswordConfirmation
+    handleForgotPasswordConfirmation,
+    handleUserDelete
 };

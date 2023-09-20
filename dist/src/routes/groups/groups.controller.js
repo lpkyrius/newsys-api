@@ -12,12 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.httpGetAllGrupos = void 0;
-//import { getAllGrupos } from '../../models/grupos.model';
-const grupos_model_1 = __importDefault(require("../../models/grupos.model"));
-function httpGetAllGrupos(req, res) {
+exports.httpGetAllGroups = void 0;
+//import { getAllGroups } from '../../models/group.model';
+const groups_model_1 = __importDefault(require("../../models/groups.model"));
+function httpGetAllGroups(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        return res.status(200).json(yield (0, grupos_model_1.default)());
+        return res.status(200).json(yield (0, groups_model_1.default)());
     });
 }
-exports.httpGetAllGrupos = httpGetAllGrupos;
+exports.httpGetAllGroups = httpGetAllGroups;

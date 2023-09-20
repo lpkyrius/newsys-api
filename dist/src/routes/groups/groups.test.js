@@ -14,11 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("../../app"));
 const supertest_1 = __importDefault(require("supertest"));
-describe('Grupos API', () => {
-    describe('Test GET /grupos', () => {
+describe('Groups API', () => {
+    describe('Test GET /group', () => {
         test('It should respond with 200 success + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
             const response = yield (0, supertest_1.default)(app_1.default)
-                .get('/grupos')
+                .get('/group')
                 .expect('Content-Type', /json/)
                 .expect(200);
         }));

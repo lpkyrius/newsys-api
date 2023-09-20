@@ -1,6 +1,13 @@
-# newsavic-api
+# newsys-api
 
-### Serviço de Apoio à Vida Carismática - RCC Brasil
+### NewSYS APIs (Backend) for your Company
+Check also [NewSYS FE (Frontend) for your Company](https://github.com/lpkyrius/newsys-fe)
+## Complete User Registration:
+- Register
+- Email verification with expiration date
+- Reset / Forgot Password option
+- Update user data
+- Delete user
 
 To run the project:
 
