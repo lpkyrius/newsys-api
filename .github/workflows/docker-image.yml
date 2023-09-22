@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: logindocker
-      run: docker login -u lpkyrius -p dckr_pat_R5UZfw9TgETYTAPq8EWPxH7ruu4
+      run: docker login -u xyz -p dckr_pat_xyz
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag lpkyrius/nsapi
     - name: Push the Docker image
