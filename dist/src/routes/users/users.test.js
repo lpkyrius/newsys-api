@@ -57,7 +57,7 @@ describe('Users API', () => {
         // console.log(message);
     });
     // usersRouter.post('/users/register', handleRegister); 
-    describe('Test POST /users/register - part 1', () => {
+    describe('Test POST /users/register', () => {
         describe('Test POST /users/register bad format email', () => {
             test('It should respond with 400 bad request + Content-Type = json', () => __awaiter(void 0, void 0, void 0, function* () {
                 let userDataWithoutDate = Object.assign({}, mainCreatedUser);
@@ -113,6 +113,9 @@ describe('Users API', () => {
                     .expect(400);
             }));
         });
+        // --------------------------------------------
+        // >>>> Create Test User is on beforeAll() <<<<
+        // --------------------------------------------
         // describe('Test POST /users/register', () => {
         //     test('It should respond with 201 success + Content-Type = json', async () => {
         //         let userDataWithoutDate = Object.assign({}, mainCreatedUser);
