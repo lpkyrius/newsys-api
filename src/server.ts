@@ -8,8 +8,12 @@ const server = http.createServer(app);
 
 async function startServer() {
     server.listen(PORT, () => {
-        // await function_name();
-        console.log(`Listening on PORT ${PORT}... @ ${serverAddress}`);
+        const initialMessage = 
+            `Listening on PORT ${PORT}... @ ${serverAddress} 
+            DatabaseServer: ${process.env.DB_HOST} PORT:${process.env.DB_PORT} DbName:${process.env.DB_NAME}`;
+        // console.log(`Listening on PORT ${PORT}... @ ${serverAddress}`);
+        // console.log(`DB: ${process.env.DB_HOST}:${process.env.DB_PORT} DbName: ${process.env.DB_NAME}`);
+        console.log(initialMessage);
     });
 }
 
