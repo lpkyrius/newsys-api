@@ -4,7 +4,8 @@ WORKDIR /app
 
 COPY package*.json ./ 
 
-RUN npm install --omit=dev
+#RUN npm install --omit=dev
+RUN npm install 
 
 COPY . ./
 
@@ -12,8 +13,9 @@ COPY . ./
 # it's a default user that comes with the 
 # docker image for NodeJS. So, we don't use 
 # the root user to run the next command. 
-USER node 
+# USER node 
 
-CMD [ "npm", "start" ]
+# CMD [ "npm", "start" ]
+CMD [ "npm", "run", "watch" ]
 
 EXPOSE 8000
