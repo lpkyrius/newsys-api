@@ -15,7 +15,6 @@ import  {
     handleForgotPasswordConfirmation,
     handleUserDelete
 } from './users.controller';
-// const { response } = require('../../app');
 
 const usersRouter = express.Router();
 

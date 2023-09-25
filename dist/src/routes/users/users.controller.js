@@ -389,7 +389,7 @@ function httpGetUser(req, res) {
                 res.status(200).json(recoveredUser[0]);
             }
             else {
-                res.status(400).json({ error: 'user not found' });
+                res.status(404).json({ error: 'user not found' });
             }
         }
         catch (error) {

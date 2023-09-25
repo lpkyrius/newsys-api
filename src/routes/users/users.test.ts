@@ -247,6 +247,16 @@ describe('Users API', () => {
 
     // usersRouter.get('/profile/:id', httpGetUser); 
     describe('Test GET /users/profile/:id', () => {
+        test('It should respond with 404 not found = json', async () => {
+            const response = await request(app)
+                .get('/users/profile/0')
+                .expect('Content-Type', /json/)
+                .expect(404);
+        });
+    });
+
+    // usersRouter.get('/profile/:id', httpGetUser); 
+    describe('Test GET /users/profile/:id', () => {
         test('It should respond with 200 success + Content-Type = json', async () => {
             const response = await request(app)
                 .get('/users/profile/' + mainCreatedUser.id)

@@ -1,0 +1,8 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Documentation from NewSys API",
+        "version": "1.0.0"
+    },
+    "basePath": "/"
+}

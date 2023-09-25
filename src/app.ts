@@ -5,10 +5,6 @@ import groupRouter from './routes/groups/groups.router';
 
 const app = express();
 
-// app.use(cors({
-//     origin: 'http://localhost:3000',
-// }));
-
 var allowedOrigins = ['http://localhost:3000',
                       'http://localhost:8000'];
 app.use(cors({
@@ -35,15 +31,3 @@ app.use(usersRouter);
 app.use(groupRouter);
 
 export default app;
-
-// CORS list
-// var whitelist = ['http://localhost:3000', 'http://localhost:8000']
-// var corsOptions = {
-//   origin: function (origin, callback) {
-//     if (whitelist.indexOf(origin) !== -1) {
-//       callback(null, true)
-//     } else {
-//       callback(new Error('Not allowed by CORS'))
-//     }
-//   }
-// }

@@ -38,18 +38,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // server functions
 const http = __importStar(require("http"));
 const app_1 = __importDefault(require("./app"));
+const swagger_1 = __importDefault(require("./services/swagger"));
+// import swaggerUi from 'swagger-ui-express';
 require('dotenv').config();
-const PORT = process.env.PORT;
-const serverAddress = `${process.env.SERVER_ADDRESS || 'http://localhost'}:${PORT}`;
+const PORT = process.env.PORT || 8000;
+const serverAddress = `${process.env.SERVER_ADDRESS}:${PORT}`;
 const server = http.createServer(app_1.default);
 function startServer() {
     return __awaiter(this, void 0, void 0, function* () {
         server.listen(PORT, () => {
-            const initialMessage = `Listening on PORT ${PORT}... @ ${serverAddress} 
-            DatabaseServer: ${process.env.DB_HOST} PORT:${process.env.DB_PORT} DbName:${process.env.DB_NAME}`;
-            // console.log(`Listening on PORT ${PORT}... @ ${serverAddress}`);
-            // console.log(`DB: ${process.env.DB_HOST}:${process.env.DB_PORT} DbName: ${process.env.DB_NAME}`);
-            console.log(initialMessage);
+            (0, swagger_1.default)(app_1.default);
+            console.log(`Listening on PORT ${PORT}... @ ${serverAddress}`);
+            console.log(`DB connected @ ${process.env.DB_HOST}:${process.env.DB_PORT} DbName: ${process.env.DB_NAME}`);
+            console.log(`Docs available @ ${process.env.SERVER_ADDRESS}:${PORT}/api-docs`);
         });
     });
 }
