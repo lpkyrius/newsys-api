@@ -1,12 +1,11 @@
 ![](https://btholt.github.io/intro-to-web-dev-v2/static/ef4a30c374ea4cf7fb52b7f8748cf4a5/0b533/node.png)
 # ToDo 
-- [x] Typescript conversion:
+- [x] Typescript conversion
 - [x] Documentation for Users email confirmation flow
-- [x] Review routes best practices
-- [x] Review tests after creating user/delete route
-- [x] Flag to CPF validation (.env)
-- [ ] ⭐️ Documentation for API Rest
-- [ ] ⭐️ Documentation for Automated tests
+- [x] Flag (on/off) CPF validation (.env)
+- [ ] Documentation for API Rest (Swagger)
+- [ ] Apply API api_key
+- [ ] Documentation for Automated tests
 - [ ] Temporary token to automatically logout users
 - [ ] Captcha
 
