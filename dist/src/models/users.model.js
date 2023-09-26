@@ -166,7 +166,7 @@ function getKeyAlreadyUsedByAnotherId(id, key) {
             return recoveredUser;
         }
         catch (error) {
-            console.log(`Error in getUserByKey(): ${error}`);
+            console.log(`Error in getKeyAlreadyUsedByAnotherId(): ${error}`);
             throw error;
         }
     });

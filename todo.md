@@ -14,7 +14,8 @@
 - [ ] SDD - Software Design Description 
 - [ ] Application Architecture Diagram
 - [ ] Source Code Documentation Standards ( ESLint/Prettier, project/folders structure, stack used, notes for developers and UX) [in progress]
-- [ ] APIs Documentation
+- [ ] APIs Documentation (Swagger)
+- [ ] API Key
 - [ ] Database Diagram
 - [ ] Test Documentation
 

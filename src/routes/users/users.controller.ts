@@ -365,7 +365,7 @@ async function httpGetAllUsers(req: Request, res: Response) {
         if (recoveredUsers.length) {
             res.status(200).json(recoveredUsers);
         } else {
-            res.status(400).json({ error: 'Can not find users.' });
+            res.status(404).json({ error: 'Can not find user.' });
         }
     } catch (error) {
         res.status(500).json({ error: 'Failed recovering users.' });

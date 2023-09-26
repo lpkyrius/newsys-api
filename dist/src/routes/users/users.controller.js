@@ -367,7 +367,7 @@ function httpGetAllUsers(req, res) {
                 res.status(200).json(recoveredUsers);
             }
             else {
-                res.status(400).json({ error: 'Can not find users.' });
+                res.status(404).json({ error: 'Can not find user.' });
             }
         }
         catch (error) {

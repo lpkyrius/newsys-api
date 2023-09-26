@@ -10,7 +10,19 @@ const user = {
     verified: false
 };
 
-const success200 = {
+const return200 = {
+    description: "Success",
+    content: {
+        "application/json": {
+            schema:{
+                type: "object",
+                example: { message: 'success'}
+            }
+        }
+    }
+};
+
+const return201 = {
     description: "Success",
     content: {
         "application/json": {
@@ -22,20 +34,20 @@ const success200 = {
     }
 };
 
-const success201 = {
-    description: "Success",
+const return400 = {
+    description: "Invalid",
     content: {
         "application/json": {
             schema:{
                 type: "object",
-                example: user
+                example: {error: 'invalid data' }
             }
         }
     }
 };
 
-const notFound404 = {
-    description: "User not found",
+const return404 = {
+    description: "Not found",
     content: {
         "application/json": {
             schema:{
@@ -46,7 +58,7 @@ const notFound404 = {
     }
 };
 
-const conflict409 = {
+const return409 = {
     description: "Conflict",
     content: {
         "application/json": {
@@ -58,24 +70,58 @@ const conflict409 = {
     }
 };
 
-const internal500 = {
+const return500 = {
     description: "Internal error",
     content: {
         "application/json": {
             schema:{
                 type: "object",
-                example: { error: 'error during process' }
+                example: { error: 'internal error during process' }
             }
         }
     }
 };
 
 // usersRouter.post  ('/users/signin', handleSignin); 
+const usersSignInSchema = {
+    post: {
+        tags: ["User"],
+        summary: "Sign-in with an user",
+        description: "User Sign-in",
+        requestBody: {
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            email: {
+                                type: "string",
+                                description: "Email of the user",
+                                example: "john.doe@email.com"
+                            },
+                            password: {
+                                type: "string",
+                                description: "Password with at least 8 characters",
+                                example: "J0hnD0&p@ssw0rd!"
+                            },
+                        }
+                    }
+                }
+            }
+        },
+        responses:{
+            200: return200,
+            400: return400,
+            500: return500,
+        } 
+    }
+};
 
 // usersRouter.post  ('/users/register', handleRegister); 
 const usersRegisterSchema = {
     post: {
         tags: ["User"],
+        summary: "Register new users",
         description: "Register a new user",
         requestBody: {
             content: {
@@ -109,9 +155,9 @@ const usersRegisterSchema = {
             }
         },
         responses:{
-            201: success201,
-            409: conflict409,
-            500: internal500,
+            201: return201,
+            409: return409,
+            500: return500,
         } 
     }
 };
@@ -120,10 +166,11 @@ const usersRegisterSchema = {
 const usersSchema = {
     get: {
         tags: ["User"],
+        summary: "List current users",
         description: "List of all current users",
         responses:{
-            200: success200,
-            500: internal500,
+            200: return200,
+            500: return500,
         } 
     }
 };
@@ -144,25 +191,149 @@ const usersByIdSchema = {
             },
         ],
         responses:{
-            200: success200,
-            404: notFound404,
-            500: internal500,
+            200: return200,
+            404: return404,
+            500: return500,
         } 
     }
 };
 
 // usersRouter.put   ('/users/update-user/:id',httpUpdateUser);
+const usersUpdateSchema = {
+    put: {
+        tags: ["User"],
+        summary: "Update user data",
+        description: "Update name and cpf of an user",
+        parameters: [
+            {
+                name: "id",
+                in: "path",
+                description: "id of the user",
+                type: "number",
+                example: "5678",
+            },
+        ],
+        requestBody: {
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            name: {
+                                type: "string",
+                                description: "Name of the user",
+                                example: "John Doe"
+                            },
+                            cpf: {
+                                type: "string",
+                                description: "Brazilian CPF document, only numbers (with or without mask).",
+                                example: "578.525.758-03"
+                            },
+                        }
+                    }
+                }
+            }
+        },
+        responses:{
+            200: return200,
+            400: return400,
+            404: return404,
+            409: return409,
+            500: return500,
+        } 
+    }
+};
+
 // usersRouter.get   ('/users/confirm-email/:id/:uniqueString', handleRegisterOrUpdateEmailConfirmation); 
+//Not an API
+
 // usersRouter.get   ('/users/user-message', handleEmailConfirmationVerified); 
+//Not an API
+
 // usersRouter.put   ('/users/update-user-email/:id',httpUpdateUserEmail);
+const usersUpdateUserEmailSchema = {
+    put: {
+        tags: ["User"],
+        summary: "Update user email",
+        description: "Update the user email - it has its specific requirements and validations",
+        parameters: [
+            {
+                name: "id",
+                in: "path",
+                description: "id of the user",
+                type: "number",
+                example: "5678",
+            },
+        ],
+        requestBody: {
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            email: {
+                                type: "string",
+                                description: "Email of the user",
+                                example: "john.doe@email.com"
+                            },
+                        }
+                    }
+                }
+            }
+        },
+        responses:{
+            200: return200,
+            400: return400,
+            404: return404,
+            409: return409,
+            500: return500,
+        } 
+    }
+};
+
 // usersRouter.get   ('/users/forgot-password', httpRenderForgotPassword);
+//Not an API
+
 // usersRouter.post  ('/users/forgot-password', httpPostForgotPassword);
+//Not an API
+
 // usersRouter.get   ('/users/reset-password/:id/:uniqueString', handleForgotPasswordConfirmation); // httpResetPassword 
+//Not an API
+
 // usersRouter.post  ('/users/reset-password/:id/:uniqueString', httpPostResetPassword); // handleForgotPasswordConfirmation
+//Not an API
+
 // usersRouter.delete('/users/delete/:id', handleUserDelete); 
 
+const userDeleteUserSchema = {
+    delete: {
+        tags: ["User"],
+        summary: "Delete user",
+        description: "Delete a specific user by id",
+        parameters: [
+            {
+                name: "id",
+                in: "path",
+                description: "id of the user",
+                type: "number",
+                example: "5678",
+            },
+        ],
+        responses:{
+            200: return200,
+            400: return400,
+            404: return404,
+            500: return500,
+        } 
+    }
+};
+
 export const userRouteDoc = {
-    "/users/register":      usersRegisterSchema,
-    "/users":               usersSchema,
-    "/users/profile/{id}":  usersByIdSchema
+    "/users/signin": usersSignInSchema,
+    "/users/register": usersRegisterSchema,
+    "/users": usersSchema,
+    "/users/profile/{id}": usersByIdSchema,
+    "/users/update-user/{id}": usersUpdateSchema,
+    "/users/update-user-email/{id}": usersUpdateUserEmailSchema,
+    "/users/delete/{id}": userDeleteUserSchema,
 };
