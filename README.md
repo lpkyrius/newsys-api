@@ -13,7 +13,7 @@ Check also [NewSYS FE (Frontend) for your Company](https://github.com/lpkyrius/n
 Also
 - Docker settings
 - Automated tests
-- Swagger - API Documentation
+- Swagger API Documentation
 
 To run the project:
 
