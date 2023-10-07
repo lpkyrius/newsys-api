@@ -3,7 +3,7 @@
 - [x] Typescript conversion
 - [x] Documentation for Users email confirmation flow
 - [x] Flag (on/off) CPF validation (.env)
-- [ ] Documentation for API Rest (Swagger)
+- [x] Documentation for API Rest (Swagger)
 - [ ] Apply API api_key
 - [ ] Documentation for Automated tests
 - [ ] Temporary token to automatically logout users
