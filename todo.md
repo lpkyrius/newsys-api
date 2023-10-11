@@ -4,7 +4,7 @@
 - [x] Documentation for Users email confirmation flow
 - [x] Flag (on/off) CPF validation (.env)
 - [x] Documentation for API Rest (Swagger)
-- [ ] Apply API api_key
+- [ ] Apply api_key
 - [ ] Documentation for Automated tests
 - [ ] Temporary token to automatically logout users
 - [ ] Captcha
