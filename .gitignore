@@ -4,6 +4,7 @@ node_modules
 # todo.txt
 # todo.md
 docker-compose.yml
+docker-image.yml
 
 .env
 .env.*
