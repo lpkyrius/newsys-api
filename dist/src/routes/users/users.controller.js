@@ -12,18 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleUserDelete = exports.handleForgotPasswordConfirmation = exports.httpPostResetPassword = exports.httpPostForgotPassword = exports.httpRenderForgotPassword = exports.handleEmailConfirmationError = exports.handleEmailConfirmationVerified = exports.httpUpdateUserEmail = exports.handleRegisterOrUpdateEmailConfirmation = exports.httpUpdateUser = exports.httpGetUser = exports.httpGetAllUsers = exports.handleRegister = exports.handleSignin = void 0;
 const users_model_1 = require("../../models/users.model");
 const passwordSize = Number(process.env.PASSWORD_MIN_SIZE || 8);
-// hash handler
 const bcrypt = require('bcryptjs');
 const saltRounds = 10;
-// email handler
 const nodemailer = require('nodemailer');
-// unique string 
 const { v4: uuidv4 } = require('uuid');
-// env variables
 require('dotenv').config();
-// path for static verified page
-const path = require("path");
-// web token
+const path = require("path"); // path for static verified page
 const jwt = require('jsonwebtoken');
 function handleSignin(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -51,7 +45,12 @@ function handleSignin(req, res) {
                         res.status(400).json({ error: 'this email has not been verified yet, verify your inbox' });
                     }
                     else {
-                        res.status(200).json(user);
+                        // 30s as a test only, then let's keep it 5 min
+                        const accessToken = jwt.sign({ "username": user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+                        const refreshToken = jwt.sign({ "username": user.username }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
+                        yield (0, users_model_1.saveCurrentUserRefreshToken)(user.id, refreshToken);
+                        res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }); // 1 day
+                        res.status(200).json({ accessToken });
                     }
                 }
                 else {
