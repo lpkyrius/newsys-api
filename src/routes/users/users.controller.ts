@@ -60,6 +60,8 @@ async function handleSignin(req: Request, res: Response) {
                         process.env.REFRESH_TOKEN_SECRET,
                         { expiresIn: '1d' }
                     );
+                    // temporary comment
+                    console.log('Degug handleSignin / saveCurrentUserRefreshToken is not implemented yet!!!');
                     await saveCurrentUserRefreshToken(user.id, refreshToken);
                     res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }); // 1 day
                     res.status(200).json({ accessToken }); 
