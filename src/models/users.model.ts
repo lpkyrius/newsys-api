@@ -159,18 +159,18 @@ async function updateUser(userId, userData) {
 
 async function saveCurrentUserRefreshToken(userId, refreshToken) {
     try {
-        // const {name, cpf } = userData
-        // const updatedUser = await db('users')
-        //     .where('id', '=', userId)
-        //     .update({
-        //         name: name,
-        //         cpf: cpf,
-        //         updated_at: new Date()
-        //       })
-        //     .returning('*');
-        return userId;
+
+        const tokenData = await db('refresh_tokens')
+            .insert({
+                user_id: userId,
+                refresh_token: refreshToken
+            })
+            .returning('*');
+            console.log('debug saveCurrentUserRefreshToken tokenData',tokenData);
+        return tokenData;  
+              
     } catch (error) {
-        console.log(`Error in updateUser(): ${ error }`);
+        console.log(`Error in saveCurrentUserRefreshToken(): ${error}`);
         throw error;
     }
 }
@@ -178,19 +178,28 @@ async function saveCurrentUserRefreshToken(userId, refreshToken) {
 async function getCurrentUserRefreshToken(refreshToken) {
     try {
 
-        // 2 parameters? getCurrentUserRefreshToken(userId, refreshToken)
-        // const {name, cpf } = userData
-        // const updatedUser = await db('users')
-        //     .where('id', '=', userId)
-        //     .update({
-        //         name: name,
-        //         cpf: cpf,
-        //         updated_at: new Date()
-        //       })
-        //     .returning('*');
-        // return user;
+        const tokenData = await db('refresh_tokens')
+        .select('*').from('refresh_tokens')
+            .where('refresh_token', '=', refreshToken);
+        return tokenData;
+
     } catch (error) {
-        console.log(`Error in updateUser(): ${ error }`);
+        console.log(`Error in getCurrentUserRefreshToken(): ${ error }`);
+        throw error;
+    }
+}
+
+async function deleteCurrentUserRefreshToken(refreshToken) {
+    try {
+
+        const deletedTokenData = await db('refresh_tokens')
+            .where({ refresh_token: refreshToken })
+            .del()
+            .returning("user_id");
+        return deletedTokenData;
+
+    } catch (error) {
+        console.log(`Error in getCurrentUserRefreshToken(): ${ error }`);
         throw error;
     }
 }
@@ -319,5 +328,6 @@ export {
     resetLoginPassword,
     deleteUser,
     saveCurrentUserRefreshToken,
-    getCurrentUserRefreshToken
+    getCurrentUserRefreshToken,
+    deleteCurrentUserRefreshToken
 };

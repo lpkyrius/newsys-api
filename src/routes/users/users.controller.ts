@@ -14,7 +14,8 @@ import {
     resetLoginPassword,
     deleteUser,
     saveCurrentUserRefreshToken,
-    getCurrentUserRefreshToken
+    getCurrentUserRefreshToken,
+    deleteCurrentUserRefreshToken
 } from '../../models/users.model';
 
 const passwordSize = Number(process.env.PASSWORD_MIN_SIZE || 8);
@@ -87,18 +88,15 @@ async function handleRefreshToken(req: Request, res: Response) {
         console.log(cookies.jwt);
         const refreshToken = cookies.jwt;
 
-        const foundUser = await getCurrentUserRefreshToken(refreshToken) || []; //user.id, refreshToke
+        const foundUser = await getCurrentUserRefreshToken(refreshToken) || []; 
         if (!foundUser) return res.status(403).json({ error: 'Forbidden.'});
 
         jwt.verify(
             refreshToken,
             process.env.REFRESH_TOKEN_SECRET,
             (err, decoded) => {
-                
-                
                 // if (err || foundUser.name !== decoded.name) return res.status(403).json({ error: 'Forbidden.'}); // invalid token
-                
-                
+                if (err) return res.status(403).json({ error: 'Forbidden.'}); // invalid token
                 // 30s as a test only, then let's keep it 15m
                 const accessToken = jwt.sign(
                     { "username": decoded.username },
