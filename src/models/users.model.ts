@@ -175,6 +175,26 @@ async function saveCurrentUserRefreshToken(userId, refreshToken) {
     }
 }
 
+async function getCurrentUserRefreshToken(refreshToken) {
+    try {
+
+        // 2 parameters? getCurrentUserRefreshToken(userId, refreshToken)
+        // const {name, cpf } = userData
+        // const updatedUser = await db('users')
+        //     .where('id', '=', userId)
+        //     .update({
+        //         name: name,
+        //         cpf: cpf,
+        //         updated_at: new Date()
+        //       })
+        //     .returning('*');
+        // return user;
+    } catch (error) {
+        console.log(`Error in updateUser(): ${ error }`);
+        throw error;
+    }
+}
+
 async function updateEmail(userId, oldEmail, userData) {
     try {
         const updatedUserLogin = await db.transaction(async (trx) => {
@@ -298,5 +318,6 @@ export {
     deleteUserVerification,
     resetLoginPassword,
     deleteUser,
-    saveCurrentUserRefreshToken
+    saveCurrentUserRefreshToken,
+    getCurrentUserRefreshToken
 };

@@ -3,16 +3,18 @@ import express, { Request, Response, NextFunction } from 'express';
 import  {
     handleSignin,
     handleRegister,
+    httpRenderForgotPassword,
+    httpPostForgotPassword,
+    httpPostResetPassword,
+    handleForgotPasswordConfirmation,
+    handleRefreshToken,
+    handleLogout,
     httpGetAllUsers,
     httpGetUser,
     httpUpdateUser,
     handleRegisterOrUpdateEmailConfirmation,
     httpUpdateUserEmail,
     handleEmailConfirmationVerified,
-    httpRenderForgotPassword,
-    httpPostForgotPassword,
-    httpPostResetPassword,
-    handleForgotPasswordConfirmation,
     handleUserDelete
 } from './users.controller';
 
@@ -26,6 +28,8 @@ usersRouter.get   ('/users/forgot-password', httpRenderForgotPassword);
 usersRouter.post  ('/users/forgot-password', httpPostForgotPassword);
 usersRouter.get   ('/users/reset-password/:id/:uniqueString', handleForgotPasswordConfirmation); // httpResetPassword 
 usersRouter.post  ('/users/reset-password/:id/:uniqueString', httpPostResetPassword); // handleForgotPasswordConfirmation
+usersRouter.get   ('/users/refresh', handleRefreshToken);
+usersRouter.get   ('/users/logout', handleLogout);
 
 usersRouter.get   ('/users', verifyJWT, httpGetAllUsers); 
 usersRouter.get   ('/users/profile/:id', verifyJWT, httpGetUser); 

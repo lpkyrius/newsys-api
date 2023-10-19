@@ -13,6 +13,7 @@ usersRouter.get('/users/forgot-password', users_controller_1.httpRenderForgotPas
 usersRouter.post('/users/forgot-password', users_controller_1.httpPostForgotPassword);
 usersRouter.get('/users/reset-password/:id/:uniqueString', users_controller_1.handleForgotPasswordConfirmation); // httpResetPassword 
 usersRouter.post('/users/reset-password/:id/:uniqueString', users_controller_1.httpPostResetPassword); // handleForgotPasswordConfirmation
+usersRouter.get('/users/refresh', users_controller_1.handleRefreshToken);
 usersRouter.get('/users', verifyJWT_1.default, users_controller_1.httpGetAllUsers);
 usersRouter.get('/users/profile/:id', verifyJWT_1.default, users_controller_1.httpGetUser);
 usersRouter.put('/users/update-user/:id', verifyJWT_1.default, users_controller_1.httpUpdateUser);

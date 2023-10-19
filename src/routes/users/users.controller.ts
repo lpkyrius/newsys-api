@@ -13,7 +13,8 @@ import {
     deleteUserVerification,
     resetLoginPassword,
     deleteUser,
-    saveCurrentUserRefreshToken
+    saveCurrentUserRefreshToken,
+    getCurrentUserRefreshToken
 } from '../../models/users.model';
 
 const passwordSize = Number(process.env.PASSWORD_MIN_SIZE || 8);
@@ -49,11 +50,11 @@ async function handleSignin(req: Request, res: Response) {
                 if (!user.verified){
                     res.status(400).json({ error: 'this email has not been verified yet, verify your inbox' });
                 } else {
-                    // 30s as a test only, then let's keep it 5 min
+                    // 30s as a test only, then let's keep it 15m
                     const accessToken = jwt.sign(
                         { "username": user.username },
                         process.env.ACCESS_TOKEN_SECRET,
-                        { expiresIn: '15m' }
+                        { expiresIn: '30s' }
                     );
                     const refreshToken = jwt.sign(
                         { "username": user.username },
@@ -73,6 +74,72 @@ async function handleSignin(req: Request, res: Response) {
 
     } catch (error) {
         res.status(500).json({ error: 'error during login attempt' });
+    }
+}
+
+async function handleRefreshToken(req: Request, res: Response) {
+
+    try {
+
+        const cookies = req.cookies;
+
+        if (!cookies?.jwt) return res.status(401).json({ error: 'Unauthorized.'});
+        console.log(cookies.jwt);
+        const refreshToken = cookies.jwt;
+
+        const foundUser = await getCurrentUserRefreshToken(refreshToken) || []; //user.id, refreshToke
+        if (!foundUser) return res.status(403).json({ error: 'Forbidden.'});
+
+        jwt.verify(
+            refreshToken,
+            process.env.REFRESH_TOKEN_SECRET,
+            (err, decoded) => {
+                
+                
+                // if (err || foundUser.name !== decoded.name) return res.status(403).json({ error: 'Forbidden.'}); // invalid token
+                
+                
+                // 30s as a test only, then let's keep it 15m
+                const accessToken = jwt.sign(
+                    { "username": decoded.username },
+                    process.env.ACCESS_TOKEN_SECRET,
+                    { expiresIn: '30s' }
+                );
+                res.json({ accessToken });
+            }
+        );
+
+    } catch (error) {
+        res.status(500).json({ error: 'error during handleRefreshToken attempt' });
+    }
+}
+
+function handleLogout(req: Request, res: Response) {
+
+    // on client (FE) also deletes the accessToken
+
+    try {
+
+        const cookies = req.cookies;
+
+        if (!cookies?.jwt) return res.status(204).json({ message: 'Successful. No content'});
+        console.log(cookies.jwt);
+        const refreshToken = cookies.jwt;
+
+        const foundUser = await getCurrentUserRefreshToken(refreshToken || []; //user.id, refreshToke
+        if (!foundUser) {
+            res.clearCookie('jwt', { httpOnly: true });
+            return res.status(204).json({ message: 'Successful. No content'});
+        }
+
+        const currentUser = await deleteCurrentUserRefreshToken(refreshToken) || []; //user.id, refreshToke
+        if (!currentUser) return res.status(204).json({ message: 'Successful. No content'});
+        // res.clearCookie('jwt', { httpOnly: true, secure: true }); // option only for production where we use https
+        res.clearCookie('jwt', { httpOnly: true }); // no "secure: true" option only for dev where we use http only
+        res.status(204).json({ message: 'Successful. No content'});
+
+    } catch (error) {
+        res.status(500).json({ error: 'error during handleRefreshToken attempt' });
     }
 }
 
@@ -710,6 +777,8 @@ async function httpPostResetPassword(req: Request, res: Response){
 
 export {
     handleSignin,
+    handleRefreshToken,
+    handleLogout,
     handleRegister,
     httpGetAllUsers,
     httpGetUser, 

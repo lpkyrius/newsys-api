@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.saveCurrentUserRefreshToken = exports.deleteUser = exports.resetLoginPassword = exports.deleteUserVerification = exports.getUserVerificationById = exports.newUserVerification = exports.updateEmail = exports.getKeyAlreadyUsedByAnotherId = exports.getUserByKey = exports.confirmUser = exports.signinUser = exports.updateUser = exports.getUserById = exports.registerUser = exports.getAllUsers = void 0;
+exports.getCurrentUserRefreshToken = exports.saveCurrentUserRefreshToken = exports.deleteUser = exports.resetLoginPassword = exports.deleteUserVerification = exports.getUserVerificationById = exports.newUserVerification = exports.updateEmail = exports.getKeyAlreadyUsedByAnotherId = exports.getUserByKey = exports.confirmUser = exports.signinUser = exports.updateUser = exports.getUserById = exports.registerUser = exports.getAllUsers = void 0;
 const { db } = require('../services/postgresql');
 function getAllUsers() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -214,6 +214,28 @@ function saveCurrentUserRefreshToken(userId, refreshToken) {
     });
 }
 exports.saveCurrentUserRefreshToken = saveCurrentUserRefreshToken;
+function getCurrentUserRefreshToken(refreshToken) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            // 2 parameters? getCurrentUserRefreshToken(userId, refreshToken)
+            // const {name, cpf } = userData
+            // const updatedUser = await db('users')
+            //     .where('id', '=', userId)
+            //     .update({
+            //         name: name,
+            //         cpf: cpf,
+            //         updated_at: new Date()
+            //       })
+            //     .returning('*');
+            // return user;
+        }
+        catch (error) {
+            console.log(`Error in updateUser(): ${error}`);
+            throw error;
+        }
+    });
+}
+exports.getCurrentUserRefreshToken = getCurrentUserRefreshToken;
 function updateEmail(userId, oldEmail, userData) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
