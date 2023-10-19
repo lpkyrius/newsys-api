@@ -31,17 +31,10 @@ exports.up = function(knex) {
             table.timestamp('created_at').defaultTo(knex.fn.now());
             table.timestamp('expires_at').defaultTo(knex.fn.now());
         })
-        .createTable('refresh_tokens', function (table) {
-            table.increments('id');
-            table.integer('user_id').references('id').inTable('users');
-            table.string('refresh_token', 200).notNullable();
-            table.timestamp('created_at').defaultTo(knex.fn.now());
-        })
 };
     
 exports.down = function(knex) {
     return knex.schema
-        .dropTable("refresh_tokens")
         .dropTable("user_verification")
         .dropTable("login")
         .dropTable("users");
