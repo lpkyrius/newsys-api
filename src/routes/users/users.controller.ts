@@ -112,7 +112,7 @@ async function handleRefreshToken(req: Request, res: Response) {
     }
 }
 
-function handleLogout(req: Request, res: Response) {
+async function handleLogout(req: Request, res: Response) {
 
     // on client (FE) also deletes the accessToken
 
@@ -124,7 +124,7 @@ function handleLogout(req: Request, res: Response) {
         console.log(cookies.jwt);
         const refreshToken = cookies.jwt;
 
-        const foundUser = await getCurrentUserRefreshToken(refreshToken || []; //user.id, refreshToke
+        const foundUser = await getCurrentUserRefreshToken(refreshToken || []); //user.id, refreshToke
         if (!foundUser) {
             res.clearCookie('jwt', { httpOnly: true });
             return res.status(204).json({ message: 'Successful. No content'});
