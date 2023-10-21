@@ -166,7 +166,6 @@ async function saveCurrentUserRefreshToken(userId, refreshToken) {
                 refresh_token: refreshToken
             })
             .returning('*');
-            console.log('debug saveCurrentUserRefreshToken tokenData',tokenData);
         return tokenData;  
               
     } catch (error) {

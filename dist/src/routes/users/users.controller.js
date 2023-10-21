@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleUserDelete = exports.handleForgotPasswordConfirmation = exports.httpPostResetPassword = exports.httpPostForgotPassword = exports.httpRenderForgotPassword = exports.handleEmailConfirmationError = exports.handleEmailConfirmationVerified = exports.httpUpdateUserEmail = exports.handleRegisterOrUpdateEmailConfirmation = exports.httpUpdateUser = exports.httpGetUser = exports.httpGetAllUsers = exports.handleRegister = exports.handleRefreshToken = exports.handleSignin = void 0;
+exports.handleUserDelete = exports.handleForgotPasswordConfirmation = exports.httpPostResetPassword = exports.httpPostForgotPassword = exports.httpRenderForgotPassword = exports.handleEmailConfirmationError = exports.handleEmailConfirmationVerified = exports.httpUpdateUserEmail = exports.handleRegisterOrUpdateEmailConfirmation = exports.httpUpdateUser = exports.httpGetUser = exports.httpGetAllUsers = exports.handleRegister = exports.handleLogout = exports.handleRefreshToken = exports.handleSignin = void 0;
 const users_model_1 = require("../../models/users.model");
 const passwordSize = Number(process.env.PASSWORD_MIN_SIZE || 8);
 const bcrypt = require('bcryptjs');
@@ -46,10 +46,9 @@ function handleSignin(req, res) {
                     }
                     else {
                         // 30s as a test only, then let's keep it 15m
-                        const accessToken = jwt.sign({ "username": user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s' });
+                        const accessToken = jwt.sign({ "username": user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
                         const refreshToken = jwt.sign({ "username": user.username }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
                         // temporary comment
-                        console.log('Degug handleSignin / saveCurrentUserRefreshToken is not implemented yet!!!');
                         yield (0, users_model_1.saveCurrentUserRefreshToken)(user.id, refreshToken);
                         res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }); // 1 day
                         res.status(200).json({ accessToken });
@@ -67,28 +66,56 @@ function handleSignin(req, res) {
 }
 exports.handleSignin = handleSignin;
 function handleRefreshToken(req, res) {
-    try {
-        const cookies = req.cookies;
-        // data validation: right email/password format avoiding SQL Injection...
-        if (!(cookies === null || cookies === void 0 ? void 0 : cookies.jwt))
-            return res.status(401).json({ error: 'Unauthorized.' });
-        console.log(cookies.jwt);
-        const refreshToken = cookies.jwt;
-        const foundUser = (0, users_model_1.getCurrentUserRefreshToken)(refreshToken); //user.id, refreshToke
-        if (!foundUser)
-            return res.status(403).json({ error: 'Forbidden.' });
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-            // if (err || foundUser.name !== decoded.name) return res.status(403).json({ error: 'Forbidden.'}); // invalid token
-            // 30s as a test only, then let's keep it 15m
-            const accessToken = jwt.sign({ "username": decoded.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s' });
-            res.json({ accessToken });
-        });
-    }
-    catch (error) {
-        res.status(500).json({ error: 'error during handleRefreshToken attempt' });
-    }
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const cookies = req.cookies;
+            if (!(cookies === null || cookies === void 0 ? void 0 : cookies.jwt))
+                return res.status(401).json({ error: 'Unauthorized.' });
+            const refreshToken = cookies.jwt;
+            const foundUser = (yield (0, users_model_1.getCurrentUserRefreshToken)(refreshToken)) || [];
+            if (!foundUser)
+                return res.status(403).json({ error: 'Forbidden.' });
+            jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+                // if (err || foundUser.name !== decoded.name) return res.status(403).json({ error: 'Forbidden.'}); // invalid token
+                if (err)
+                    return res.status(403).json({ error: 'Forbidden.' }); // invalid token
+                // 30s as a test only, then let's keep it 15m
+                const accessToken = jwt.sign({ "username": decoded.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30s' });
+                res.json({ accessToken });
+            });
+        }
+        catch (error) {
+            res.status(500).json({ error: 'error during handleRefreshToken attempt' });
+        }
+    });
 }
 exports.handleRefreshToken = handleRefreshToken;
+function handleLogout(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // on client (FE) also deletes the accessToken
+        try {
+            const cookies = req.cookies;
+            if (!(cookies === null || cookies === void 0 ? void 0 : cookies.jwt))
+                return res.status(204).json({ message: 'Successful. No content' });
+            const refreshToken = cookies.jwt;
+            const foundUser = yield (0, users_model_1.getCurrentUserRefreshToken)(refreshToken || []); //user.id, refreshToke
+            if (!foundUser) {
+                res.clearCookie('jwt', { httpOnly: true });
+                return res.status(204).json({ message: 'Successful. No content' });
+            }
+            const currentUser = (yield (0, users_model_1.deleteCurrentUserRefreshToken)(refreshToken)) || []; //user.id, refreshToke
+            if (!currentUser)
+                return res.status(204).json({ message: 'Successful. No content' });
+            // res.clearCookie('jwt', { httpOnly: true, secure: true }); // option only for production where we use https
+            res.clearCookie('jwt', { httpOnly: true }); // no "secure: true" option only for dev where we use http only
+            res.status(204).json({ message: 'Successful. No content' });
+        }
+        catch (error) {
+            res.status(500).json({ error: 'error during handleRefreshToken attempt' });
+        }
+    });
+}
+exports.handleLogout = handleLogout;
 function formatCPF(cpf) {
     // let's keep only the numbers
     cpf = cpf.replace(/[^\d]/g, '');

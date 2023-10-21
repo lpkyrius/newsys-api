@@ -55,7 +55,7 @@ async function handleSignin(req: Request, res: Response) {
                     const accessToken = jwt.sign(
                         { "username": user.username },
                         process.env.ACCESS_TOKEN_SECRET,
-                        { expiresIn: '30s' }
+                        { expiresIn: '15m' }
                     );
                     const refreshToken = jwt.sign(
                         { "username": user.username },
@@ -63,7 +63,6 @@ async function handleSignin(req: Request, res: Response) {
                         { expiresIn: '1d' }
                     );
                     // temporary comment
-                    console.log('Degug handleSignin / saveCurrentUserRefreshToken is not implemented yet!!!');
                     await saveCurrentUserRefreshToken(user.id, refreshToken);
                     res.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }); // 1 day
                     res.status(200).json({ accessToken }); 
@@ -83,14 +82,10 @@ async function handleRefreshToken(req: Request, res: Response) {
     try {
 
         const cookies = req.cookies;
-
         if (!cookies?.jwt) return res.status(401).json({ error: 'Unauthorized.'});
-        console.log(cookies.jwt);
         const refreshToken = cookies.jwt;
-
         const foundUser = await getCurrentUserRefreshToken(refreshToken) || []; 
         if (!foundUser) return res.status(403).json({ error: 'Forbidden.'});
-
         jwt.verify(
             refreshToken,
             process.env.REFRESH_TOKEN_SECRET,
@@ -119,17 +114,14 @@ async function handleLogout(req: Request, res: Response) {
     try {
 
         const cookies = req.cookies;
-
         if (!cookies?.jwt) return res.status(204).json({ message: 'Successful. No content'});
-        console.log(cookies.jwt);
         const refreshToken = cookies.jwt;
-
         const foundUser = await getCurrentUserRefreshToken(refreshToken || []); //user.id, refreshToke
         if (!foundUser) {
             res.clearCookie('jwt', { httpOnly: true });
             return res.status(204).json({ message: 'Successful. No content'});
         }
-
+        
         const currentUser = await deleteCurrentUserRefreshToken(refreshToken) || []; //user.id, refreshToke
         if (!currentUser) return res.status(204).json({ message: 'Successful. No content'});
         // res.clearCookie('jwt', { httpOnly: true, secure: true }); // option only for production where we use https

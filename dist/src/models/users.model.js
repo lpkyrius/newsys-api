@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCurrentUserRefreshToken = exports.saveCurrentUserRefreshToken = exports.deleteUser = exports.resetLoginPassword = exports.deleteUserVerification = exports.getUserVerificationById = exports.newUserVerification = exports.updateEmail = exports.getKeyAlreadyUsedByAnotherId = exports.getUserByKey = exports.confirmUser = exports.signinUser = exports.updateUser = exports.getUserById = exports.registerUser = exports.getAllUsers = void 0;
+exports.deleteCurrentUserRefreshToken = exports.getCurrentUserRefreshToken = exports.saveCurrentUserRefreshToken = exports.deleteUser = exports.resetLoginPassword = exports.deleteUserVerification = exports.getUserVerificationById = exports.newUserVerification = exports.updateEmail = exports.getKeyAlreadyUsedByAnotherId = exports.getUserByKey = exports.confirmUser = exports.signinUser = exports.updateUser = exports.getUserById = exports.registerUser = exports.getAllUsers = void 0;
 const { db } = require('../services/postgresql');
 function getAllUsers() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -196,19 +196,16 @@ exports.updateUser = updateUser;
 function saveCurrentUserRefreshToken(userId, refreshToken) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // const {name, cpf } = userData
-            // const updatedUser = await db('users')
-            //     .where('id', '=', userId)
-            //     .update({
-            //         name: name,
-            //         cpf: cpf,
-            //         updated_at: new Date()
-            //       })
-            //     .returning('*');
-            return userId;
+            const tokenData = yield db('refresh_tokens')
+                .insert({
+                user_id: userId,
+                refresh_token: refreshToken
+            })
+                .returning('*');
+            return tokenData;
         }
         catch (error) {
-            console.log(`Error in updateUser(): ${error}`);
+            console.log(`Error in saveCurrentUserRefreshToken(): ${error}`);
             throw error;
         }
     });
@@ -217,25 +214,34 @@ exports.saveCurrentUserRefreshToken = saveCurrentUserRefreshToken;
 function getCurrentUserRefreshToken(refreshToken) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // 2 parameters? getCurrentUserRefreshToken(userId, refreshToken)
-            // const {name, cpf } = userData
-            // const updatedUser = await db('users')
-            //     .where('id', '=', userId)
-            //     .update({
-            //         name: name,
-            //         cpf: cpf,
-            //         updated_at: new Date()
-            //       })
-            //     .returning('*');
-            // return user;
+            const tokenData = yield db('refresh_tokens')
+                .select('*').from('refresh_tokens')
+                .where('refresh_token', '=', refreshToken);
+            return tokenData;
         }
         catch (error) {
-            console.log(`Error in updateUser(): ${error}`);
+            console.log(`Error in getCurrentUserRefreshToken(): ${error}`);
             throw error;
         }
     });
 }
 exports.getCurrentUserRefreshToken = getCurrentUserRefreshToken;
+function deleteCurrentUserRefreshToken(refreshToken) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const deletedTokenData = yield db('refresh_tokens')
+                .where({ refresh_token: refreshToken })
+                .del()
+                .returning("user_id");
+            return deletedTokenData;
+        }
+        catch (error) {
+            console.log(`Error in getCurrentUserRefreshToken(): ${error}`);
+            throw error;
+        }
+    });
+}
+exports.deleteCurrentUserRefreshToken = deleteCurrentUserRefreshToken;
 function updateEmail(userId, oldEmail, userData) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
