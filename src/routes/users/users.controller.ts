@@ -559,6 +559,18 @@ function checkUserName(name: string) {
     }
 }
 
+function checkUserPwd(pwd: string) {
+    // At least one lower case, one upper case, one digit and one special character. 
+    // Size between 8 to 24
+    const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
+    //if(/^[A-Za-z\s]{3,100}$/.test(name)) {
+    if(PWD_REGEX.test(pwd)) {
+        return true; // valid
+    } else {
+        return false; // invalid
+    }
+}
+
 function checkEmail(email: string) {
     if(!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
         return false; // invalid
