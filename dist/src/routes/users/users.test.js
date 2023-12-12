@@ -163,7 +163,7 @@ describe('Users API', () => {
             }));
         });
     });
-    // usersRouter.post('/users/signin',     handleSignin); 
+    // usersRouter.post('/users/signin',     handleLogin); 
     describe('Test POST /users/signIn', () => {
         test('It should respond with 400 Bad Request due to user not validated yet', () => __awaiter(void 0, void 0, void 0, function* () {
             const response = yield (0, supertest_1.default)(app_1.default)

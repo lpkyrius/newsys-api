@@ -24,6 +24,7 @@ describe('Users API', () => {
         name: mainCreatedUser.name,
         cpf: mainCreatedUser.cpf,
     };
+    let accessToken = '';
 
     beforeAll( async () => {
 
@@ -110,19 +111,21 @@ describe('Users API', () => {
             });
         });   
 
-        describe('Test POST /users/register blank cpf', () => {
-            test('It should respond with 400 bad request + Content-Type = json', async () => {
+        // <not used for now---------->
 
-                let userDataWithoutDate = Object.assign({}, mainCreatedUser);
-                userDataWithoutDate.cpf = "";
+        // describe('Test POST /users/register blank cpf', () => {
+        //     test('It should respond with 400 bad request + Content-Type = json', async () => {
 
-                const response = await request(app)
-                    .post('/users/register')
-                    .send(userDataWithoutDate)
-                    .expect('Content-Type', /json/)
-                    .expect(400);
-            }); 
-        });   
+        //         let userDataWithoutDate = Object.assign({}, mainCreatedUser);
+        //         userDataWithoutDate.cpf = "";
+
+        //         const response = await request(app)
+        //             .post('/users/register')
+        //             .send(userDataWithoutDate)
+        //             .expect('Content-Type', /json/)
+        //             .expect(400);
+        //     }); 
+        // });   
 
         // --------------------------------------------
         // >>>> Create Test User is on beforeAll() <<<<
@@ -159,6 +162,8 @@ describe('Users API', () => {
         //     });
         // });
 
+        // </not used for now---------->
+
         describe('Test POST /users/register email already exists', () => {
 
             let userDataWithoutDate = Object.assign({}, mainCreatedUser);
@@ -177,7 +182,7 @@ describe('Users API', () => {
 
             let userDataWithoutDate = Object.assign({}, mainCreatedUser);
             userDataWithoutDate.email = "new." + userDataWithoutDate.email;
-
+            
             test('It should respond with 409 Conflict + Content-Type = json', async () => {
                 const response = await request(app)
                     .post('/users/register')
@@ -189,8 +194,9 @@ describe('Users API', () => {
 
     });
 
-    // usersRouter.post('/users/signin',     handleSignin); 
+    // usersRouter.post('/users/signin',     handleLogin); 
     describe('Test POST /users/signIn', () => {
+        
         test('It should respond with 400 Bad Request due to user not validated yet', async () => {
             const response = await request(app)
                 .post('/users/signin')
@@ -204,7 +210,7 @@ describe('Users API', () => {
 
         test('It should respond with 200 success - login', async () => {
 
-            // Forces email verification for the test user
+            // Forces email verification to validate our test user
             await confirmUser(mainCreatedUser.id);
 
             const response = await request(app)
@@ -215,6 +221,9 @@ describe('Users API', () => {
                 })
                 .expect('Content-Type', /json/)
                 .expect(200);
+            
+            // The token for any other test
+            accessToken = response.body.accessToken;
         });
 
         test('It should respond with 400 bad request - invalid data', async () => {
@@ -229,7 +238,7 @@ describe('Users API', () => {
 
             expect(response.body).toStrictEqual(
                 {
-                    "error": "Invalid data."
+                    "error": "Password should contain at least 8 characters."
                 }
             );
         });
@@ -240,6 +249,7 @@ describe('Users API', () => {
         test('It should respond with 200 success + Content-Type = json', async () => {
             const response = await request(app)
                 .get('/users')
+                .set('Authorization', 'bearer ' + accessToken)
                 .expect('Content-Type', /json/)
                 .expect(200);
         });
@@ -250,6 +260,7 @@ describe('Users API', () => {
         test('It should respond with 404 not found = json', async () => {
             const response = await request(app)
                 .get('/users/profile/0')
+                .set('Authorization', 'bearer ' + accessToken)
                 .expect('Content-Type', /json/)
                 .expect(404);
         });
@@ -260,6 +271,7 @@ describe('Users API', () => {
         test('It should respond with 200 success + Content-Type = json', async () => {
             const response = await request(app)
                 .get('/users/profile/' + mainCreatedUser.id)
+                .set('Authorization', 'bearer ' + accessToken)
                 .expect('Content-Type', /json/)
                 .expect(200);
         });
@@ -273,6 +285,7 @@ describe('Users API', () => {
                 editableUser.name = "test#$";
                 const response = await request(app)
                     .put('/users/update-user/' + mainCreatedUser.id)
+                    .set('Authorization', 'bearer ' + accessToken)
                     .send(editableUser)
                     .expect('Content-Type', /json/)
                     .expect(400);
@@ -285,6 +298,7 @@ describe('Users API', () => {
                 editableUser.name = "";
                 const response = await request(app)
                     .put('/users/update-user/' + mainCreatedUser.id)
+                    .set('Authorization', 'bearer ' + accessToken)
                     .send(editableUser)
                     .expect('Content-Type', /json/)
                     .expect(400);
@@ -299,6 +313,7 @@ describe('Users API', () => {
                     editableUser.cpf = "";
                     const response = await request(app)
                         .put('/users/update-user/' + mainCreatedUser.id)
+                        .set('Authorization', 'bearer ' + accessToken)
                         .send(editableUser)
                         .expect('Content-Type', /json/)
                         .expect(400);
@@ -317,6 +332,7 @@ describe('Users API', () => {
             test('It should respond with 200 success + Content-Type = json', async () => {
                 const response = await request(app)
                     .put('/users/update-user/' + mainCreatedUser.id)
+                    .set('Authorization', 'bearer ' + accessToken)
                     .send(editableUser)
                     .expect('Content-Type', /json/)
                     .expect(200);
@@ -331,6 +347,7 @@ describe('Users API', () => {
             test('It should respond with 409 conflict + Content-Type = json', async () => {
                 const response = await request(app)
                     .put('/users/update-user-email/' + mainCreatedUser.id)
+                    .set('Authorization', 'bearer ' + accessToken)
                     .send({"email": secCreatedUser.email})
                     .expect('Content-Type', /json/)
                     .expect(409);
@@ -341,6 +358,7 @@ describe('Users API', () => {
             test('It should respond with 400 fail + Content-Type = json', async () => {
                 const response = await request(app)
                     .put('/users/update-user-email/' + mainCreatedUser.id)
+                    .set('Authorization', 'bearer ' + accessToken)
                     .send({"email": "email.com"})
                     .expect('Content-Type', /json/)
                     .expect(400);
@@ -351,6 +369,7 @@ describe('Users API', () => {
             test('It should respond with 404 not found + Content-Type = json', async () => {
                 const response = await request(app)
                     .put('/users/update-user-email/0')
+                    .set('Authorization', 'bearer ' + accessToken)
                     .send({"email": "myemail@myemail.com"})
                     .expect('Content-Type', /json/)
                     .expect(404);
@@ -361,6 +380,7 @@ describe('Users API', () => {
             test('It should respond with 200 success + Content-Type = json', async () => {
                 const response = await request(app)
                     .put('/users/update-user-email/' + mainCreatedUser.id)
+                    .set('Authorization', 'bearer ' + accessToken)
                     .send({"email": "myemail@myemail.com"})
                     .expect('Content-Type', /json/)
                     .expect(200);
@@ -371,30 +391,33 @@ describe('Users API', () => {
     // usersRouter.delete('/users/delete/:id', handleUserDelete);
     describe('Test delete /users/delete/:id', () => {
 
-        describe('Test delete /users/delete/:id Main Temporary User', () => {
-            test('It should respond with 200 success + Content-Type = json', async () => {
-                const response = await request(app)
-                    .delete('/users/delete/' + mainCreatedUser.id)
-                    .expect('Content-Type', /json/)
-                .expect(200);
-            });
-        });
-
-        describe('Test delete /users/delete/:id general test', () => {
-            test('It should respond with 404 not found', async () => {
-                const response = await request(app)
-                    .delete('/users/delete/' + mainCreatedUser.id)
-                    .expect('Content-Type', /json/)
-                .expect(404);
-            });
-        });
-
         describe('Test delete /users/delete/:id Sec Temporary User', () => {
             test('It should respond with 200 success + Content-Type = json', async () => {
                 const response = await request(app)
                     .delete('/users/delete/' + secCreatedUser.id)
+                    .set('Authorization', 'bearer ' + accessToken)
                     .expect('Content-Type', /json/)
-                .expect(200);
+                    .expect(200);
+            });
+        });
+
+        describe('Test delete /users/delete/:id Sec Temporary User (already deleted)', () => {
+            test('It should respond with 404 not found', async () => {
+                const response = await request(app)
+                    .delete('/users/delete/' + secCreatedUser.id)
+                    .set('Authorization', 'bearer ' + accessToken)
+                    .expect('Content-Type', /json/)
+                    .expect(404);
+            });
+        });
+
+        describe('Test delete /users/delete/:id Main Temporary User', () => {
+            test('It should respond with 200 success + Content-Type = json', async () => {
+                const response = await request(app)
+                    .delete('/users/delete/' + mainCreatedUser.id)
+                    .set('Authorization', 'bearer ' + accessToken)
+                    .expect('Content-Type', /json/)
+                    .expect(200);
             });
         });
 

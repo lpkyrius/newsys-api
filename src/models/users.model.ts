@@ -290,6 +290,11 @@ async function deleteUser(id) {
 
         // 2 - Delete User & Login info
         const deletedUserInfo = await db.transaction(async (trx) => {
+            const deletedToken = await trx('refresh_tokens')
+                .where({ user_id: id })
+                .del()
+                .returning("id");
+                
             const deletedLogin = await trx('login')
                 .where({ id: id })
                 .del()

@@ -334,6 +334,10 @@ function deleteUser(id) {
             yield deleteUserVerification(id);
             // 2 - Delete User & Login info
             const deletedUserInfo = yield db.transaction((trx) => __awaiter(this, void 0, void 0, function* () {
+                const deletedToken = yield trx('refresh_tokens')
+                    .where({ user_id: id })
+                    .del()
+                    .returning("id");
                 const deletedLogin = yield trx('login')
                     .where({ id: id })
                     .del()

@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express'; 
 
 import  {
-    handleSignin,
+    handleLogin,
     handleRegister,
     httpRenderForgotPassword,
     httpPostForgotPassword,
@@ -22,7 +22,7 @@ const usersRouter = express.Router();
 
 import verifyJWT from '../../middleware/verifyJWT';
 
-usersRouter.post  ('/users/signin', handleSignin); 
+usersRouter.post  ('/users/signin', handleLogin); 
 usersRouter.post  ('/users/register', handleRegister); 
 usersRouter.get   ('/users/forgot-password', httpRenderForgotPassword);
 usersRouter.post  ('/users/forgot-password', httpPostForgotPassword);

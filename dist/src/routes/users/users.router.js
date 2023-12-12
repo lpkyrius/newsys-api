@@ -7,7 +7,7 @@ const express_1 = __importDefault(require("express"));
 const users_controller_1 = require("./users.controller");
 const usersRouter = express_1.default.Router();
 const verifyJWT_1 = __importDefault(require("../../middleware/verifyJWT"));
-usersRouter.post('/users/signin', users_controller_1.handleSignin);
+usersRouter.post('/users/signin', users_controller_1.handleLogin);
 usersRouter.post('/users/register', users_controller_1.handleRegister);
 usersRouter.get('/users/forgot-password', users_controller_1.httpRenderForgotPassword);
 usersRouter.post('/users/forgot-password', users_controller_1.httpPostForgotPassword);
