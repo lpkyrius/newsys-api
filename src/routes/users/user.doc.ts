@@ -82,7 +82,7 @@ const return500 = {
     }
 };
 
-// usersRouter.post  ('/users/signin', handleSignin); 
+// usersRouter.post  ('/users/signin', handleLogin); 
 const usersSignInSchema = {
     post: {
         tags: ["User"],

@@ -1,4 +1,4 @@
-import express from 'express'; 
+import express, { Request, Response, NextFunction } from 'express'; 
 
 import  { 
     httpGetAllGroups 
@@ -6,7 +6,9 @@ import  {
  
 const groupRouter = express.Router();
 
-groupRouter.get('/group', httpGetAllGroups);
+import verifyJWT from '../../middleware/verifyJWT';
+
+groupRouter.get('/group', verifyJWT, httpGetAllGroups);
 
 export default groupRouter;
 
