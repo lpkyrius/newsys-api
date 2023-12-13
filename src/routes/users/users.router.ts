@@ -1,8 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express'; 
-import express, { Request, Response, NextFunction } from 'express'; 
 
 import  {
-    handleLogin,
     handleLogin,
     handleRegister,
     renderForgotPasswordPage,
@@ -25,9 +23,6 @@ const usersRouter = express.Router();
 import verifyJWT from '../../middleware/verifyJWT';
 
 usersRouter.post  ('/users/signin', handleLogin); 
-import verifyJWT from '../../middleware/verifyJWT';
-
-usersRouter.post  ('/users/signin', handleLogin); 
 usersRouter.post  ('/users/register', handleRegister); 
 usersRouter.get   ('/users/confirm-email/:id/:uniqueString', handleRegisterOrUpdateEmailConfirmation);
 usersRouter.get   ('/users/user-message', handleEmailConfirmationVerified); 
@@ -45,4 +40,3 @@ usersRouter.put   ('/users/update-user-email/:id', verifyJWT, httpUpdateUserEmai
 usersRouter.delete('/users/delete/:id', verifyJWT, handleUserDelete); 
 
 export default usersRouter;
-

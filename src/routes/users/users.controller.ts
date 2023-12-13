@@ -16,10 +16,6 @@ import {
     saveCurrentUserRefreshToken,
     getCurrentUserRefreshToken,
     deleteCurrentUserRefreshToken
-    deleteUser,
-    saveCurrentUserRefreshToken,
-    getCurrentUserRefreshToken,
-    deleteCurrentUserRefreshToken
 } from '../../models/users.model';
 
 const passwordSize = Number(process.env.PASSWORD_MIN_SIZE || 8);
@@ -29,10 +25,8 @@ const nodemailer = require('nodemailer');
 const {v4: uuidv4} = require('uuid');
 require('dotenv').config();
 const path = require("path"); // path for static verified page
-const path = require("path"); // path for static verified page
 const jwt = require('jsonwebtoken');
 
-async function handleLogin(req: Request, res: Response) {
 async function handleLogin(req: Request, res: Response) {
     try {
         let {email, password } = req.body;
@@ -129,8 +123,6 @@ async function handleLogout(req: Request, res: Response) {
     } catch (error) {
         console.error(`handleLogout Error-> ${error}`);
         res.status(500).json({ error: 'error during handleLogout attempt' });
-        console.error(`handleLogout Error-> ${error}`);
-        res.status(500).json({ error: 'error during handleLogout attempt' });
     }
 }
 
@@ -166,36 +158,13 @@ async function handleRegister(req: Request, res: Response) {
         sendConfirmationEmail(req, res, email, registeredUser[0].id, 'register');
         
         return res.status(201).json(registeredUser[0]);
-
-        if (!checkUserName(name))
-            return res.status(400).json({ error: 'invalid name' });
-        if (!checkEmail(email))
-            return res.status(400).json({ error: 'Invalid email' });
-        if (!checkPassword(password))
-            return res.status(400).json({ error: `Password should contain at least ${ passwordSize } characters.` });
-        if (!CheckCPF(cpf))
-            return res.status(400).json({ error: 'invalid cpf' });
-        if (await checkCpfExists(cpf))
-            return res.status(409).json({ error: 'cpf already in use, try to log in ou reset your password' });
-        if (await checkEmailExists(email))
-            return res.status(409).json({ error: 'email already in use, try to log in ou reset your password' });
-
-        password = bcrypt.hashSync(password, saltRounds);
-        const userData = { email, name, cpf, created_at, password };
-        const registeredUser = await registerUser(userData);
-
-        sendConfirmationEmail(req, res, email, registeredUser[0].id, 'register');
-        
-        return res.status(201).json(registeredUser[0]);
         
     } catch (error) {
-        console.error(`handleRegister Error-> ${error}`);
         console.error(`handleRegister Error-> ${error}`);
         res.status(500).json({ error: 'error during user registration.' });
     }
 }
 
-// Send confirmation email when a new user sign on
 // Send confirmation email when a new user sign on
 const sendConfirmationEmail = async (req: Request, res: Response, email: string, userId: number, goal: string) => {
     try {
@@ -349,14 +318,12 @@ function handleEmailConfirmationError(req: Request, res: Response, message: stri
 }
 
 // Handle user confirmation: 
-// Handle user confirmation: 
 // it returns the confirmation email from:
 // user register || update user email 
 async function handleRegisterOrUpdateEmailConfirmation(req: Request, res: Response) {
     await processEmailConfirmation(req, res, 'register_or_update_email');
 }
 
-// Handle user confirmation: 
 // Handle user confirmation: 
 // it returns the confirmation email from:
 // forgot password 
@@ -454,11 +421,6 @@ async function listAllUsers(req: Request, res: Response) {
 
         return res.status(404).json({ error: 'Can not find user.' });
     
-        if (recoveredUsers.length) 
-            return res.status(200).json(recoveredUsers);
-
-        return res.status(404).json({ error: 'Can not find user.' });
-    
     } catch (error) {
         console.error(`listAllUsers Error-> ${error}`);
         res.status(500).json({ error: 'Failed recovering users.' });
@@ -470,9 +432,7 @@ async function httpGetUser(req: Request, res: Response) {
         const key = req.params;
         // Validation
         if (isNaN(Number(key.id)))
-        if (isNaN(Number(key.id)))
             return res.status(400).json({ error: 'the ID must be a number'});
-
 
         const recoveredUser = await getUserByKey(key);
         if (recoveredUser.length) 
@@ -480,14 +440,8 @@ async function httpGetUser(req: Request, res: Response) {
 
         return res.status(404).json({ error: 'user not found' });
 
-        if (recoveredUser.length) 
-            return res.status(200).json(recoveredUser[0]);
-
-        return res.status(404).json({ error: 'user not found' });
-
         
     } catch (error) {
-        console.error(`httpGetUser Error-> ${error}`);
         console.error(`httpGetUser Error-> ${error}`);
         res.status(500).json({ error: 'error attempting to access the user' });
     }
@@ -520,27 +474,7 @@ async function httpUpdateUser(req: Request, res: Response) {
         return res.status(404).json({ error: 'user not found' });
 
 
-        cpf = formatCPF(cpf); 
-
-        if (isNaN(Number(userId)))
-            return res.status(400).json({ error: 'the ID must be a number'});
-        if (!checkUserName(name))
-            return res.status(400).json({ error: 'invalid name' });
-        if (!CheckCPF(cpf))
-            return res.status(400).json({ error: 'invalid cpf' });
-        if (await checkCpfAlreadyUsed(userId,cpf))
-            return res.status(409).json({ error: 'cpf already in use' });
-
-        const userData = { name, cpf };
-        const updatedUser = await updateUser(userId, userData);
-        if (updatedUser.length) 
-            return res.status(200).json(updatedUser[0]);
-
-        return res.status(404).json({ error: 'user not found' });
-
-
     } catch (error) {
-        console.error(`httpUpdateUser Error-> ${error}`);
         console.error(`httpUpdateUser Error-> ${error}`);
         res.status(500).json({error: 'error attempting to update the user'});
     }   
@@ -561,17 +495,7 @@ async function handleUserDelete(req: Request, res: Response) {
 
         return res.status(404).json({ error: 'user not found' });
 
-        if (isNaN(Number(userId)))
-            return res.status(400).json({ error: 'the ID must be a number'});
-
-        const deletedUserInfo = await deleteUser(userId);
-        if (deletedUserInfo) 
-            return res.status(200).json({ message: `User id ${ deletedUserInfo.id } successfully deleted!`});
-
-        return res.status(404).json({ error: 'user not found' });
-
     } catch (error) {
-        console.error(`handleUserDelete Error-> ${error}`);
         console.error(`handleUserDelete Error-> ${error}`);
         res.status(500).json({error: 'error attempting to delete the user'});
     }   
@@ -610,34 +534,7 @@ async function httpUpdateUserEmail(req: Request, res: Response) {
 
         return res.status(400).json({ error: 'error attempting to update the email' });
 
-        if (isNaN(Number(userId)))
-            return res.status(400).json({ error: 'the ID must be a number'});
-        if (!checkEmail(email))
-            return res.status(400).json({ error: 'invalid email.' });
-        if (await checkEmailAlreadyUsed(userId,email))
-            return res.status(409).json({ error: 'email already in use' });
-
-        const recoveredUser = await getUserByKey({ id: userId});
-        if (!recoveredUser.length) 
-            return res.status(404).json({ error: 'user not found' });
-
-        const checkIfEmailChanged = await getUserByKey({id: userId});
-        // To verify if we are actually changing the email or if it's still the same
-        if (checkIfEmailChanged.length && checkIfEmailChanged[0].email == email)
-            return res.status(200).json(checkIfEmailChanged[0]);
-
-        // update email and update verified=false in order to force validate the email again
-        const userData = { email: email, verified: false };
-        const updatedUser = await updateEmail(userId, checkIfEmailChanged[0].email, userData);
-        if (updatedUser.length) {
-            await sendConfirmationEmail(req, res, email, updatedUser[0].id,'update-user-email');
-            return res.status(200).json(updatedUser[0]);
-        } 
-
-        return res.status(400).json({ error: 'error attempting to update the email' });
-
     } catch (error) {
-        console.error(`httpUpdateUserEmail Error-> ${error}`);
         console.error(`httpUpdateUserEmail Error-> ${error}`);
         res.status(500).json({error: 'error attempting to update the email'});
     }   
@@ -660,42 +557,9 @@ async function postForgotPasswordEmail(req: Request, res: Response){
             return;
         }
         if (!checkEmail(email)){
-            return;
-        }
-        if (!checkEmail(email)){
             messageQueryString = `?error=true&message=
             Invalid email.`;
             handleEmailConfirmationError(req, res, messageQueryString);
-            return;
-        }
-
-        const recoveredUser = await getUserByKey({ email: email });
-        if (!recoveredUser.length) {
-            messageQueryString = `?error=true&message=
-            Invalid email.`;
-            handleEmailConfirmationError(req, res, messageQueryString);
-            return;
-        }
-
-        const loginData = {
-            email: email,
-            action: 'reset-password'
-        };
-        const login = await signinUser(loginData, bcrypt, saltRounds) || [];
-        if (!login.length){
-            messageQueryString = `?error=true&message=
-            User not found.`;
-            handleEmailConfirmationError(req, res, messageQueryString);
-            return;
-        }
-
-        // Create a one time link valid for 30 minutes (inside sendConfirmationEmail() )
-        // Send confirmation email
-        sendConfirmationEmail(req, res, email, recoveredUser[0].id, 'reset-password');                    
-        messageQueryString = `?error=false&message=
-        The link to reset your password has been sent to your email.`;
-        handleEmailConfirmationError(req, res, messageQueryString);
-     
             return;
         }
 
@@ -746,24 +610,15 @@ async function postResetPassword(req: Request, res: Response){
             return;
         }
         if (isNaN(Number(id))){
-            return;
-        }
-        if (isNaN(Number(id))){
             messageQueryString = `?error=true&message=
             Invalid ID.`;
             handleEmailConfirmationError(req, res, messageQueryString);
             return;
         }
         if (password.length < passwordSize){
-            return;
-        }
-        if (password.length < passwordSize){
             messageQueryString = `?error=true&message=
             Password must contain at least ${ passwordSize } characters.`;
             handleEmailConfirmationError(req, res, messageQueryString);
-            return;
-        }
-        if (password !== password2){
             return;
         }
         if (password !== password2){
@@ -816,54 +671,7 @@ async function postResetPassword(req: Request, res: Response){
             You can log in now.`;
             handleEmailConfirmationError(req, res, messageQueryString);
                   
-            return;
         }
-           
-        const recoveredUser = await getUserByKey({ id });
-        if (!recoveredUser.length) {
-            messageQueryString = `?error=true&message=
-            Invalid ID.`;
-            handleEmailConfirmationError(req, res, messageQueryString);
-            return;
-        }
-
-        const loginData = {
-            email: recoveredUser[0].email,
-            action: 'reset-password'
-        };
-        const login = await signinUser(loginData, bcrypt, saltRounds) || [];
-
-        if (login.length){
-            // Create a one time link valid for 30 minutes
-            const newPassword = bcrypt.hashSync(password, saltRounds);
-            const loginData = { 
-                email: recoveredUser[0].email,
-                password: newPassword
-            };
-            const resetedPassword = await resetLoginPassword(loginData, bcrypt, saltRounds);
-            if (!resetedPassword.email){
-                messageQueryString = `?error=true&message=
-                Error attempting to update your email. <br>
-                Please, review your data and try again.`;
-                handleEmailConfirmationError(req, res, messageQueryString);
-                return;
-            }
-
-            // Just in case the user had registered 
-            // but before confirm his email has requested
-            // reset password - it also update users.updated_at field
-            const updatedUser = await confirmUser(id);
-
-            // The verification record is not necessary any more, 
-            // also should be deleted to avoid using the same link again
-            deleteUserVerification(recoveredUser[0].id);
-            messageQueryString = `?error=false&message=
-            New password defined successfully for ${ resetedPassword.email }. <br>
-            You can log in now.`;
-            handleEmailConfirmationError(req, res, messageQueryString);
-                  
-        }
- 
  
     } catch (error) {
         console.error(`postResetPassword Error-> ${error}`);
@@ -998,137 +806,7 @@ function checkPassword(password: string) {
 }
 // </Block of validation functions----->
 
-// <Block of validation functions----->
-function checkUserName(name: string) {
-    // The number of characters must be between 3 and 100. 
-    // The string should only contain alphanumeric characters and/or underscores (_).
-    // The first character of the string should be alphabetic
-    if (!name)
-        return false;
-    if(/^[A-Za-z\s]{3,100}$/.test(name))
-        return true; 
-
-    return false; 
-}
-
-function checkUserPwd(pwd: string) {
-    // At least one lower case, one upper case, one digit and one special character. 
-    // Size between 8 to 24
-    const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
-    if (!pwd)
-        return false;
-    if(PWD_REGEX.test(pwd)) 
-        return true; 
-
-    return false; 
-
-}
-
-function checkEmail(email: string) {
-    if (!email) return false; 
-    if (email.trim()==='') return false; 
-    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) return false; 
-    if (email.length < 3 || email.length > 100) return false; 
-
-    return true; 
-}
-
-async function checkEmailExists(email: string){
-    const key = { email: email }
-    const exists = await getUserByKey(key);
-    if (exists.length)
-        return true;
-
-    return false;
-}
-
-async function checkCpfExists(cpf: string){
-    const key = { cpf: cpf };
-    const exists = await getUserByKey(key);
-    if (exists.length)
-        return true;
-    
-    return false;
-}
-
-async function checkCpfAlreadyUsed(id: string | number, cpf: string){
-    const idSearch = { id: id };
-    const keySearch = { cpf: cpf };
-    const exists = await getKeyAlreadyUsedByAnotherId(idSearch, keySearch);
-    if (exists.length)
-        return true;
-
-    return false;
-
-}
-
-async function checkEmailAlreadyUsed(id: string | number, email: string){
-    const idSearch = { id: id };
-    const keySearch = { email: email };
-    const exists = await getKeyAlreadyUsedByAnotherId(idSearch, keySearch);
-    if (exists.length)
-        return true;
-
-    return false;
-}
-
-function formatCPF(cpf: string) {
-    // let's keep only the numbers
-    cpf = cpf.replace(/[^\d]/g, '');
-
-    return cpf.slice(0,11);
-}
-
-function CheckCPF(strCPF: string) {
-
-    let Soma: number;
-    let Resto: number;
-    let validaKey: boolean = ((process.env.CPF_VALIDATION || "1") == "1") ? true : false;
-    let i: number = 1;
-
-    if (!validaKey) 
-        return true; // validation has been turned off.
-
-    Soma = 0;
-    if (strCPF == "00000000000") return false;
-
-    for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
-    Resto = (Soma * 10) % 11;
-
-    if ((Resto == 10) || (Resto == 11))  Resto = 0;
-    if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
-
-    Soma = 0;
-    for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
-    Resto = (Soma * 10) % 11;
-
-    if ((Resto == 10) || (Resto == 11))  Resto = 0;
-    if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
-    
-    return true;
-}
-
-function validateEmail(email: string) {
-    if (!email) return false; 
-    if (email.trim()==='') return false; 
-    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) return false; 
-    if (email.length < 3 || email.length > 100) return false;  
-
-    return true; 
-}
-
-function checkPassword(password: string) {
-    if (!password) return false; 
-    if (password.length < passwordSize) return false;
-
-    return true;
-}
-// </Block of validation functions----->
-
 export {
-    handleLogin,
-    handleRefreshToken,
-    handleLogout,
     handleLogin,
     handleRefreshToken,
     handleLogout,
