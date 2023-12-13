@@ -1,36 +1,43 @@
-import express from 'express'; 
+import express, { Request, Response, NextFunction } from 'express'; 
 
 import  {
-    handleSignin,
+    handleLogin,
     handleRegister,
-    httpGetAllUsers,
+    renderForgotPasswordPage,
+    postForgotPasswordEmail,
+    postResetPassword,
+    handleForgotPasswordConfirmationReturn,
+    handleRefreshToken,
+    handleLogout,
+    listAllUsers,
     httpGetUser,
     httpUpdateUser,
     handleRegisterOrUpdateEmailConfirmation,
     httpUpdateUserEmail,
     handleEmailConfirmationVerified,
-    httpRenderForgotPassword,
-    httpPostForgotPassword,
-    httpPostResetPassword,
-    handleForgotPasswordConfirmation,
     handleUserDelete
 } from './users.controller';
 
 const usersRouter = express.Router();
 
-usersRouter.post  ('/users/signin', handleSignin); 
+import verifyJWT from '../../middleware/verifyJWT';
+
+usersRouter.post  ('/users/signin', handleLogin); 
 usersRouter.post  ('/users/register', handleRegister); 
-usersRouter.get   ('/users', httpGetAllUsers); 
-usersRouter.get   ('/users/profile/:id', httpGetUser); 
-usersRouter.put   ('/users/update-user/:id',httpUpdateUser);
-usersRouter.get   ('/users/confirm-email/:id/:uniqueString', handleRegisterOrUpdateEmailConfirmation); 
+usersRouter.get   ('/users/confirm-email/:id/:uniqueString', handleRegisterOrUpdateEmailConfirmation);
 usersRouter.get   ('/users/user-message', handleEmailConfirmationVerified); 
-usersRouter.put   ('/users/update-user-email/:id',httpUpdateUserEmail);
-usersRouter.get   ('/users/forgot-password', httpRenderForgotPassword);
-usersRouter.post  ('/users/forgot-password', httpPostForgotPassword);
-usersRouter.get   ('/users/reset-password/:id/:uniqueString', handleForgotPasswordConfirmation); // httpResetPassword 
-usersRouter.post  ('/users/reset-password/:id/:uniqueString', httpPostResetPassword); // handleForgotPasswordConfirmation
-usersRouter.delete('/users/delete/:id', handleUserDelete); 
+usersRouter.get   ('/users/forgot-password', renderForgotPasswordPage);
+usersRouter.post  ('/users/forgot-password', postForgotPasswordEmail);
+usersRouter.get   ('/users/reset-password/:id/:uniqueString', handleForgotPasswordConfirmationReturn); 
+usersRouter.post  ('/users/reset-password/:id/:uniqueString', postResetPassword); 
+usersRouter.get   ('/users/refresh', handleRefreshToken);
+usersRouter.get   ('/users/logout', handleLogout);
+
+usersRouter.get   ('/users', verifyJWT, listAllUsers); 
+usersRouter.get   ('/users/profile/:id', verifyJWT, httpGetUser); 
+usersRouter.put   ('/users/update-user/:id',verifyJWT, httpUpdateUser); 
+usersRouter.put   ('/users/update-user-email/:id', verifyJWT, httpUpdateUserEmail);
+usersRouter.delete('/users/delete/:id', verifyJWT, handleUserDelete); 
 
 export default usersRouter;
 

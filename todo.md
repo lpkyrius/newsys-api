@@ -4,9 +4,7 @@
 - [x] Documentation for Users email confirmation flow
 - [x] Flag (on/off) CPF validation (.env)
 - [x] Documentation for API Rest (Swagger)
-- [ ] Apply api_key
-- [ ] Documentation for Automated tests
-- [ ] Temporary token to automatically logout users
+- [x] Security Token (JWT) in BE.
 - [ ] Captcha
 
 ## Documents

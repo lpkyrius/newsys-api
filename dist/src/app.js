@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const users_router_1 = __importDefault(require("./routes/users/users.router"));
 const groups_router_1 = __importDefault(require("./routes/groups/groups.router"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const app = (0, express_1.default)();
 var allowedOrigins = ['http://localhost:3000',
     'http://localhost:8000'];
@@ -26,6 +27,7 @@ app.use((0, cors_1.default)({
 }));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
+app.use((0, cookie_parser_1.default)());
 app.set('view engine', 'ejs');
 app.get('/', (req, res) => { res.status(200).send('New SYS - Your Company'); });
 app.use(users_router_1.default);

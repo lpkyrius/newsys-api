@@ -157,6 +157,52 @@ async function updateUser(userId, userData) {
     }
 }
 
+async function saveCurrentUserRefreshToken(userId, refreshToken) {
+    try {
+
+        const tokenData = await db('refresh_tokens')
+            .insert({
+                user_id: userId,
+                refresh_token: refreshToken
+            })
+            .returning('*');
+        return tokenData;  
+              
+    } catch (error) {
+        console.log(`Error in saveCurrentUserRefreshToken(): ${error}`);
+        throw error;
+    }
+}
+
+async function getCurrentUserRefreshToken(refreshToken) {
+    try {
+
+        const tokenData = await db('refresh_tokens')
+        .select('*').from('refresh_tokens')
+            .where('refresh_token', '=', refreshToken);
+        return tokenData;
+
+    } catch (error) {
+        console.log(`Error in getCurrentUserRefreshToken(): ${ error }`);
+        throw error;
+    }
+}
+
+async function deleteCurrentUserRefreshToken(refreshToken) {
+    try {
+
+        const deletedTokenData = await db('refresh_tokens')
+            .where({ refresh_token: refreshToken })
+            .del()
+            .returning("user_id");
+        return deletedTokenData;
+
+    } catch (error) {
+        console.log(`Error in getCurrentUserRefreshToken(): ${ error }`);
+        throw error;
+    }
+}
+
 async function updateEmail(userId, oldEmail, userData) {
     try {
         const updatedUserLogin = await db.transaction(async (trx) => {
@@ -244,6 +290,11 @@ async function deleteUser(id) {
 
         // 2 - Delete User & Login info
         const deletedUserInfo = await db.transaction(async (trx) => {
+            const deletedToken = await trx('refresh_tokens')
+                .where({ user_id: id })
+                .del()
+                .returning("id");
+                
             const deletedLogin = await trx('login')
                 .where({ id: id })
                 .del()
@@ -279,5 +330,8 @@ export {
     getUserVerificationById,
     deleteUserVerification,
     resetLoginPassword,
-    deleteUser
+    deleteUser,
+    saveCurrentUserRefreshToken,
+    getCurrentUserRefreshToken,
+    deleteCurrentUserRefreshToken
 };

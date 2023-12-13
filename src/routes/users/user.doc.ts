@@ -82,7 +82,7 @@ const return500 = {
     }
 };
 
-// usersRouter.post  ('/users/signin', handleSignin); 
+// usersRouter.post  ('/users/signin', handleLogin); 
 const usersSignInSchema = {
     post: {
         tags: ["User"],
@@ -162,17 +162,29 @@ const usersRegisterSchema = {
     }
 };
 
-// usersRouter.get   ('/users', httpGetAllUsers); 
+// usersRouter.get   ('/users', listAllUsers); 
 const usersSchema = {
     get: {
         tags: ["User"],
         summary: "List current users",
         description: "List of all current users",
-        responses:{
+        security: [
+            {
+                bearerAuth: [],
+            },
+        ],
+        responses: {
             200: return200,
             500: return500,
-        } 
-    }
+        },
+    },
+    securityDefinitions: {
+        bearerAuth: {
+            type: "apiKey",
+            name: "Authorization",
+            in: "header",
+        },
+    },
 };
 
 // usersRouter.get   ('/users/profile/:id', httpGetUser); 
@@ -181,6 +193,11 @@ const usersByIdSchema = {
         tags: ["User"],
         summary: "Get user from path id",
         description: "Get user by id",
+        security: [
+            {
+                bearerAuth: [],
+            },
+        ],
         parameters: [
             {
                 name: "id",
@@ -195,7 +212,14 @@ const usersByIdSchema = {
             404: return404,
             500: return500,
         } 
-    }
+    },
+    securityDefinitions: {
+        bearerAuth: {
+            type: "apiKey",
+            name: "Authorization",
+            in: "header",
+        },
+    },
 };
 
 // usersRouter.put   ('/users/update-user/:id',httpUpdateUser);
@@ -291,16 +315,16 @@ const usersUpdateUserEmailSchema = {
     }
 };
 
-// usersRouter.get   ('/users/forgot-password', httpRenderForgotPassword);
+// usersRouter.get   ('/users/forgot-password', renderForgotPasswordPage);
 //Not an API
 
-// usersRouter.post  ('/users/forgot-password', httpPostForgotPassword);
+// usersRouter.post  ('/users/forgot-password', postForgotPasswordEmail);
 //Not an API
 
-// usersRouter.get   ('/users/reset-password/:id/:uniqueString', handleForgotPasswordConfirmation); // httpResetPassword 
+// usersRouter.get   ('/users/reset-password/:id/:uniqueString', handleForgotPasswordConfirmationReturn); // httpResetPassword 
 //Not an API
 
-// usersRouter.post  ('/users/reset-password/:id/:uniqueString', httpPostResetPassword); // handleForgotPasswordConfirmation
+// usersRouter.post  ('/users/reset-password/:id/:uniqueString', postResetPassword); // handleForgotPasswordConfirmationReturn
 //Not an API
 
 // usersRouter.delete('/users/delete/:id', handleUserDelete); 

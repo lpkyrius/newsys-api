@@ -13,24 +13,15 @@ const options: swaggerJsdoc.options = {
                 url: `${process.env.SERVER_ADDRESS || 'http://localhost'}:${process.env.PORT || 8000}`,
             }
         ],
+        security: [
+            {
+                bearerAuth: [],
+            },
+        ],
         info: {
             title: 'REST API Docs',
             version: '1.0.0'
         },
-        components:{
-            securitySchemas:{
-                bearerAuth:{
-                    type: 'http',
-                    scheme: 'bearer',
-                    bearerFormat: 'JWT'
-                }
-            }
-        },
-        security:[
-            {
-                bearerAuth: [],
-            }
-        ],
         tags: [
             {
                 name: "User",
@@ -39,7 +30,21 @@ const options: swaggerJsdoc.options = {
         ],
         paths: userRouteDoc,
     },
-    apis: ['../routes/users/users.router.js', '../routes/groups/groups.router.js']
+    components: {
+        securitySchemas: {
+            bearerAuth: {
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT',
+            },
+        },
+    },
+    security: [
+        {
+            bearerAuth: [],
+        },
+    ],
+    apis: ['../../dist/src/routes/users/users.router.js', '../../dist/src/routes/groups/groups.router.js']
 }
 
 const swaggerSpec = swaggerJsdoc(options);
@@ -50,7 +55,7 @@ function swaggerDocs(app: Express){
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
     // Docs in JSON format
-    app.get('api-docs.json', (req: Request, res: Response) => {
+    app.get('/api-docs.json', (req: Request, res: Response) => {
         res.setHeader('Content-Type', 'application/json');
         res.send(swaggerSpec);
     });
