@@ -8,6 +8,8 @@ const users_controller_1 = require("./users.controller");
 const usersRouter = express_1.default.Router();
 const verifyJWT_1 = __importDefault(require("../../middleware/verifyJWT"));
 usersRouter.post('/users/signin', users_controller_1.handleLogin);
+const verifyJWT_1 = __importDefault(require("../../middleware/verifyJWT"));
+usersRouter.post('/users/signin', users_controller_1.handleLogin);
 usersRouter.post('/users/register', users_controller_1.handleRegister);
 usersRouter.get('/users/confirm-email/:id/:uniqueString', users_controller_1.handleRegisterOrUpdateEmailConfirmation);
 usersRouter.get('/users/user-message', users_controller_1.handleEmailConfirmationVerified);

@@ -1,6 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express'; 
+import express, { Request, Response, NextFunction } from 'express'; 
 
 import  {
+    handleLogin,
     handleLogin,
     handleRegister,
     renderForgotPasswordPage,
@@ -20,6 +22,9 @@ import  {
 
 const usersRouter = express.Router();
 
+import verifyJWT from '../../middleware/verifyJWT';
+
+usersRouter.post  ('/users/signin', handleLogin); 
 import verifyJWT from '../../middleware/verifyJWT';
 
 usersRouter.post  ('/users/signin', handleLogin); 

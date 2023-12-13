@@ -18,7 +18,9 @@ const nodemailer = require('nodemailer');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const path = require("path"); // path for static verified page
+const path = require("path"); // path for static verified page
 const jwt = require('jsonwebtoken');
+function handleLogin(req, res) {
 function handleLogin(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -100,9 +102,12 @@ function handleLogout(req, res) {
         catch (error) {
             console.error(`handleLogout Error-> ${error}`);
             res.status(500).json({ error: 'error during handleLogout attempt' });
+            console.error(`handleLogout Error-> ${error}`);
+            res.status(500).json({ error: 'error during handleLogout attempt' });
         }
     });
 }
+exports.handleLogout = handleLogout;
 exports.handleLogout = handleLogout;
 function handleRegister(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -130,14 +135,33 @@ function handleRegister(req, res) {
             const registeredUser = yield (0, users_model_1.registerUser)(userData);
             sendConfirmationEmail(req, res, email, registeredUser[0].id, 'register');
             return res.status(201).json(registeredUser[0]);
+            if (!checkUserName(name))
+                return res.status(400).json({ error: 'invalid name' });
+            if (!checkEmail(email))
+                return res.status(400).json({ error: 'Invalid email' });
+            if (!checkPassword(password))
+                return res.status(400).json({ error: `Password should contain at least ${passwordSize} characters.` });
+            if (!CheckCPF(cpf))
+                return res.status(400).json({ error: 'invalid cpf' });
+            if (yield checkCpfExists(cpf))
+                return res.status(409).json({ error: 'cpf already in use, try to log in ou reset your password' });
+            if (yield checkEmailExists(email))
+                return res.status(409).json({ error: 'email already in use, try to log in ou reset your password' });
+            password = bcrypt.hashSync(password, saltRounds);
+            const userData = { email, name, cpf, created_at, password };
+            const registeredUser = yield (0, users_model_1.registerUser)(userData);
+            sendConfirmationEmail(req, res, email, registeredUser[0].id, 'register');
+            return res.status(201).json(registeredUser[0]);
         }
         catch (error) {
+            console.error(`handleRegister Error-> ${error}`);
             console.error(`handleRegister Error-> ${error}`);
             res.status(500).json({ error: 'error during user registration.' });
         }
     });
 }
 exports.handleRegister = handleRegister;
+// Send confirmation email when a new user sign on
 // Send confirmation email when a new user sign on
 const sendConfirmationEmail = (req, res, email, userId, goal) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -291,6 +315,7 @@ function handleEmailConfirmationError(req, res, message) {
 }
 exports.handleEmailConfirmationError = handleEmailConfirmationError;
 // Handle user confirmation: 
+// Handle user confirmation: 
 // it returns the confirmation email from:
 // user register || update user email 
 function handleRegisterOrUpdateEmailConfirmation(req, res) {
@@ -299,6 +324,7 @@ function handleRegisterOrUpdateEmailConfirmation(req, res) {
     });
 }
 exports.handleRegisterOrUpdateEmailConfirmation = handleRegisterOrUpdateEmailConfirmation;
+// Handle user confirmation: 
 // Handle user confirmation: 
 // it returns the confirmation email from:
 // forgot password 
@@ -383,6 +409,9 @@ function listAllUsers(req, res) {
             if (recoveredUsers.length)
                 return res.status(200).json(recoveredUsers);
             return res.status(404).json({ error: 'Can not find user.' });
+            if (recoveredUsers.length)
+                return res.status(200).json(recoveredUsers);
+            return res.status(404).json({ error: 'Can not find user.' });
         }
         catch (error) {
             console.error(`listAllUsers Error-> ${error}`);
@@ -397,13 +426,18 @@ function httpGetUser(req, res) {
             const key = req.params;
             // Validation
             if (isNaN(Number(key.id)))
+            if (isNaN(Number(key.id)))
                 return res.status(400).json({ error: 'the ID must be a number' });
             const recoveredUser = yield (0, users_model_1.getUserByKey)(key);
             if (recoveredUser.length)
                 return res.status(200).json(recoveredUser[0]);
             return res.status(404).json({ error: 'user not found' });
+            if (recoveredUser.length)
+                return res.status(200).json(recoveredUser[0]);
+            return res.status(404).json({ error: 'user not found' });
         }
         catch (error) {
+            console.error(`httpGetUser Error-> ${error}`);
             console.error(`httpGetUser Error-> ${error}`);
             res.status(500).json({ error: 'error attempting to access the user' });
         }
@@ -431,8 +465,22 @@ function httpUpdateUser(req, res) {
             if (updatedUser.length)
                 return res.status(200).json(updatedUser[0]);
             return res.status(404).json({ error: 'user not found' });
+            if (isNaN(Number(userId)))
+                return res.status(400).json({ error: 'the ID must be a number' });
+            if (!checkUserName(name))
+                return res.status(400).json({ error: 'invalid name' });
+            if (!CheckCPF(cpf))
+                return res.status(400).json({ error: 'invalid cpf' });
+            if (yield checkCpfAlreadyUsed(userId, cpf))
+                return res.status(409).json({ error: 'cpf already in use' });
+            const userData = { name, cpf };
+            const updatedUser = yield (0, users_model_1.updateUser)(userId, userData);
+            if (updatedUser.length)
+                return res.status(200).json(updatedUser[0]);
+            return res.status(404).json({ error: 'user not found' });
         }
         catch (error) {
+            console.error(`httpUpdateUser Error-> ${error}`);
             console.error(`httpUpdateUser Error-> ${error}`);
             res.status(500).json({ error: 'error attempting to update the user' });
         }
@@ -450,8 +498,15 @@ function handleUserDelete(req, res) {
             if (deletedUserInfo)
                 return res.status(200).json({ message: `User id ${deletedUserInfo.id} successfully deleted!` });
             return res.status(404).json({ error: 'user not found' });
+            if (isNaN(Number(userId)))
+                return res.status(400).json({ error: 'the ID must be a number' });
+            const deletedUserInfo = yield (0, users_model_1.deleteUser)(userId);
+            if (deletedUserInfo)
+                return res.status(200).json({ message: `User id ${deletedUserInfo.id} successfully deleted!` });
+            return res.status(404).json({ error: 'user not found' });
         }
         catch (error) {
+            console.error(`handleUserDelete Error-> ${error}`);
             console.error(`handleUserDelete Error-> ${error}`);
             res.status(500).json({ error: 'error attempting to delete the user' });
         }
@@ -485,8 +540,30 @@ function httpUpdateUserEmail(req, res) {
                 return res.status(200).json(updatedUser[0]);
             }
             return res.status(400).json({ error: 'error attempting to update the email' });
+            if (isNaN(Number(userId)))
+                return res.status(400).json({ error: 'the ID must be a number' });
+            if (!checkEmail(email))
+                return res.status(400).json({ error: 'invalid email.' });
+            if (yield checkEmailAlreadyUsed(userId, email))
+                return res.status(409).json({ error: 'email already in use' });
+            const recoveredUser = yield (0, users_model_1.getUserByKey)({ id: userId });
+            if (!recoveredUser.length)
+                return res.status(404).json({ error: 'user not found' });
+            const checkIfEmailChanged = yield (0, users_model_1.getUserByKey)({ id: userId });
+            // To verify if we are actually changing the email or if it's still the same
+            if (checkIfEmailChanged.length && checkIfEmailChanged[0].email == email)
+                return res.status(200).json(checkIfEmailChanged[0]);
+            // update email and update verified=false in order to force validate the email again
+            const userData = { email: email, verified: false };
+            const updatedUser = yield (0, users_model_1.updateEmail)(userId, checkIfEmailChanged[0].email, userData);
+            if (updatedUser.length) {
+                yield sendConfirmationEmail(req, res, email, updatedUser[0].id, 'update-user-email');
+                return res.status(200).json(updatedUser[0]);
+            }
+            return res.status(400).json({ error: 'error attempting to update the email' });
         }
         catch (error) {
+            console.error(`httpUpdateUserEmail Error-> ${error}`);
             console.error(`httpUpdateUserEmail Error-> ${error}`);
             res.status(500).json({ error: 'error attempting to update the email' });
         }
@@ -509,13 +586,40 @@ function postForgotPasswordEmail(req, res) {
             Invalid email.`;
                 handleEmailConfirmationError(req, res, messageQueryString);
                 return;
+                return;
             }
+            if (!checkEmail(email)) {
             if (!checkEmail(email)) {
                 messageQueryString = `?error=true&message=
             Invalid email.`;
                 handleEmailConfirmationError(req, res, messageQueryString);
                 return;
+                return;
             }
+            const recoveredUser = yield (0, users_model_1.getUserByKey)({ email: email });
+            if (!recoveredUser.length) {
+                messageQueryString = `?error=true&message=
+            Invalid email.`;
+                handleEmailConfirmationError(req, res, messageQueryString);
+                return;
+            }
+            const loginData = {
+                email: email,
+                action: 'reset-password'
+            };
+            const login = (yield (0, users_model_1.signinUser)(loginData, bcrypt, saltRounds)) || [];
+            if (!login.length) {
+                messageQueryString = `?error=true&message=
+            User not found.`;
+                handleEmailConfirmationError(req, res, messageQueryString);
+                return;
+            }
+            // Create a one time link valid for 30 minutes (inside sendConfirmationEmail() )
+            // Send confirmation email
+            sendConfirmationEmail(req, res, email, recoveredUser[0].id, 'reset-password');
+            messageQueryString = `?error=false&message=
+        The link to reset your password has been sent to your email.`;
+            handleEmailConfirmationError(req, res, messageQueryString);
             const recoveredUser = yield (0, users_model_1.getUserByKey)({ email: email });
             if (!recoveredUser.length) {
                 messageQueryString = `?error=true&message=
@@ -559,25 +663,70 @@ function postResetPassword(req, res) {
             Invalid parameters.`;
                 handleEmailConfirmationError(req, res, messageQueryString);
                 return;
+                return;
             }
+            if (isNaN(Number(id))) {
             if (isNaN(Number(id))) {
                 messageQueryString = `?error=true&message=
             Invalid ID.`;
                 handleEmailConfirmationError(req, res, messageQueryString);
                 return;
+                return;
             }
+            if (password.length < passwordSize) {
             if (password.length < passwordSize) {
                 messageQueryString = `?error=true&message=
             Password must contain at least ${passwordSize} characters.`;
                 handleEmailConfirmationError(req, res, messageQueryString);
                 return;
+                return;
             }
+            if (password !== password2) {
             if (password !== password2) {
                 messageQueryString = `?error=true&message=
             Password and confirmation password do not match.`;
                 handleEmailConfirmationError(req, res, messageQueryString);
                 return;
+                return;
             }
+            const recoveredUser = yield (0, users_model_1.getUserByKey)({ id });
+            if (!recoveredUser.length) {
+                messageQueryString = `?error=true&message=
+            Invalid ID.`;
+                handleEmailConfirmationError(req, res, messageQueryString);
+                return;
+            }
+            const loginData = {
+                email: recoveredUser[0].email,
+                action: 'reset-password'
+            };
+            const login = (yield (0, users_model_1.signinUser)(loginData, bcrypt, saltRounds)) || [];
+            if (login.length) {
+                // Create a one time link valid for 30 minutes
+                const newPassword = bcrypt.hashSync(password, saltRounds);
+                const loginData = {
+                    email: recoveredUser[0].email,
+                    password: newPassword
+                };
+                const resetedPassword = yield (0, users_model_1.resetLoginPassword)(loginData, bcrypt, saltRounds);
+                if (!resetedPassword.email) {
+                    messageQueryString = `?error=true&message=
+                Error attempting to update your email. <br>
+                Please, review your data and try again.`;
+                    handleEmailConfirmationError(req, res, messageQueryString);
+                    return;
+                }
+                // Just in case the user had registered 
+                // but before confirm his email has requested
+                // reset password - it also update users.updated_at field
+                const updatedUser = yield (0, users_model_1.confirmUser)(id);
+                // The verification record is not necessary any more, 
+                // also should be deleted to avoid using the same link again
+                (0, users_model_1.deleteUserVerification)(recoveredUser[0].id);
+                messageQueryString = `?error=false&message=
+            New password defined successfully for ${resetedPassword.email}. <br>
+            You can log in now.`;
+                handleEmailConfirmationError(req, res, messageQueryString);
             const recoveredUser = yield (0, users_model_1.getUserByKey)({ id });
             if (!recoveredUser.length) {
                 messageQueryString = `?error=true&message=
