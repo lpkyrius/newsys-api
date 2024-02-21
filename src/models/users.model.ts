@@ -6,8 +6,8 @@ async function getAllUsers() {
         .select('*').from('users');
         return recoveredUsers;
     } catch (error) {
-    console.log(`Error in getAllUsers(): ${ error }`)
-    throw error;
+        console.log(`Error in getAllUsers(): ${ error }`)
+        throw error;
     }
 }
 
